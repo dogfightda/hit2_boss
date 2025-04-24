@@ -1,5 +1,5 @@
-<!DOCTYPE html>
 
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
@@ -9,7 +9,8 @@
     function downloadCSV() {
       db.ref("bosses").once("value", (snap) => {
         const data = snap.val();
-        let csvContent = "보스ID,보스오픈시간,닉네임\n";
+        let csvContent = "보스ID,보스오픈시간,닉네임
+";
         const sortedBossIds = Object.keys(data).sort((a, b) => {
           const ta = data[a].timestamp || 0;
           const tb = data[b].timestamp || 0;
@@ -20,14 +21,16 @@
           const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
           if (boss.participants) {
             for (const nick in boss.participants) {
-              csvContent += `"${bossId}","${openTime}","${nick}"\n`;
+              csvContent += `"${bossId}","${openTime}","${nick}"
+`;
             }
           } else {
-            csvContent += `"${bossId}","${openTime}",""\n`;
+            csvContent += `"${bossId}","${openTime}",""
+`;
           }
         }
 
-        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const blob = new Blob(["﻿" + csvContent], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -41,7 +44,8 @@
     function downloadCSV() {
       db.ref("bosses").once("value", (snap) => {
         const data = snap.val();
-        let csvContent = "보스ID,보스오픈시간,닉네임\n";
+        let csvContent = "보스ID,보스오픈시간,닉네임
+";
         const sortedBossIds = Object.keys(data).sort((a, b) => {
           const ta = data[a].timestamp || 0;
           const tb = data[b].timestamp || 0;
@@ -52,14 +56,16 @@
           const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
           if (boss.participants) {
             for (const nick in boss.participants) {
-              csvContent += `"${bossId}","${openTime}","${nick}"\n`;
+              csvContent += `"${bossId}","${openTime}","${nick}"
+`;
             }
           } else {
-            csvContent += `"${bossId}","${openTime}",""\n`;
+            csvContent += `"${bossId}","${openTime}",""
+`;
           }
         }
 
-        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const blob = new Blob(["﻿" + csvContent], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -214,13 +220,9 @@
       if (email === "dogfightda@gmail.com" && password === "0716") {
         localStorage.setItem("admin", email);
         alert("관리자 인증 성공!");
-        checkAdmin();
-    window.setTimeout(() => {
-      const deleteAllBtn = document.getElementById("deleteAllButton");
-      if (deleteAllBtn) {
-        deleteAllBtn.style.display = isAdmin() ? "inline-block" : "none";
-      }
-    }, 0);
+        checkAdmin(); // 로그인 후 즉시 체크
+        updateDeleteButtonVisibility(); // 로그인 후 삭제 버튼 상태 즉시 갱신
+        window.location.reload(); // 로그인 후 페이지 새로 고침
       } else {
         alert("이메일 또는 비밀번호가 올바르지 않습니다.");
       }
@@ -247,18 +249,24 @@
         authInfo.style.display = "none";
         adminButton.style.display = "inline-block";
       }
+
+      // 삭제 버튼 즉시 갱신
+      updateDeleteButtonVisibility();
+    }
+
+    function updateDeleteButtonVisibility() {
+      const deleteAllBtn = document.getElementById("deleteAllButton");
+      if (deleteAllBtn) {
+        deleteAllBtn.style.display = isAdmin() ? "inline-block" : "none";
+      }
     }
 
     function logout() {
       localStorage.removeItem("admin");
       alert("로그아웃 되었습니다.");
       checkAdmin();
-    window.setTimeout(() => {
-      const deleteAllBtn = document.getElementById("deleteAllButton");
-      if (deleteAllBtn) {
-        deleteAllBtn.style.display = isAdmin() ? "inline-block" : "none";
-      }
-    }, 0);
+      updateDeleteButtonVisibility();
+      window.location.reload(); // 로그아웃 후 페이지 새로 고침
     }
 
     function openBoss() {
@@ -274,18 +282,31 @@
       if (!nickname) return alert("닉네임을 먼저 저장해주세요!");
       db.ref("bosses/" + bossId + "/score").once("value", (snap) => {
         const score = snap.val() || 0;
-        db.ref("bosses/" + bossId + "/participants/" + nickname).set({ score });
+        db.ref("bosses/" + bossId + "/participants/" + nickname).set({ score }).then(() => {
+          alert(`${nickname} 참여가 완료되었습니다.`);
+          window.location.reload(); // 참여 완료 후 페이지 새로 고침
+        });
       });
     }
 
     function deleteBoss(bossId) {
+      if (!isAdmin()) {
+        alert("관리자만 보스를 삭제할 수 있습니다.");
+        return;
+      }
       if (!confirm(`${bossId} 보스를 삭제하시겠습니까?`)) return;
-      db.ref("bosses/" + bossId).remove();
+      db.ref("bosses/" + bossId).remove().then(() => {
+        alert("보스가 삭제되었습니다.");
+        window.location.reload(); // 삭제 후 페이지 새로 고침
+      });
     }
 
     function deleteParticipant(bossId, nickname) {
       if (!confirm(`${nickname}을(를) 삭제하시겠습니까?`)) return;
-      db.ref("bosses/" + bossId + "/participants/" + nickname).remove();
+      db.ref("bosses/" + bossId + "/participants/" + nickname).remove().then(() => {
+        alert(`${nickname}이(가) 삭제되었습니다.`);
+        window.location.reload(); // 삭제 후 페이지 새로 고침
+      });
     }
 
     function loadBosses() {
@@ -306,7 +327,7 @@
           const disabled = withinTime ? "" : "btn-disabled";
           const label = withinTime ? "참여" : "참여 불가";
 
-          let html = `<div class="boss"><h3>${bossId} <span style=\"font-size:0.9em; color:#666;\">(${new Date(openTime).toLocaleString("ko-KR")})</span>`;
+          let html = `<div class="boss"><h3>${bossId} <span style="font-size:0.9em; color:#666;">(${new Date(openTime).toLocaleString("ko-KR")})</span>`;
           if (isAdmin()) {
             html += ` <span class="admin-delete" onclick="deleteBoss('${bossId}')">[보스 삭제]</span>`;
           }
@@ -333,7 +354,6 @@
       });
     }
 
-    
     function displayTotalScores() {
       db.ref("bosses").once("value", (snap) => {
         const data = snap.val();
@@ -358,71 +378,14 @@
       });
     }
 
-
 window.onload = function () {
   displayTotalScores();
-      const savedNickname = localStorage.getItem("nickname");
-      if (savedNickname) {
-        document.getElementById("nickname").value = savedNickname;
-      }
-      checkAdmin();
-    window.setTimeout(() => {
-      const deleteAllBtn = document.getElementById("deleteAllButton");
-      if (deleteAllBtn) {
-        deleteAllBtn.style.display = isAdmin() ? "inline-block" : "none";
-      }
-    }, 0);
-      loadBosses();
-  const deleteAllBtn = document.getElementById("deleteAllButton");
-  if (deleteAllBtn) {
-    deleteAllBtn.style.display = isAdmin() ? "inline-block" : "none";
+  const savedNickname = localStorage.getItem("nickname");
+  if (savedNickname) {
+    document.getElementById("nickname").value = savedNickname;
   }
-    }
-  
-    function downloadCSV() {
-      db.ref("bosses").once("value", (snap) => {
-        const data = snap.val();
-        let csvContent = "보스ID,보스오픈시간,닉네임\n";
-        const sortedBossIds = Object.keys(data).sort((a, b) => {
-          const ta = data[a].timestamp || 0;
-          const tb = data[b].timestamp || 0;
-          return tb - ta;
-        });
-        for (const bossId of sortedBossIds) {
-          const boss = data[bossId];
-          const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
-          if (boss.participants) {
-            for (const nick in boss.participants) {
-              csvContent += `"${bossId}","${openTime}","${nick}"\n`;
-            }
-          } else {
-            csvContent += `"${bossId}","${openTime}",""\n`;
-          }
-        }
-
-        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "보스참여자목록.csv";
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-    }
-
-
-function confirmAndDeleteAll() {
-  if (!isAdmin()) return;
-  const pw = prompt("비밀번호를 입력하세요:");
-  if (pw === "0716") {
-    if (confirm("정말로 모든 보스를 삭제하시겠습니까?")) {
-      db.ref("bosses").remove().then(() => {
-        alert("전체 삭제 완료");
-      });
-    }
-  } else {
-    alert("비밀번호가 틀렸습니다.");
-  }
+  checkAdmin();
+  loadBosses();
 }
 </script>
 </body>
