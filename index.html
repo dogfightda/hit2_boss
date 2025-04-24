@@ -11,7 +11,7 @@
     .boss { margin-top: 1em; background: #fff; border: 1px solid #ddd; padding: 1em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .participants { margin-top: 0.5em; font-size: 0.9em; color: #333; }
     .admin-delete { color: red; cursor: pointer; margin-left: 1em; }
-    #menu { margin-top: 1.5em; padding: 1em; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
+    .btn-disabled { background: #ccc; color: #666; border: 1px dashed #999; cursor: not-allowed; }
     #adminButton, #authInfo { position: absolute; top: 10px; right: 10px; }
     #authInfo { background: #e8f0fe; padding: 0.5em 1em; border-radius: 6px; display: none; }
   </style>
@@ -24,15 +24,6 @@
   <div id="authInfo">
     <strong>로그인 상태:</strong> <span id="authStatus">-</span>
     <button onclick="logout()">로그아웃</button>
-  </div>
-
-  <div id="menu">
-    <strong>메뉴</strong>:
-    <ul>
-      <li>1. 보스 참여</li>
-      <li>2. 참여자 목록</li>
-      <li id="adminMenu" style="display:none;">3. 관리자 메뉴 (보스 오픈/삭제)</li>
-    </ul>
   </div>
 
   <div>
@@ -86,7 +77,6 @@
 
     function checkAdmin() {
       const adminSection = document.getElementById("adminSection");
-      const adminMenu = document.getElementById("adminMenu");
       const authInfo = document.getElementById("authInfo");
       const adminButton = document.getElementById("adminButton");
 
@@ -94,7 +84,6 @@
 
       const isAdminUser = isAdmin();
       adminSection.style.display = isAdminUser ? "block" : "none";
-      adminMenu.style.display = isAdminUser ? "list-item" : "none";
 
       if (currentUser) {
         authInfo.style.display = "block";
@@ -115,7 +104,8 @@
     function openBoss() {
       const bossId = document.getElementById("bossId").value;
       if (!bossId) return alert("보스 ID를 입력하세요!");
-      db.ref("bosses/" + bossId).set({ open: true });
+      const timestamp = Date.now();
+      db.ref("bosses/" + bossId).set({ open: true, timestamp });
     }
 
     function participate(bossId) {
@@ -124,9 +114,9 @@
       db.ref("bosses/" + bossId + "/participants/" + nickname).set(true);
     }
 
-    function deleteParticipant(bossId, nickname) {
-      if (!confirm(`${nickname}을(를) 삭제하시겠습니까?`)) return;
-      db.ref("bosses/" + bossId + "/participants/" + nickname).remove();
+    function deleteBoss(bossId) {
+      if (!confirm(`${bossId} 보스를 삭제하시겠습니까?`)) return;
+      db.ref("bosses/" + bossId).remove();
     }
 
     function loadBosses() {
@@ -134,10 +124,20 @@
         const data = snap.val();
         const container = document.getElementById("bossList");
         container.innerHTML = "";
+        const now = Date.now();
         for (const bossId in data) {
           const boss = data[bossId];
-          let html = `<div class="boss"><b>${bossId}</b><br>`;
-          html += `<button onclick="participate('${bossId}')">참여</button>`;
+          const openTime = boss.timestamp || 0;
+          const elapsed = now - openTime;
+          const sixHours = 6 * 60 * 60 * 1000;
+          const withinTime = elapsed <= sixHours;
+          const buttonClass = withinTime ? "" : "btn-disabled";
+          const buttonText = withinTime ? "참여" : "참여 불가";
+          let html = `<div class="boss"><b>${bossId}</b>`;
+          if (isAdmin()) {
+            html += ` <span class="admin-delete" onclick="deleteBoss('${bossId}')">[보스 삭제]</span>`;
+          }
+          html += `<br><button class="${buttonClass}" onclick="${withinTime ? `participate('${bossId}')` : `alert('참여 가능 시간이 지났습니다.')`}">${buttonText}</button>`;
           html += `<div class="participants">`;
           if (boss.participants) {
             html += "<ul>";
@@ -156,6 +156,11 @@
           container.innerHTML += html;
         }
       });
+    }
+
+    function deleteParticipant(bossId, nickname) {
+      if (!confirm(`${nickname}을(를) 삭제하시겠습니까?`)) return;
+      db.ref("bosses/" + bossId + "/participants/" + nickname).remove();
     }
 
     window.onload = function() {
