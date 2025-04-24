@@ -72,30 +72,29 @@
       background-color: #f9f9f9;
       color: #222;
       margin: 0;
-      padding: 2rem;
+      padding: 1rem;
     }
 
     header {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
       background-color: #ffffff;
-      padding: 1rem 2rem;
+      padding: 1rem;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     h1 {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       margin: 0;
       color: #333;
     }
 
     #adminButton, #authInfo {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
+      align-self: flex-end;
     }
 
     #authInfo {
@@ -112,11 +111,13 @@
 
     input {
       padding: 0.5rem;
-      margin-right: 0.5rem;
+      margin: 0.3rem 0.5rem 0.3rem 0;
       border: 1px solid #ccc;
       border-radius: 6px;
       background-color: #fff;
       color: #222;
+      width: 100%;
+      max-width: 300px;
     }
 
     button {
@@ -141,11 +142,11 @@
     }
 
     .section {
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
       background: #ffffff;
-      padding: 1.5rem;
+      padding: 1rem;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
     .boss {
@@ -176,8 +177,8 @@
     #scoreSummary {
       background: #ffffff;
       border-radius: 10px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
     #scoreSummary h3 {
@@ -186,6 +187,18 @@
 
     #scoreSummary li {
       color: #333;
+    }
+
+    @media screen and (min-width: 768px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      input {
+        width: auto;
+      }
     }
 </style>
 </head>
