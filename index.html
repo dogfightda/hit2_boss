@@ -1,43 +1,133 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>보탐 참여 시스템</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; padding: 2em; background: #f9f9f9; position: relative; }
-    input, button { padding: 0.5em; margin: 0.3em 0; border: 1px solid #ccc; border-radius: 4px; }
-    .boss { margin-top: 1em; background: #fff; border: 1px solid #ddd; padding: 1em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .participants { margin-top: 0.5em; font-size: 0.9em; color: #333; }
-    .admin-delete { color: red; cursor: pointer; margin-left: 1em; }
-    .btn-disabled { background: #ccc; color: #666; border: 1px dashed #999; cursor: not-allowed; }
-    #adminButton, #authInfo { position: absolute; top: 10px; right: 10px; }
-    #authInfo { background: #e8f0fe; padding: 0.5em 1em; border-radius: 6px; display: none; }
+    body {
+      font-family: 'Segoe UI', 'Pretendard', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: #f5f7fa;
+      color: #333;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    #adminButton, #authInfo {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+    }
+
+    #authInfo {
+      background: #e3f2fd;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      display: none;
+    }
+
+    label, input, button {
+      font-size: 1rem;
+    }
+
+    input {
+      padding: 0.5rem;
+      margin-right: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1565c0;
+    }
+
+    .btn-disabled {
+      background-color: #cfd8dc;
+      color: #666;
+      border: 1px dashed #999;
+      cursor: not-allowed;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .boss {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .boss h3 {
+      margin-top: 0;
+    }
+
+    .participants {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .admin-delete {
+      color: red;
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
   </style>
 </head>
 <body>
-  <h1>🔥 보탐 오픈 및 참여</h1>
+  <header>
+    <h1>🔥 보탐 참여 시스템</h1>
+    <button id="adminButton" onclick="setAdmin()">🔐 관리자 설정</button>
+    <div id="authInfo">
+      로그인: <span id="authStatus">-</span>
+      <button onclick="logout()">로그아웃</button>
+    </div>
+  </header>
 
-  <button id="adminButton" onclick="setAdmin()">🔐 관리자 설정</button>
-
-  <div id="authInfo">
-    <strong>로그인 상태:</strong> <span id="authStatus">-</span>
-    <button onclick="logout()">로그아웃</button>
-  </div>
-
-  <div>
-    <label>닉네임: <input type="text" id="nickname" placeholder="닉네임 입력" /></label>
+  <div class="section">
+    <label>닉네임:
+      <input type="text" id="nickname" placeholder="닉네임 입력" />
+    </label>
     <button onclick="saveNickname()">닉네임 저장</button>
   </div>
 
-  <div id="adminSection" style="display:none;">
-    <label>보스 ID: <input type="text" id="bossId" placeholder="예: 20250424_보탐_카인" /></label>
+  <div id="adminSection" class="section" style="display:none;">
+    <label>보스 ID:
+      <input type="text" id="bossId" placeholder="보스 이름 자유입력" />
+    </label>
     <button onclick="openBoss()">보스 오픈</button>
   </div>
 
-  <h2>✅ 오픈된 보스</h2>
-  <div id="bossList"></div>
+  <div class="section">
+    <h2>✅ 오픈된 보스</h2>
+    <p style="color: #555; font-size: 0.95rem;">⚠️ 보스 오픈 후 6시간 동안만 참여버튼 선택이 가능합니다.</p>
+    <div id="bossList"></div>
+  </div>
 
   <script>
     const firebaseConfig = {
@@ -79,14 +169,13 @@
       const adminSection = document.getElementById("adminSection");
       const authInfo = document.getElementById("authInfo");
       const adminButton = document.getElementById("adminButton");
-
       const currentUser = localStorage.getItem("admin");
 
       const isAdminUser = isAdmin();
       adminSection.style.display = isAdminUser ? "block" : "none";
 
       if (currentUser) {
-        authInfo.style.display = "block";
+        authInfo.style.display = "inline-block";
         adminButton.style.display = "none";
         document.getElementById("authStatus").textContent = currentUser;
       } else {
@@ -119,6 +208,11 @@
       db.ref("bosses/" + bossId).remove();
     }
 
+    function deleteParticipant(bossId, nickname) {
+      if (!confirm(`${nickname}을(를) 삭제하시겠습니까?`)) return;
+      db.ref("bosses/" + bossId + "/participants/" + nickname).remove();
+    }
+
     function loadBosses() {
       db.ref("bosses").on("value", (snap) => {
         const data = snap.val();
@@ -128,16 +222,16 @@
         for (const bossId in data) {
           const boss = data[bossId];
           const openTime = boss.timestamp || 0;
-          const elapsed = now - openTime;
-          const sixHours = 6 * 60 * 60 * 1000;
-          const withinTime = elapsed <= sixHours;
-          const buttonClass = withinTime ? "" : "btn-disabled";
-          const buttonText = withinTime ? "참여" : "참여 불가";
-          let html = `<div class="boss"><b>${bossId}</b>`;
+          const withinTime = (now - openTime) < (6 * 60 * 60 * 1000);
+          const disabled = withinTime ? "" : "btn-disabled";
+          const label = withinTime ? "참여" : "참여 불가";
+
+          let html = `<div class="boss"><h3>${bossId} <span style=\"font-size:0.9em; color:#666;\">(${new Date(openTime).toLocaleString("ko-KR")})</span>`;
           if (isAdmin()) {
             html += ` <span class="admin-delete" onclick="deleteBoss('${bossId}')">[보스 삭제]</span>`;
           }
-          html += `<br><button class="${buttonClass}" onclick="${withinTime ? `participate('${bossId}')` : `alert('참여 가능 시간이 지났습니다.')`}">${buttonText}</button>`;
+          html += `</h3><button class="${disabled}" onclick="${withinTime ? `participate('${bossId}')` : `alert('참여 시간이 지났습니다.')`}">${label}</button>`;
+
           html += `<div class="participants">`;
           if (boss.participants) {
             html += "<ul>";
@@ -152,18 +246,14 @@
           } else {
             html += "참여자 없음";
           }
-          html += `</div></div>`;
+          html += "</div></div>";
+
           container.innerHTML += html;
         }
       });
     }
 
-    function deleteParticipant(bossId, nickname) {
-      if (!confirm(`${nickname}을(를) 삭제하시겠습니까?`)) return;
-      db.ref("bosses/" + bossId + "/participants/" + nickname).remove();
-    }
-
-    window.onload = function() {
+    window.onload = function () {
       const savedNickname = localStorage.getItem("nickname");
       if (savedNickname) {
         document.getElementById("nickname").value = savedNickname;
