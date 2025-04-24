@@ -371,7 +371,7 @@
           if (isAdmin()) {
             html += ` <span class="admin-delete" onclick="deleteBoss('${bossId}')">[보스 삭제]</span>`;
           }
-          html += `</h3><button class="${disabled}" onclick="${withinTime ? `participate('${bossId}')` : `alert('참여 시간이 지났습니다.')`}">${label}</button>`;
+          html += `</h3><button class="${disabled}" onclick="${withinTime ? `participate('${bossId}')` : `alert('참여 시간이 지났습니다.')`}">${label}</button>` + `<button style="margin-left: 10px; background-color: #e91e63; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold;" onclick="cancelParticipation('${bossId}')">취소</button>`;
 
           html += `<div class="participants">`;
           if (boss.participants) {
@@ -510,6 +510,18 @@ function downloadCSV() {
     a.download = "보스참여자목록.csv";
     a.click();
     URL.revokeObjectURL(url);
+  });
+}
+
+
+function cancelParticipation(bossId) {
+  const nickname = localStorage.getItem("nickname");
+  if (!nickname) return alert("닉네임이 저장되어 있지 않습니다.");
+  if (!confirm(`${nickname}님의 참여를 취소하시겠습니까?`)) return;
+
+  db.ref("bosses/" + bossId + "/participants/" + nickname).remove().then(() => {
+    alert("참여가 취소되었습니다.");
+    window.location.reload();
   });
 }
 
