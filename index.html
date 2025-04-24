@@ -17,18 +17,17 @@
   <h1>🔥 보탐 오픈 및 참여</h1>
 
   <div>
-    <label>보스 ID: <input type="text" id="bossId" placeholder="예: 20250424_보탐_카인" /></label>
-    <button onclick="openBoss()">보스 오픈</button>
-  </div>
-
-  <div>
     <label>닉네임: <input type="text" id="nickname" placeholder="닉네임 입력" /></label>
     <button onclick="saveNickname()">닉네임 저장</button>
   </div>
 
   <div>
-    <label>관리자 이메일: <input type="text" id="adminEmail" placeholder="관리자 이메일 입력" /></label>
-    <button onclick="saveAdmin()">관리자 설정</button>
+    <button onclick="promptAdmin()">관리자 설정</button>
+  </div>
+
+  <div id="adminSection" style="display:none;">
+    <label>보스 ID: <input type="text" id="bossId" placeholder="예: 20250424_보탐_카인" /></label>
+    <button onclick="openBoss()">보스 오픈</button>
   </div>
 
   <h2>✅ 오픈된 보스</h2>
@@ -57,16 +56,21 @@
       }
     }
 
-    function saveAdmin() {
-      const email = document.getElementById("adminEmail").value;
+    function promptAdmin() {
+      const email = prompt("관리자 이메일을 입력하세요:");
       if (email) {
         localStorage.setItem("admin", email);
         alert("관리자 설정 완료!");
+        checkAdmin();
       }
     }
 
     function isAdmin() {
       return localStorage.getItem("admin") === "dogfightda@gmail.com";
+    }
+
+    function checkAdmin() {
+      document.getElementById("adminSection").style.display = isAdmin() ? "block" : "none";
     }
 
     function openBoss() {
@@ -115,7 +119,10 @@
       });
     }
 
-    window.onload = loadBosses;
+    window.onload = function() {
+      checkAdmin();
+      loadBosses();
+    }
   </script>
 </body>
 </html>
