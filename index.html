@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Firebase CDN 연결 테스트</title>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js"></script>
+</head>
+<body>
+  <h2>Firebase 연결 상태 확인</h2>
+  <p id="result">데이터를 불러오는 중...</p>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAY6Ff6uZ-iZ7soeuXBU0mtTKKZZ8gAPck",
+      authDomain: "bossraidtracker.firebaseapp.com",
+      databaseURL: "https://bossraidtracker-default-rtdb.firebaseio.com",
+      projectId: "bossraidtracker",
+      storageBucket: "bossraidtracker.appspot.com",
+      messagingSenderId: "975753692062",
+      appId: "1:975753692062:web:0991fb5bcbc52a9d3d0c8f",
+      measurementId: "G-MC8YY38ZP3"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    db.ref("test").once("value").then((snap) => {
+      const val = snap.val();
+      document.getElementById("result").textContent =
+        val !== null ? "✅ Firebase 연결 성공: " + val : "❌ /test 경로에 데이터 없음";
+    }).catch((error) => {
+      document.getElementById("result").textContent = "❌ 오류 발생: " + error.message;
+    });
+  </script>
+</body>
+</html>
