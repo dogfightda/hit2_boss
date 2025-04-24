@@ -369,11 +369,14 @@
           }
         }
 
+        // Sort the scores in descending order
+        const sortedScores = Object.entries(totalScores).sort((a, b) => b[1] - a[1]);
+
         const summaryDiv = document.getElementById("scoreSummary");
         summaryDiv.innerHTML = "<h3>🔥 닉네임별 누적 점수</h3><ul>" + 
-          Object.entries(totalScores)
-                .map(([nick, score]) => `<li><strong>${nick}</strong>: ${score}점</li>`)
-                .join("") + 
+          sortedScores
+            .map(([nick, score]) => `<li><strong>${nick}</strong>: ${score}점</li>`)
+            .join("") + 
           "</ul>";
       });
     }
