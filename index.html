@@ -1,49 +1,121 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Firebase Realtime Database Example</title>
+  <meta charset="UTF-8">
+  <title>보탐 참여 시스템</title>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; padding: 2em; background: #f9f9f9; }
+    input, button { padding: 0.5em; margin: 0.3em 0; border: 1px solid #ccc; border-radius: 4px; }
+    .boss { margin-top: 1em; background: #fff; border: 1px solid #ddd; padding: 1em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .participants { margin-top: 0.5em; font-size: 0.9em; color: #333; }
+    .admin-delete { color: red; cursor: pointer; margin-left: 1em; }
+  </style>
 </head>
 <body>
-  <h1>Firebase Realtime Database Example</h1>
+  <h1>🔥 보탐 오픈 및 참여</h1>
 
-  <button onclick="writeData('John', 'john@example.com')">Write Data</button>
-  <button onclick="readData('John')">Read Data</button>
+  <div>
+    <label>보스 ID: <input type="text" id="bossId" placeholder="예: 20250424_보탐_카인" /></label>
+    <button onclick="openBoss()">보스 오픈</button>
+  </div>
+
+  <div>
+    <label>닉네임: <input type="text" id="nickname" placeholder="닉네임 입력" /></label>
+    <button onclick="saveNickname()">닉네임 저장</button>
+  </div>
+
+  <div>
+    <label>관리자 이메일: <input type="text" id="adminEmail" placeholder="관리자 이메일 입력" /></label>
+    <button onclick="saveAdmin()">관리자 설정</button>
+  </div>
+
+  <h2>✅ 오픈된 보스</h2>
+  <div id="bossList"></div>
 
   <script>
-    // Firebase 구성
     const firebaseConfig = {
       apiKey: "AIzaSyAY6Ff6uZ-iZ7soeuXBU0mtTKKZZ8gAPck",
       authDomain: "bossraidtracker.firebaseapp.com",
       databaseURL: "https://bossraidtracker-default-rtdb.firebaseio.com",
       projectId: "bossraidtracker",
-      storageBucket: "bossraidtracker.firebasestorage.app",
+      storageBucket: "bossraidtracker.appspot.com",
       messagingSenderId: "975753692062",
       appId: "1:975753692062:web:0991fb5bcbc52a9d3d0c8f",
       measurementId: "G-MC8YY38ZP3"
     };
 
-    // Firebase 초기화
     firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    // Realtime Database 참조 가져오기
-    const database = firebase.database();
+    function saveNickname() {
+      const nickname = document.getElementById("nickname").value;
+      if (nickname) {
+        localStorage.setItem("nickname", nickname);
+        alert("닉네임 저장 완료!");
+      }
+    }
 
-    // 데이터 쓰기
-    function writeData(name, email) {
-      firebase.database().ref('users/' + name).set({
-        email: email
+    function saveAdmin() {
+      const email = document.getElementById("adminEmail").value;
+      if (email) {
+        localStorage.setItem("admin", email);
+        alert("관리자 설정 완료!");
+      }
+    }
+
+    function isAdmin() {
+      return localStorage.getItem("admin") === "dogfightda@gmail.com";
+    }
+
+    function openBoss() {
+      const bossId = document.getElementById("bossId").value;
+      if (!bossId) return alert("보스 ID를 입력하세요!");
+      db.ref("bosses/" + bossId).set({ open: true });
+    }
+
+    function participate(bossId) {
+      const nickname = localStorage.getItem("nickname");
+      if (!nickname) return alert("닉네임을 먼저 저장해주세요!");
+      db.ref("bosses/" + bossId + "/participants/" + nickname).set(true);
+    }
+
+    function deleteParticipant(bossId, nickname) {
+      if (!confirm(`${nickname}을(를) 삭제하시겠습니까?`)) return;
+      db.ref("bosses/" + bossId + "/participants/" + nickname).remove();
+    }
+
+    function loadBosses() {
+      db.ref("bosses").on("value", (snap) => {
+        const data = snap.val();
+        const container = document.getElementById("bossList");
+        container.innerHTML = "";
+        for (const bossId in data) {
+          const boss = data[bossId];
+          let html = `<div class="boss"><b>${bossId}</b><br>`;
+          html += `<button onclick="participate('${bossId}')">참여</button>`;
+          html += `<div class="participants">`;
+          if (boss.participants) {
+            html += "<ul>";
+            for (const nick in boss.participants) {
+              html += `<li>${nick}`;
+              if (isAdmin()) {
+                html += ` <span class="admin-delete" onclick="deleteParticipant('${bossId}', '${nick}')">[삭제]</span>`;
+              }
+              html += `</li>`;
+            }
+            html += "</ul>";
+          } else {
+            html += "참여자 없음";
+          }
+          html += `</div></div>`;
+          container.innerHTML += html;
+        }
       });
     }
 
-    // 데이터 읽기
-    function readData(name) {
-      firebase.database().ref('users/' + name).once('value', (snapshot) => {
-        const data = snapshot.val();
-        console.log(data);
-      });
-    }
+    window.onload = loadBosses;
   </script>
 </body>
 </html>
