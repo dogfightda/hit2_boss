@@ -4,8 +4,60 @@
   <meta charset="UTF-8" />
   <title>보탐 참여 시스템</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js">
+    function downloadCSV() {
+      db.ref("bosses").once("value", (snap) => {
+        const data = snap.val();
+        let csvContent = "보스ID,보스오픈시간,닉네임\n";
+        for (const bossId in data) {
+          const boss = data[bossId];
+          const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
+          if (boss.participants) {
+            for (const nick in boss.participants) {
+              csvContent += `"${bossId}","${openTime}","${nick}"\n`;
+            }
+          } else {
+            csvContent += `"${bossId}","${openTime}",""\n`;
+          }
+        }
+
+        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "보스참여자목록.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+</script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js">
+    function downloadCSV() {
+      db.ref("bosses").once("value", (snap) => {
+        const data = snap.val();
+        let csvContent = "보스ID,보스오픈시간,닉네임\n";
+        for (const bossId in data) {
+          const boss = data[bossId];
+          const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
+          if (boss.participants) {
+            for (const nick in boss.participants) {
+              csvContent += `"${bossId}","${openTime}","${nick}"\n`;
+            }
+          } else {
+            csvContent += `"${bossId}","${openTime}",""\n`;
+          }
+        }
+
+        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "보스참여자목록.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+</script>
   <style>
     body {
       font-family: 'Segoe UI', 'Pretendard', sans-serif;
@@ -125,6 +177,8 @@
 
   <div class="section">
     <h2>✅ 오픈된 보스</h2>
+    <p style="color: #555; font-size: 0.95rem;">⚠️ 보스 오픈 후 6시간 동안만 참여버튼 선택이 가능합니다.</p>
+    <button onclick="downloadCSV()">CSV 다운로드</button>
     <p style="color: #555; font-size: 0.95rem;">⚠️ 보스 오픈 후 6시간 동안만 참여버튼 선택이 가능합니다.</p>
     <div id="bossList"></div>
   </div>
@@ -261,6 +315,32 @@
       checkAdmin();
       loadBosses();
     }
-  </script>
+  
+    function downloadCSV() {
+      db.ref("bosses").once("value", (snap) => {
+        const data = snap.val();
+        let csvContent = "보스ID,보스오픈시간,닉네임\n";
+        for (const bossId in data) {
+          const boss = data[bossId];
+          const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
+          if (boss.participants) {
+            for (const nick in boss.participants) {
+              csvContent += `"${bossId}","${openTime}","${nick}"\n`;
+            }
+          } else {
+            csvContent += `"${bossId}","${openTime}",""\n`;
+          }
+        }
+
+        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "보스참여자목록.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+</script>
 </body>
 </html>
