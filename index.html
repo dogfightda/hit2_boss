@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Firebase 테스트</title>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js"></script>
+</head>
+<body>
+  <h2>Firebase 연결 상태:</h2>
+  <p id="result">확인 중...</p>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAY6Ff6uZ-iZ7soeuXBU0mtTKKZZ8gAPck",
+      authDomain: "bossraidtracker.firebaseapp.com",
+      databaseURL: "https://bossraidtracker-default-rtdb.firebaseio.com",
+      projectId: "bossraidtracker",
+      storageBucket: "bossraidtracker.firebasestorage.app",
+      messagingSenderId: "975753692062",
+      appId: "1:975753692062:web:0991fb5bcbc52a9d3d0c8f"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    db.ref(".info/connected").on("value", (snap) => {
+      const el = document.getElementById("result");
+      if (snap.val() === true) {
+        el.textContent = "✅ Firebase 연결 성공!";
+      } else {
+        el.textContent = "❌ Firebase 연결 실패";
+      }
+    });
+  </script>
+</body>
+</html>
