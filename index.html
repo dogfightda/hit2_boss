@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Firebase 연결 테스트 (수정 완료)</title>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js"></script>
+</head>
+<body>
+  <h2>Firebase /test 값 읽기 테스트</h2>
+  <p id="output">값을 불러오는 중...</p>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAY6Ff6uZ-iZ7soeuXBU0mtTKKZZ8gAPck",
+      authDomain: "bossraidtracker.firebaseapp.com",
+      databaseURL: "https://bossraidtracker-default-rtdb.firebaseio.com",
+      projectId: "bossraidtracker",
+      storageBucket: "bossraidtracker.appspot.com",
+      messagingSenderId: "975753692062",
+      appId: "1:975753692062:web:0991fb5bcbc52a9d3d0c8f",
+      measurementId: "G-MC8YY38ZP3"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    db.ref("test").once("value").then((snapshot) => {
+      const val = snapshot.val();
+      document.getElementById("output").textContent = val !== null 
+        ? `✅ Firebase 연결 성공: ${val}`
+        : "❌ /test 경로에 데이터가 없습니다.";
+    }).catch((error) => {
+      document.getElementById("output").textContent = "❌ 오류: " + error.message;
+    });
+  </script>
+</body>
+</html>
