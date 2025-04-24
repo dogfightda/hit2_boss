@@ -6,16 +6,7 @@
 <title>대장길드 참여자 체크</title>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js">
-    function downloadCSV() {
-      db.ref("bosses").once("value", (snap) => {
-        const data = snap.val();
-        let csvContent = "보스ID,보스오픈시간,닉네임
-";
-        const sortedBossIds = Object.keys(data).sort((a, b) => {
-          const ta = data[a].timestamp || 0;
-          const tb = data[b].timestamp || 0;
-          return tb - ta;
-        });
+    );
         for (const bossId of sortedBossIds) {
           const boss = data[bossId];
           const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
@@ -78,22 +69,27 @@
 <style>
     body {
       font-family: 'Segoe UI', 'Pretendard', sans-serif;
+      background-color: #f9f9f9;
+      color: #222;
       margin: 0;
       padding: 2rem;
-      background: #f5f7fa;
-      color: #333;
     }
 
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background-color: #ffffff;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       margin-bottom: 2rem;
     }
 
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       margin: 0;
+      color: #333;
     }
 
     #adminButton, #authInfo {
@@ -107,6 +103,7 @@
       padding: 0.5rem 1rem;
       border-radius: 6px;
       display: none;
+      color: #222;
     }
 
     label, input, button {
@@ -117,7 +114,9 @@
       padding: 0.5rem;
       margin-right: 0.5rem;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 6px;
+      background-color: #fff;
+      color: #222;
     }
 
     button {
@@ -125,8 +124,9 @@
       background-color: #1976d2;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
+      transition: background-color 0.2s ease;
     }
 
     button:hover {
@@ -134,39 +134,60 @@
     }
 
     .btn-disabled {
-      background-color: #cfd8dc;
-      color: #666;
-      border: 1px dashed #999;
+      background-color: #e0e0e0;
+      color: #888;
+      border: 1px dashed #aaa;
       cursor: not-allowed;
     }
 
     .section {
       margin-bottom: 2rem;
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .boss {
-      background: white;
+      background: #fafafa;
       border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
       padding: 1rem;
       margin-bottom: 1rem;
     }
 
     .boss h3 {
       margin-top: 0;
+      color: #222;
     }
 
     .participants {
       margin-top: 0.5rem;
       font-size: 0.9rem;
+      color: #333;
     }
 
     .admin-delete {
-      color: red;
+      color: #d32f2f;
       cursor: pointer;
       margin-left: 0.5rem;
     }
-  </style>
+
+    #scoreSummary {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    #scoreSummary h3 {
+      color: #1976d2;
+    }
+
+    #scoreSummary li {
+      color: #333;
+    }
+</style>
 </head>
 <body>
 <header>
@@ -178,6 +199,7 @@
 </div>
 </header>
 <div id="scoreSummary" style="margin-bottom: 2rem; background: #fff; border-radius: 10px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1);"></div>
+
 <div class="section">
 <label>닉네임:
       <input id="nickname" placeholder="닉네임 입력" type="text"/>
@@ -188,7 +210,9 @@
 <label>보스 ID:<input id="bossId" placeholder="보스 이름 자유입력"/></label><input id="bossScore" placeholder="점수 입력" type="number"/><button onclick="openBoss()">보스 오픈</button></div>
 <div class="section">
 <h2>✅ 오픈된 보스 <span style="font-size: 0.85rem; color: #666;">(보스 오픈 후 6시간 동안만 참여 체크가 가능합니다. 또한 데이터 삭제 필요 시 관리자에게 문의 주세요.)</span></h2>
-<div style="text-align: right;"><!-- <button onclick="downloadCSV()">CSV 다운로드</button> --><button id="deleteAllButton" onclick="confirmAndDeleteAll()" style="margin-left: 10px; background-color: #d32f2f; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">전체 삭제</button></div>
+<div style="text-align: right;"><!-- <button onclick="downloadCSV()">CSV 다운로드</button> --><button onclick="downloadCSV()" style="background-color: #43a047; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold; margin-right: 10px;">📥 CSV 다운로드</button><button id="deleteAllButton" onclick="confirmAndDeleteAll()" style="background-color: #d32f2f; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">전체 삭제</button></div>
+
+
 <div id="bossList"></div>
 </div>
 <script>
@@ -220,7 +244,8 @@
       if (email === "dogfightda@gmail.com" && password === "0716") {
         localStorage.setItem("admin", email);
         alert("관리자 인증 성공!");
-        checkAdmin(); // 로그인 후 즉시 체크
+        checkAdmin();
+   // 로그인 후 즉시 체크
         updateDeleteButtonVisibility(); // 로그인 후 삭제 버튼 상태 즉시 갱신
         window.location.reload(); // 로그인 후 페이지 새로 고침
       } else {
@@ -240,6 +265,7 @@
 
       const isAdminUser = isAdmin();
       adminSection.style.display = isAdminUser ? "block" : "none";
+      
 
       if (currentUser) {
         authInfo.style.display = "inline-block";
@@ -265,6 +291,7 @@
       localStorage.removeItem("admin");
       alert("로그아웃 되었습니다.");
       checkAdmin();
+  
       updateDeleteButtonVisibility();
       window.location.reload(); // 로그아웃 후 페이지 새로 고침
     }
@@ -388,6 +415,7 @@ window.onload = function () {
     document.getElementById("nickname").value = savedNickname;
   }
   checkAdmin();
+  
   loadBosses();
 }
 
@@ -404,6 +432,71 @@ function confirmAndDeleteAll() {
   }).catch((error) => {
     console.error("전체 삭제 실패:", error);
     alert("전체 삭제에 실패했습니다.");
+  });
+}
+
+
+
+function downloadCSV() {
+  db.ref("bosses").once("value", (snap) => {
+    const data = snap.val();
+    let csvContent = "보스ID,보스오픈시간,닉네임,점수\n";
+    const sortedBossIds = Object.keys(data).sort((a, b) => {
+      const ta = data[a].timestamp || 0;
+      const tb = data[b].timestamp || 0;
+      return tb - ta;
+    });
+    for (const bossId of sortedBossIds) {
+      const boss = data[bossId];
+      const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
+      if (boss.participants) {
+        for (const nick in boss.participants) {
+          const score = boss.participants[nick].score || 0;
+          csvContent += `"\${bossId}","\${openTime}","\${nick}","\${score}"\n`;
+        }
+      } else {
+        csvContent += `"\${bossId}","\${openTime}","",""\n`;
+      }
+    }
+    const blob = new Blob(["﻿" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "보스참여자목록.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+
+function downloadCSV() {
+  db.ref("bosses").once("value", (snap) => {
+    const data = snap.val();
+    let csvContent = "보스ID,보스오픈시간,닉네임,점수\n";
+    const sortedBossIds = Object.keys(data).sort((a, b) => {
+      const ta = data[a].timestamp || 0;
+      const tb = data[b].timestamp || 0;
+      return tb - ta;
+    });
+    for (const bossId of sortedBossIds) {
+      const boss = data[bossId];
+      const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
+      if (boss.participants) {
+        for (const nick in boss.participants) {
+          const score = boss.participants[nick].score || 0;
+          csvContent += '"' + bossId + '","' + openTime + '","' + nick + '","' + score + '"\n';
+        }
+      } else {
+        csvContent += '"' + bossId + '","' + openTime + '","",""\n';
+      }
+    }
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "보스참여자목록.csv";
+    a.click();
+    URL.revokeObjectURL(url);
   });
 }
 
