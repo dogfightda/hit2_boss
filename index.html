@@ -390,6 +390,23 @@ window.onload = function () {
   checkAdmin();
   loadBosses();
 }
+
+function confirmAndDeleteAll() {
+  if (!isAdmin()) {
+    alert("관리자만 전체 삭제가 가능합니다.");
+    return;
+  }
+  if (!confirm("정말 모든 보스를 삭제하시겠습니까?")) return;
+
+  db.ref("bosses").remove().then(() => {
+    alert("전체 보스 데이터가 삭제되었습니다.");
+    window.location.reload(); // 삭제 후 페이지 새로 고침
+  }).catch((error) => {
+    console.error("전체 삭제 실패:", error);
+    alert("전체 삭제에 실패했습니다.");
+  });
+}
+
 </script>
 </body>
 </html>
