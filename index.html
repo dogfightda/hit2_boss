@@ -8,6 +8,9 @@
 <body>
   <h1>Firebase Realtime Database Example</h1>
 
+  <button onclick="writeData('John', 'john@example.com')">Write Data</button>
+  <button onclick="readData('John')">Read Data</button>
+
   <script>
     // Firebase 구성
     const firebaseConfig = {
@@ -42,8 +45,5 @@
       });
     }
   </script>
-
-  <button onclick="writeData('John', 'john@example.com')">Write Data</button>
-  <button onclick="readData('John')">Read Data</button>
 </body>
 </html>
