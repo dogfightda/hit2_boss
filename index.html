@@ -6,17 +6,20 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; padding: 2em; background: #f9f9f9; }
+    body { font-family: 'Segoe UI', sans-serif; padding: 2em; background: #f9f9f9; position: relative; }
     input, button { padding: 0.5em; margin: 0.3em 0; border: 1px solid #ccc; border-radius: 4px; }
     .boss { margin-top: 1em; background: #fff; border: 1px solid #ddd; padding: 1em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .participants { margin-top: 0.5em; font-size: 0.9em; color: #333; }
     .admin-delete { color: red; cursor: pointer; margin-left: 1em; }
     #authInfo { margin-top: 1em; padding: 1em; background: #e8f0fe; border-radius: 8px; }
     #menu { margin-top: 1.5em; padding: 1em; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
+    #adminButton { position: absolute; top: 10px; right: 10px; }
   </style>
 </head>
 <body>
   <h1>🔥 보탐 오픈 및 참여</h1>
+
+  <button id="adminButton" onclick="setAdmin()">🔐 관리자 설정</button>
 
   <div id="authInfo">
     <strong>로그인 상태:</strong> <span id="authStatus">-</span>
@@ -35,10 +38,6 @@
   <div>
     <label>닉네임: <input type="text" id="nickname" placeholder="닉네임 입력" /></label>
     <button onclick="saveNickname()">닉네임 저장</button>
-  </div>
-
-  <div>
-    <button onclick="setAdmin()">🔐 관리자 설정</button>
   </div>
 
   <div id="adminSection" style="display:none;">
