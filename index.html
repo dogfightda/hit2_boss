@@ -11,9 +11,9 @@
     .boss { margin-top: 1em; background: #fff; border: 1px solid #ddd; padding: 1em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .participants { margin-top: 0.5em; font-size: 0.9em; color: #333; }
     .admin-delete { color: red; cursor: pointer; margin-left: 1em; }
-    #authInfo { margin-top: 1em; padding: 1em; background: #e8f0fe; border-radius: 8px; }
     #menu { margin-top: 1.5em; padding: 1em; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
-    #adminButton { position: absolute; top: 10px; right: 10px; }
+    #adminButton, #authInfo { position: absolute; top: 10px; right: 10px; }
+    #authInfo { background: #e8f0fe; padding: 0.5em 1em; border-radius: 6px; display: none; }
   </style>
 </head>
 <body>
@@ -23,7 +23,7 @@
 
   <div id="authInfo">
     <strong>로그인 상태:</strong> <span id="authStatus">-</span>
-    <button onclick="logout()" style="margin-left: 10px;">로그아웃</button>
+    <button onclick="logout()">로그아웃</button>
   </div>
 
   <div id="menu">
@@ -87,12 +87,23 @@
     function checkAdmin() {
       const adminSection = document.getElementById("adminSection");
       const adminMenu = document.getElementById("adminMenu");
+      const authInfo = document.getElementById("authInfo");
+      const adminButton = document.getElementById("adminButton");
+
+      const currentUser = localStorage.getItem("admin");
+
       const isAdminUser = isAdmin();
       adminSection.style.display = isAdminUser ? "block" : "none";
       adminMenu.style.display = isAdminUser ? "list-item" : "none";
 
-      const currentUser = localStorage.getItem("admin") || "-";
-      document.getElementById("authStatus").textContent = currentUser;
+      if (currentUser) {
+        authInfo.style.display = "block";
+        adminButton.style.display = "none";
+        document.getElementById("authStatus").textContent = currentUser;
+      } else {
+        authInfo.style.display = "none";
+        adminButton.style.display = "inline-block";
+      }
     }
 
     function logout() {
