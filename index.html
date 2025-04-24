@@ -22,7 +22,7 @@
   </div>
 
   <div>
-    <button onclick="promptAdmin()">관리자 설정</button>
+    <button onclick="setAdmin()">🔐 관리자 설정</button>
   </div>
 
   <div id="adminSection" style="display:none;">
@@ -56,7 +56,7 @@
       }
     }
 
-    function promptAdmin() {
+    function setAdmin() {
       const email = prompt("관리자 이메일을 입력하세요:");
       if (email) {
         localStorage.setItem("admin", email);
@@ -120,6 +120,10 @@
     }
 
     window.onload = function() {
+      const savedNickname = localStorage.getItem("nickname");
+      if (savedNickname) {
+        document.getElementById("nickname").value = savedNickname;
+      }
       checkAdmin();
       loadBosses();
     }
