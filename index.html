@@ -11,10 +11,26 @@
     .boss { margin-top: 1em; background: #fff; border: 1px solid #ddd; padding: 1em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .participants { margin-top: 0.5em; font-size: 0.9em; color: #333; }
     .admin-delete { color: red; cursor: pointer; margin-left: 1em; }
+    #authInfo { margin-top: 1em; padding: 1em; background: #e8f0fe; border-radius: 8px; }
+    #menu { margin-top: 1.5em; padding: 1em; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
   </style>
 </head>
 <body>
   <h1>🔥 보탐 오픈 및 참여</h1>
+
+  <div id="authInfo">
+    <strong>로그인 상태:</strong> <span id="authStatus">-</span>
+    <button onclick="logout()" style="margin-left: 10px;">로그아웃</button>
+  </div>
+
+  <div id="menu">
+    <strong>메뉴</strong>:
+    <ul>
+      <li>1. 보스 참여</li>
+      <li>2. 참여자 목록</li>
+      <li id="adminMenu" style="display:none;">3. 관리자 메뉴 (보스 오픈/삭제)</li>
+    </ul>
+  </div>
 
   <div>
     <label>닉네임: <input type="text" id="nickname" placeholder="닉네임 입력" /></label>
@@ -70,7 +86,20 @@
     }
 
     function checkAdmin() {
-      document.getElementById("adminSection").style.display = isAdmin() ? "block" : "none";
+      const adminSection = document.getElementById("adminSection");
+      const adminMenu = document.getElementById("adminMenu");
+      const isAdminUser = isAdmin();
+      adminSection.style.display = isAdminUser ? "block" : "none";
+      adminMenu.style.display = isAdminUser ? "list-item" : "none";
+
+      const currentUser = localStorage.getItem("admin") || "-";
+      document.getElementById("authStatus").textContent = currentUser;
+    }
+
+    function logout() {
+      localStorage.removeItem("admin");
+      alert("로그아웃 되었습니다.");
+      checkAdmin();
     }
 
     function openBoss() {
