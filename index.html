@@ -313,8 +313,20 @@
       const bossId = document.getElementById("bossId").value;
       if (!bossId) return alert("보스 ID를 입력하세요!");
       const score = parseInt(document.getElementById("bossScore").value) || 0;
-      const timestamp = Date.now();
-      db.ref("bosses/" + bossId).set({ open: true, timestamp, score });
+
+      // 보스 ID 중복 체크 추가
+      db.ref("bosses/" + bossId).once("value", (snap) => {
+        if (snap.exists()) {
+          alert("이미 동일한 보스 ID가 존재합니다. 다른 ID를 입력해주세요.");
+          return;
+        }
+
+        const timestamp = Date.now();
+        db.ref("bosses/" + bossId).set({ open: true, timestamp, score }).then(() => {
+          alert("보스가 성공적으로 오픈되었습니다.");
+          window.location.reload();
+        });
+      });
     }
 
     function participate(bossId) {
