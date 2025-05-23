@@ -1,520 +1,567 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"/>
-<title>대장길드 참여자 체크</title>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js">
-    );
-        for (const bossId of sortedBossIds) {
-          const boss = data[bossId];
-          const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
-          if (boss.participants) {
-            for (const nick in boss.participants) {
-              csvContent += `"${bossId}","${openTime}","${nick}"
-`;
-            }
-          } else {
-            csvContent += `"${bossId}","${openTime}",""
-`;
-          }
-        }
-
-        const blob = new Blob(["﻿" + csvContent], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "보스참여자목록.csv";
-        a.click();
-        URL.revokeObjectURL(url);
-      });
+  <meta charset="utf-8">
+  <title>대장길드 참여자 체크 Ver 2.0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --secondary-color: #818cf8;
+      --background-color: #f8fafc;
+      --card-background: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --danger-color: #ef4444;
+      --success-color: #22c55e;
     }
-</script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js">
-    function downloadCSV() {
-      db.ref("bosses").once("value", (snap) => {
-        const data = snap.val();
-        let csvContent = "보스ID,보스오픈시간,닉네임
-";
-        const sortedBossIds = Object.keys(data).sort((a, b) => {
-          const ta = data[a].timestamp || 0;
-          const tb = data[b].timestamp || 0;
-          return tb - ta;
-        });
-        for (const bossId of sortedBossIds) {
-          const boss = data[bossId];
-          const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
-          if (boss.participants) {
-            for (const nick in boss.participants) {
-              csvContent += `"${bossId}","${openTime}","${nick}"
-`;
-            }
-          } else {
-            csvContent += `"${bossId}","${openTime}",""
-`;
-          }
-        }
 
-        const blob = new Blob(["﻿" + csvContent], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "보스참여자목록.csv";
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-    }
-</script>
-<style>
     body {
-      font-family: 'Segoe UI', 'Pretendard', sans-serif;
-      background-color: #f9f9f9;
-      color: #222;
-      margin: 0;
-      padding: 1rem;
+      background-color: var(--background-color);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 16px;
+      padding: 2rem;
+      color: var(--text-primary);
     }
 
-    header {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      align-items: flex-start;
-      background-color: #ffffff;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      margin-bottom: 1.5rem;
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    h1 {
-      font-size: 1.5rem;
-      margin: 0;
-      color: #333;
-    }
-
-    #adminButton, #authInfo {
-      align-self: flex-end;
-    }
-
-    #authInfo {
-      background: #e3f2fd;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      display: none;
-      color: #222;
-    }
-
-    label, input, button {
-      font-size: 1rem;
-    }
-
-    input {
-      padding: 0.5rem;
-      margin: 0.3rem 0.5rem 0.3rem 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: #fff;
-      color: #222;
-      width: 100%;
-      max-width: 300px;
-    }
-
-    button {
-      padding: 0.5rem 1rem;
-      background-color: #1976d2;
-      color: white;
+    .card {
+      background-color: var(--card-background);
       border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    button:hover {
-      background-color: #1565c0;
-    }
-
-    .btn-disabled {
-      background-color: #e0e0e0;
-      color: #888;
-      border: 1px dashed #aaa;
-      cursor: not-allowed;
-    }
-
-    .section {
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
       margin-bottom: 1.5rem;
-      background: #ffffff;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease-in-out;
     }
 
-    .boss {
-      background: #fafafa;
-      border-radius: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .boss h3 {
-      margin-top: 0;
-      color: #222;
-    }
-
-    .participants {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: #333;
+    .card:hover {
+      transform: translateY(-2px);
     }
 
     .admin-delete {
-      color: #d32f2f;
+      color: var(--danger-color);
       cursor: pointer;
       margin-left: 0.5rem;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+
+    .admin-delete:hover {
+      opacity: 1;
+    }
+
+    .btn {
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      border: none;
+      color: #1e293b;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #c2e9fb 0%, #a1c4fd 100%);
+      color: #1e293b;
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+      border-color: var(--danger-color);
+    }
+
+    .btn-outline-primary {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .btn-disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .boss-card {
+      padding: 1.5rem;
+    }
+
+    .boss-card .btn {
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+      margin-bottom: 0;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+    }
+
+    .btn-action-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    }
+
+    .input-group {
+      gap: 0.5rem;
+    }
+
+    .text-muted {
+      color: var(--text-secondary) !important;
+    }
+
+    h1 {
+      font-weight: 700;
+      color: var(--primary-color);
     }
 
     #scoreSummary {
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 1rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      color: #1e293b;
     }
 
-    #scoreSummary h3 {
-      color: #1976d2;
+    #scoreSummary h5 {
+      color: #1e293b;
+      font-weight: 700;
     }
 
-    #scoreSummary li {
-      color: #333;
+    #scoreSummary ul li {
+      color: #1e293b;
     }
 
-    @media screen and (min-width: 768px) {
-      header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
+    .participant-list {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      background-color: rgba(0, 0, 0, 0.02);
+      border-radius: 8px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 0.5rem;
       }
-
-      input {
-        width: auto;
+      .container {
+        padding: 0;
+        max-width: 100vw;
+      }
+      .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        margin-bottom: 1rem;
+        padding: 1rem !important;
+      }
+      .boss-card {
+        padding: 1rem !important;
+      }
+      .section-title, h1, h5 {
+        font-size: 1.1rem !important;
+      }
+      .input-group {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .input-group > input,
+      .input-group > button,
+      .input-group > .form-control,
+      .input-group > .btn {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box;
+      }
+      .form-control {
+        font-size: 1rem;
+        padding: 0.6rem 0.8rem;
+      }
+      .btn, .btn-sm, .btn-action-group .btn, .btn-action-group .btn-sm {
+        width: 100% !important;
+        font-size: 0.95rem !important;
+        padding: 0.45rem 0.5rem !important;
+        min-width: 0 !important;
+        box-sizing: border-box;
+      }
+      .btn-action-group {
+        gap: 0.2rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .participant-list {
+        padding: 0.3rem;
+      }
+      #scoreSummary {
+        padding: 1rem !important;
+        font-size: 0.95rem;
+      }
+      .card-title {
+        margin-bottom: 0.5rem !important;
+      }
+      .text-muted.mb-3 {
+        margin-bottom: 0.5rem !important;
+      }
+      .d-flex.justify-content-between.align-items-center.mb-4 {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        gap: 0.7rem;
+      }
+      .ms-auto {
+        margin-left: auto !important;
+      }
+      #adminButton {
+        margin-bottom: 0 !important;
+      }
+      #authInfo {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+      #authStatus {
+        word-break: break-all;
+      }
+      #authInfo button {
+        margin-left: 0.5rem;
+      }
+      .d-flex.gap-2 {
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        width: 100%;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .d-flex.gap-2 > .btn {
+        width: auto !important;
+        min-width: 0 !important;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .btn-cancel-red, .btn-primary {
+        min-width: 0;
+        padding: 0.45rem 0.7rem;
+        font-size: 0.95rem;
       }
     }
-</style>
+
+    #showMoreScores {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: #fff !important;
+      border: none !important;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(79,139,253,0.08);
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    #showMoreScores:hover, #showMoreScores:focus {
+      background: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
+      color: #fff !important;
+    }
+
+    .btn-participate {
+      border: 2px solid #ef4444 !important;
+      color: #ef4444 !important;
+      background: #fff !important;
+      font-weight: 700;
+      min-width: 64px;
+      text-align: center;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-participate:hover, .btn-participate:focus {
+      background: #ffe4e6 !important;
+      color: #b91c1c !important;
+    }
+
+    .btn-cancel-red {
+      background: linear-gradient(135deg, #f87171 0%, #ef4444 100%) !important;
+      color: #fff !important;
+      border: none !important;
+      font-weight: 700;
+      min-width: 80px;
+      text-align: center;
+      border-radius: 8px;
+      font-size: 1rem;
+      padding: 0.45rem 1.2rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-cancel-red:hover, .btn-cancel-red:focus {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+      color: #fff !important;
+    }
+    .btn-primary {
+      min-width: 80px;
+      padding: 0.45rem 1.2rem;
+      font-weight: 700;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 1rem;
+    }
+  </style>
 </head>
 <body>
-<header>
-<h1>🔥 대장길드 참여자 체크</h1>
-<button id="adminButton" onclick="setAdmin()">🔐 관리자 설정</button>
-<div id="authInfo">
-      로그인: <span id="authStatus">-</span>
-<button onclick="logout()">로그아웃</button>
-</div>
-</header>
-<div id="scoreSummary" style="margin-bottom: 2rem; background: #fff; border-radius: 10px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1);"></div>
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+    <h1 class="h3 mb-0">대장길드 참여자 체크 Ver 2.0</h1>
+    <div class="ms-auto">
+      <button id="adminButton" class="btn btn-outline-primary btn-sm" onclick="setAdmin()">관리자 설정</button>
+    </div>
+    <div id="authInfo" class="d-none mt-2">
+      <span class="me-2">로그인: <strong id="authStatus">-</strong></span>
+      <button class="btn btn-outline-primary btn-sm" onclick="logout()">로그아웃</button>
+    </div>
+  </div>
 
-<div class="section">
-<label>닉네임:
-      <input id="nickname" placeholder="닉네임 입력" type="text"/>
-</label>
-<button onclick="saveNickname()">닉네임 저장</button>
-</div>
-<div class="section" id="adminSection" style="display:none;">
-<label>보스 ID:<input id="bossId" placeholder="보스 이름 자유입력"/></label><input id="bossScore" placeholder="점수 입력" type="number"/><button onclick="openBoss()">보스 오픈</button></div>
-<div class="section">
-<h2>✅ 오픈된 보스 <span style="font-size: 0.85rem; color: #666;">(보스 오픈 후 6시간 동안만 참여 체크가 가능합니다. 또한 데이터 삭제 필요 시 관리자에게 문의 주세요.)</span></h2>
-<div style="text-align: right;"><!-- <button onclick="downloadCSV()">CSV 다운로드</button> --><button onclick="downloadCSV()" style="background-color: #43a047; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold; margin-right: 10px;">📥 CSV 다운로드</button><button id="deleteAllButton" onclick="confirmAndDeleteAll()" style="background-color: #d32f2f; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold;">전체 삭제</button></div>
+  <div id="scoreSummary" class="card p-4 mb-4"></div>
 
+  <div class="card p-4 mb-4">
+    <h5 class="section-title">닉네임 설정</h5>
+    <div class="input-group">
+      <input id="nickname" class="form-control" placeholder="닉네임을 입력해주세요">
+      <button class="btn btn-primary" onclick="saveNickname()">저장</button>
+    </div>
+  </div>
 
-<div id="bossList"></div>
+  <div id="adminSection" class="card p-4 mb-4 d-none">
+    <h5 class="section-title">보스 정보 등록</h5>
+    <div class="input-group">
+      <input id="bossId" class="form-control" placeholder="보스 이름을 입력해주세요">
+      <input id="bossScore" class="form-control" type="number" placeholder="점수를 입력해주세요">
+      <input id="bossTime" class="form-control" type="datetime-local">
+      <button class="btn btn-primary" onclick="openBoss()">보스 오픈</button>
+    </div>
+  </div>
+
+  <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h5 class="section-title mb-0">오픈된 보스</h5>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm" onclick="downloadCSV()">CSV 다운로드</button>
+        <button id="deleteAllButton" class="btn btn-outline-danger btn-sm" onclick="confirmAndDeleteAll()">전체 삭제</button>
+      </div>
+    </div>
+    <div id="bossList"></div>
+  </div>
 </div>
+
 <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAY6Ff6uZ-iZ7soeuXBU0mtTKKZZ8gAPck",
-      authDomain: "bossraidtracker.firebaseapp.com",
-      databaseURL: "https://bossraidtracker-default-rtdb.firebaseio.com",
-      projectId: "bossraidtracker",
-      storageBucket: "bossraidtracker.appspot.com",
-      messagingSenderId: "975753692062",
-      appId: "1:975753692062:web:0991fb5bcbc52a9d3d0c8f",
-      measurementId: "G-MC8YY38ZP3"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyAY6Ff6uZ-iZ7soeuXBU0mtTKKZZ8gAPck",
+  authDomain: "bossraidtracker.firebaseapp.com",
+  databaseURL: "https://bossraidtracker-default-rtdb.firebaseio.com",
+  projectId: "bossraidtracker",
+  storageBucket: "bossraidtracker.appspot.com",
+  messagingSenderId: "975753692062",
+  appId: "1:975753692062:web:0991fb5bcbc52a9d3d0c8f"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    function saveNickname() {
-      const nickname = document.getElementById("nickname").value;
-      if (nickname) {
-        localStorage.setItem("nickname", nickname);
-        alert("닉네임 저장 완료!");
-      }
-    }
-
-    function setAdmin() {
-      const email = prompt("관리자 이메일을 입력하세요:");
-      const password = prompt("비밀번호를 입력하세요:");
-      if (email === "dogfightda@gmail.com" && password === "0716") {
-        localStorage.setItem("admin", email);
-        alert("관리자 인증 성공!");
-        checkAdmin();
-   // 로그인 후 즉시 체크
-        updateDeleteButtonVisibility(); // 로그인 후 삭제 버튼 상태 즉시 갱신
-        window.location.reload(); // 로그인 후 페이지 새로 고침
-      } else {
-        alert("이메일 또는 비밀번호가 올바르지 않습니다.");
-      }
-    }
-
-    function isAdmin() {
-      return localStorage.getItem("admin") === "dogfightda@gmail.com";
-    }
-
-    function checkAdmin() {
-      const adminSection = document.getElementById("adminSection");
-      const authInfo = document.getElementById("authInfo");
-      const adminButton = document.getElementById("adminButton");
-      const currentUser = localStorage.getItem("admin");
-
-      const isAdminUser = isAdmin();
-      adminSection.style.display = isAdminUser ? "block" : "none";
-      
-
-      if (currentUser) {
-        authInfo.style.display = "inline-block";
-        adminButton.style.display = "none";
-        document.getElementById("authStatus").textContent = currentUser;
-      } else {
-        authInfo.style.display = "none";
-        adminButton.style.display = "inline-block";
-      }
-
-      // 삭제 버튼 즉시 갱신
-      updateDeleteButtonVisibility();
-    }
-
-    function updateDeleteButtonVisibility() {
-      const deleteAllBtn = document.getElementById("deleteAllButton");
-      if (deleteAllBtn) {
-        deleteAllBtn.style.display = isAdmin() ? "inline-block" : "none";
-      }
-    }
-
-    function logout() {
-      localStorage.removeItem("admin");
-      alert("로그아웃 되었습니다.");
-      checkAdmin();
-  
-      updateDeleteButtonVisibility();
-      window.location.reload(); // 로그아웃 후 페이지 새로 고침
-    }
-
-    function openBoss() {
-      const bossId = document.getElementById("bossId").value;
-      if (!bossId) return alert("보스 ID를 입력하세요!");
-      const score = parseInt(document.getElementById("bossScore").value) || 0;
-
-      // 보스 ID 중복 체크 추가
-      db.ref("bosses/" + bossId).once("value", (snap) => {
-        if (snap.exists()) {
-          alert("이미 동일한 보스 ID가 존재합니다. 다른 ID를 입력해주세요.");
-          return;
-        }
-
-        const timestamp = Date.now();
-        db.ref("bosses/" + bossId).set({ open: true, timestamp, score }).then(() => {
-          alert("보스가 성공적으로 오픈되었습니다.");
-          window.location.reload();
-        });
-      });
-    }
-
-    function participate(bossId) {
-      const nickname = localStorage.getItem("nickname");
-      if (!nickname) return alert("닉네임을 먼저 저장해주세요!");
-      db.ref("bosses/" + bossId + "/score").once("value", (snap) => {
-        const score = snap.val() || 0;
-        db.ref("bosses/" + bossId + "/participants/" + nickname).set({ score }).then(() => {
-          alert(`${nickname} 참여가 완료되었습니다.`);
-          window.location.reload(); // 참여 완료 후 페이지 새로 고침
-        });
-      });
-    }
-
-    function deleteBoss(bossId) {
-      if (!isAdmin()) {
-        alert("관리자만 보스를 삭제할 수 있습니다.");
-        return;
-      }
-      if (!confirm(`${bossId} 보스를 삭제하시겠습니까?`)) return;
-      db.ref("bosses/" + bossId).remove().then(() => {
-        alert("보스가 삭제되었습니다.");
-        window.location.reload(); // 삭제 후 페이지 새로 고침
-      });
-    }
-
-    function deleteParticipant(bossId, nickname) {
-      if (!confirm(`${nickname}을(를) 삭제하시겠습니까?`)) return;
-      db.ref("bosses/" + bossId + "/participants/" + nickname).remove().then(() => {
-        alert(`${nickname}이(가) 삭제되었습니다.`);
-        window.location.reload(); // 삭제 후 페이지 새로 고침
-      });
-    }
-
-    function loadBosses() {
-      db.ref("bosses").on("value", (snap) => {
-        const data = snap.val();
-        const container = document.getElementById("bossList");
-        container.innerHTML = "";
-        const now = Date.now();
-        const sortedBossIds = Object.keys(data).sort((a, b) => {
-          const ta = data[a].timestamp || 0;
-          const tb = data[b].timestamp || 0;
-          return tb - ta;
-        });
-        for (const bossId of sortedBossIds) {
-          const boss = data[bossId];
-          const openTime = boss.timestamp || 0;
-          const withinTime = (now - openTime) < (6 * 60 * 60 * 1000);
-          const disabled = withinTime ? "" : "btn-disabled";
-          const label = withinTime ? "참여" : "참여 불가";
-
-          let html = `<div class="boss"><h3>${bossId} <span style="font-size:0.9em; color:#666;">(${new Date(openTime).toLocaleString("ko-KR")})</span>`;
-          if (isAdmin()) {
-            html += ` <span class="admin-delete" onclick="deleteBoss('${bossId}')">[보스 삭제]</span>`;
-          }
-          html += `</h3><button class="${disabled}" onclick="${withinTime ? `participate('${bossId}')` : `alert('참여 시간이 지났습니다.')`}">${label}</button>` + `<button style="margin-left: 10px; background-color: #e91e63; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold;" onclick="cancelParticipation('${bossId}')">취소</button>`;
-
-          html += `<div class="participants">`;
-          if (boss.participants) {
-            html += "<ul>";
-            for (const nick in boss.participants) {
-              html += `<li>${nick} (${boss.participants[nick].score || 0}점)`;
-              if (isAdmin()) {
-                html += ` <span class="admin-delete" onclick="deleteParticipant('${bossId}', '${nick}')">[삭제]</span>`;
-              }
-              html += `</li>`;
-            }
-            html += "</ul>";
-          } else {
-            html += "참여자 없음";
-          }
-          html += "</div></div>";
-
-          container.innerHTML += html;
-        }
-      });
-    }
-
-    function displayTotalScores() {
-      db.ref("bosses").once("value", (snap) => {
-        const data = snap.val();
-        const totalScores = {};
-
-        for (const bossId in data) {
-          const boss = data[bossId];
-          if (boss.participants) {
-            for (const nick in boss.participants) {
-              const score = boss.participants[nick].score || 0;
-              totalScores[nick] = (totalScores[nick] || 0) + score;
-            }
-          }
-        }
-
-        // Sort the scores in descending order
-        const sortedScores = Object.entries(totalScores).sort((a, b) => b[1] - a[1]);
-
-        const summaryDiv = document.getElementById("scoreSummary");
-        summaryDiv.innerHTML = "<h3>🔥 닉네임별 누적 점수</h3><ul>" + 
-          sortedScores
-            .map(([nick, score]) => `<li><strong>${nick}</strong>: ${score}점</li>`)
-            .join("") + 
-          "</ul>";
-      });
-    }
-
-window.onload = function () {
-  displayTotalScores();
-  const savedNickname = localStorage.getItem("nickname");
-  if (savedNickname) {
-    document.getElementById("nickname").value = savedNickname;
-  }
-  checkAdmin();
-  
-  loadBosses();
+function saveNickname() {
+  let nickname = document.getElementById("nickname").value;
+  nickname = nickname.replace(/\s/g, "");
+  localStorage.setItem("nickname", nickname);
+  document.getElementById("nickname").value = nickname;
+  alert("닉네임이 성공적으로 저장되었습니다.");
 }
 
-function confirmAndDeleteAll() {
-  if (!isAdmin()) {
-    alert("관리자만 전체 삭제가 가능합니다.");
-    return;
-  }
-  if (!confirm("정말 모든 보스를 삭제하시겠습니까?")) return;
+function setAdmin() {
+  const email = prompt("관리자 이메일을 입력해주세요:");
+  const password = prompt("관리자 비밀번호를 입력해주세요:");
+  if (email === "dogfightda@gmail.com" && password === "0716") {
+    localStorage.setItem("admin", email);
+    alert("관리자 인증이 완료되었습니다.");
+    checkAdmin();
+    location.reload();
+  } else alert("관리자 인증에 실패했습니다. 이메일과 비밀번호를 다시 확인해주세요.");
+}
 
-  db.ref("bosses").remove().then(() => {
-    alert("전체 보스 데이터가 삭제되었습니다.");
-    window.location.reload(); // 삭제 후 페이지 새로 고침
-  }).catch((error) => {
-    console.error("전체 삭제 실패:", error);
-    alert("전체 삭제에 실패했습니다.");
+function logout() {
+  localStorage.removeItem("admin");
+  alert("로그아웃이 완료되었습니다.");
+  location.reload();
+}
+
+function isAdmin() {
+  return localStorage.getItem("admin") === "dogfightda@gmail.com";
+}
+
+function checkAdmin() {
+  document.getElementById("adminSection").classList.toggle("d-none", !isAdmin());
+  document.getElementById("authInfo").classList.toggle("d-none", !isAdmin());
+  document.getElementById("adminButton").classList.toggle("d-none", isAdmin());
+  document.getElementById("authStatus").textContent = isAdmin() ? localStorage.getItem("admin") : "-";
+  document.getElementById("deleteAllButton").style.display = isAdmin() ? "inline-block" : "none";
+}
+
+function openBoss() {
+  const bossId = document.getElementById("bossId").value.trim();
+  const scoreInput = document.getElementById("bossScore").value.trim();
+  const score = parseInt(scoreInput);
+  const timeInput = document.getElementById("bossTime").value;
+  const timestamp = timeInput ? new Date(timeInput).getTime() : Date.now();
+
+  if (!bossId) return alert("보스 이름을 입력해주세요.");
+  if (!scoreInput || isNaN(score)) return alert("점수를 올바른 숫자로 입력해주세요.");
+  db.ref("bosses/"+bossId).set({open:true,timestamp:timestamp,score}).then(()=>location.reload());
+}
+
+function participate(bossId){
+  const nickname=localStorage.getItem("nickname");
+  if(!nickname)return alert("닉네임을 먼저 저장해주세요.");
+  db.ref(`bosses/${bossId}/score`).once("value",snap=>{
+    const score=snap.val()||0;
+    db.ref(`bosses/${bossId}/participants/${nickname}`).set({score}).then(()=>location.reload());
   });
 }
 
+function cancelParticipation(bossId){
+  const nickname = localStorage.getItem("nickname");
+  if (!nickname) return alert("닉네임을 먼저 저장해주세요.");
+  if (confirm("정말로 보스 참여를 취소하시겠습니까?")) {
+    db.ref(`bosses/${bossId}/participants/${nickname}`).remove().then(()=>location.reload());
+  }
+}
 
+function deleteBoss(bossId){
+  if(confirm("해당 보스 정보를 삭제하시겠습니까?"))db.ref("bosses/"+bossId).remove().then(()=>location.reload());
+}
 
+function deleteParticipant(bossId,nick){
+  if(confirm("해당 참여자의 정보를 삭제하시겠습니까?"))db.ref(`bosses/${bossId}/participants/${nick}`).remove().then(()=>location.reload());
+}
+
+function confirmAndDeleteAll(){
+  if(!isAdmin()){ alert("관리자만 삭제할 수 있는 기능입니다."); return; }
+  if(confirm("모든 보스 정보와 참여자 정보가 삭제됩니다. 정말로 진행하시겠습니까?")) db.ref("bosses").remove().then(()=>location.reload());
+}
+
+function loadBosses(){
+  db.ref("bosses").on("value",snap=>{
+    const data=snap.val(),now=Date.now(),cont=document.getElementById("bossList");cont.innerHTML="";
+    const sortedIds = Object.keys(data).sort((a,b)=>data[b].timestamp - data[a].timestamp);
+    for(const id of sortedIds){
+      const boss=data[id],open=boss.timestamp,within=(now-open)<21600000;
+      let html = `<div class="card boss-card mb-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="card-title mb-2">${id}
+            ${isAdmin()?`<span class="admin-delete" onclick="deleteBoss('${id}')">[삭제]</span>`:""}</h5>
+            <div class="text-muted mb-3">${new Date(open).toLocaleString("ko-KR")}</div>
+          </div>
+          <div class="btn-action-group">
+            <button class="btn btn-sm btn-primary ${within?"":"btn-disabled"}" onclick="${within?`participate('${id}')`:"alert('참여 가능 시간이 지났습니다.')"}">${within?"참여":"불가"}</button>
+            <button class="btn btn-sm btn-cancel-red" onclick="cancelParticipation('${id}')">취소</button>
+          </div>
+        </div>
+        <div class="participant-list">
+          <ul class="mt-2">`;
+      if (boss.participants) {
+        const sortedNicks = Object.entries(boss.participants).sort((a, b) => a[0].localeCompare(b[0]));
+        for (const [nick, info] of sortedNicks) {
+          html += `<li>${nick} <span class="text-muted">(${info.score}점)</span> ${isAdmin()?`<span class="admin-delete" onclick="deleteParticipant('${id}','${nick}')">[삭제]</span>`:""}</li>`;
+        }
+      } else html += "<li class='text-muted'>참여자 없음</li>";
+      html += "</ul></div></div>";
+      cont.innerHTML += html;
+    }
+  });
+}
+
+function displayTotalScores(){
+  db.ref("bosses").once("value",snap=>{
+    const data=snap.val(),scores={};
+    for(const id in data){
+      const boss=data[id];
+      if(boss.participants){
+        for(const nick in boss.participants){
+          const score=boss.participants[nick].score||0;
+          scores[nick]=(scores[nick]||0)+score;
+        }
+      }
+    }
+    const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+    let showAll = false;
+    function renderList() {
+      const displayList = showAll ? sorted : sorted.slice(0, 10);
+      const html = displayList.map(([n,s],index)=>`<li><strong>${index + 1}등</strong> ${n}: ${s}점</li>`).join('');
+      document.getElementById('scoreSummary').innerHTML =
+        `<h5 class='mb-2'>닉네임별 누적 점수</h5>
+        <ul>${html}</ul>
+        ${sorted.length > 10 ? `<button id='showMoreScores' class='btn btn-outline-light btn-sm mt-2'>${showAll ? '접기' : '더보기'}</button>` : ''}`;
+      if(sorted.length > 10) {
+        document.getElementById('showMoreScores').onclick = () => {
+          showAll = !showAll;
+          renderList();
+        };
+      }
+    }
+    renderList();
+  });
+}
+
+window.onload=()=>{checkAdmin();displayTotalScores();loadBosses();};
+</script>
+
+<script>
 function downloadCSV() {
   db.ref("bosses").once("value", (snap) => {
     const data = snap.val();
     let csvContent = "보스ID,보스오픈시간,닉네임,점수\n";
-    const sortedBossIds = Object.keys(data).sort((a, b) => {
-      const ta = data[a].timestamp || 0;
-      const tb = data[b].timestamp || 0;
-      return tb - ta;
-    });
+
+    const sortedBossIds = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
     for (const bossId of sortedBossIds) {
       const boss = data[bossId];
       const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
+
       if (boss.participants) {
-        for (const nick in boss.participants) {
-          const score = boss.participants[nick].score || 0;
-          csvContent += `"\${bossId}","\${openTime}","\${nick}","\${score}"\n`;
+        const sortedParticipants = Object.entries(boss.participants).sort((a, b) => a[0].localeCompare(b[0]));
+        for (const [nick, info] of sortedParticipants) {
+          const score = info.score || 0;
+          csvContent += `"${bossId}","${openTime}","${nick}","${score}"\n`;
         }
       } else {
-        csvContent += `"\${bossId}","\${openTime}","",""\n`;
+        csvContent += `"${bossId}","${openTime}","",""\n`;
       }
     }
-    const blob = new Blob(["﻿" + csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "보스참여자목록.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-}
 
-
-function downloadCSV() {
-  db.ref("bosses").once("value", (snap) => {
-    const data = snap.val();
-    let csvContent = "보스ID,보스오픈시간,닉네임,점수\n";
-    const sortedBossIds = Object.keys(data).sort((a, b) => {
-      const ta = data[a].timestamp || 0;
-      const tb = data[b].timestamp || 0;
-      return tb - ta;
-    });
-    for (const bossId of sortedBossIds) {
-      const boss = data[bossId];
-      const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
-      if (boss.participants) {
-        for (const nick in boss.participants) {
-          const score = boss.participants[nick].score || 0;
-          csvContent += '"' + bossId + '","' + openTime + '","' + nick + '","' + score + '"\n';
-        }
-      } else {
-        csvContent += '"' + bossId + '","' + openTime + '","",""\n';
-      }
-    }
     const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -524,19 +571,18 @@ function downloadCSV() {
     URL.revokeObjectURL(url);
   });
 }
+</script>
 
-
-function cancelParticipation(bossId) {
-  const nickname = localStorage.getItem("nickname");
-  if (!nickname) return alert("닉네임이 저장되어 있지 않습니다.");
-  if (!confirm(`${nickname}님의 참여를 취소하시겠습니까?`)) return;
-
-  db.ref("bosses/" + bossId + "/participants/" + nickname).remove().then(() => {
-    alert("참여가 취소되었습니다.");
-    window.location.reload();
-  });
-}
-
+<script>
+// 닉네임 입력 시 실시간으로 공백 제거
+window.addEventListener('DOMContentLoaded', function() {
+  var nicknameInput = document.getElementById("nickname");
+  if(nicknameInput) {
+    nicknameInput.addEventListener("input", function(e) {
+      this.value = this.value.replace(/\s/g, "");
+    });
+  }
+});
 </script>
 </body>
 </html>
