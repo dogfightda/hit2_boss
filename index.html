@@ -581,6 +581,8 @@ window.addEventListener('DOMContentLoaded', function() {
     nicknameInput.addEventListener("input", function(e) {
       this.value = this.value.replace(/\s/g, "");
     });
+    var saved = localStorage.getItem("nickname");
+    if(saved) nicknameInput.value = saved;
   }
 });
 </script>
