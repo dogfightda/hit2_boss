@@ -512,13 +512,18 @@ function loadBosses(){
 
 function displayTotalScores(){
   db.ref("bosses").once("value",snap=>{
-    const data=snap.val(),scores={};
+    const data=snap.val(),scores={},participation={};
+    // 총 보스 수 계산
+    const totalBosses = Object.keys(data).length;
+    
     for(const id in data){
       const boss=data[id];
       if(boss.participants){
         for(const nick in boss.participants){
           const score=boss.participants[nick].score||0;
           scores[nick]=(scores[nick]||0)+score;
+          // 참여한 보스 수 계산
+          participation[nick] = (participation[nick] || 0) + 1;
         }
       }
     }
@@ -526,7 +531,11 @@ function displayTotalScores(){
     let showAll = false;
     function renderList() {
       const displayList = showAll ? sorted : sorted.slice(0, 5);
-      const html = displayList.map(([n,s],index)=>`<li><strong>${index + 1}등</strong> ${n}: ${s}점</li>`).join('');
+      const html = displayList.map(([n,s],index)=>{
+        const participated = participation[n] || 0;
+        const participationRate = ((participated / totalBosses) * 100).toFixed(1);
+        return `<li><strong>${index + 1}등</strong> ${n}: ${s}점 ( 참여건수 : ${participated} | 참여율 : ${participationRate}%)</li>`;
+      }).join('');
       document.getElementById('scoreSummary').innerHTML =
         `<h5 class='mb-2'>닉네임별 누적 점수</h5>
         <ul>${html}</ul>
