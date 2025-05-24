@@ -583,7 +583,7 @@ function loadBosses(){
             <div class="text-muted mb-3">${new Date(open).toLocaleString("ko-KR")}</div>
           </div>
           <div class="btn-action-group">
-            <button class="btn btn-sm ${within ? 'btn-primary' : 'btn-secondary'}" onclick="${within ? `participate('${id}')` : "alert('참여 가능 시간이 지났습니다.')"}" style="${!within ? 'background: #6c757d !important; border: none !important; color: #fff !important;' : ''}">${within ? "참여" : "불가"}</button>
+            <button class="btn btn-sm ${within ? 'btn-primary' : 'btn-secondary'}" onclick="${within ? `participate('${id}')` : "alert('참여 가능 시간이 지났습니다.')"}" style="${!within ? 'background: #6c757d !important; border: none !important; color: #fff !important; min-width: 80px; padding: 0.45rem 1.2rem; font-size: 1rem;' : ''}">${within ? "참여" : "불가"}</button>
             <button class="btn btn-sm btn-cancel-red" onclick="cancelParticipation('${id}')">취소</button>
           </div>
         </div>
