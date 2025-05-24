@@ -534,7 +534,7 @@ function displayTotalScores(){
       const html = displayList.map(([n,s],index)=>{
         const participated = participation[n] || 0;
         const participationRate = ((participated / totalBosses) * 100).toFixed(1);
-        return `<li><strong>${index + 1}등</strong> ${n}: ${s}점 ( 참여건수 : ${participated} | 참여율 : ${participationRate}%)</li>`;
+        return `<li><strong>${index + 1}등</strong> ${n}: ${s}점 <span style="font-size: 70%">( 건수 : ${participated} | 참여율 : ${participationRate}%)</span></li>`;
       }).join('');
       document.getElementById('scoreSummary').innerHTML =
         `<h5 class='mb-2'>닉네임별 누적 점수</h5>
