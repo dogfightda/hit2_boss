@@ -9,6 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root {
       --primary-color: #4f46e5;
@@ -268,11 +269,12 @@
         gap: 0.5rem;
         margin-bottom: 0.5rem;
       }
-      .d-flex.gap-2 > .btn {
+      .d-flex.gap-2 > .btn,
+      .d-flex.justify-content-between.align-items-center.mb-2 > .btn {
         width: auto !important;
         min-width: 0 !important;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        font-size: 0.95rem !important;
+        padding: 0.3rem 0.7rem !important;
       }
       .btn-cancel-red, .btn-primary {
         min-width: 0;
@@ -370,12 +372,15 @@
   </div>
 
   <div class="card p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
       <h5 class="section-title mb-0">오픈된 보스</h5>
-      <div class="d-flex gap-2">
-        <button class="btn btn-outline-primary btn-sm" onclick="downloadCSV()">CSV 다운로드</button>
-        <button id="deleteAllButton" class="btn btn-outline-danger btn-sm" onclick="confirmAndDeleteAll()">전체 삭제</button>
-      </div>
+      <button class="btn btn-outline-primary btn-sm" onclick="downloadCSV()">CSV 다운로드</button>
+    </div>
+    <div style="margin:0.2rem 0 0.5rem 0; color:#1976d2; font-size:0.98rem; font-weight:500;">
+      안내 : 보스 지정된 오픈시간 후 6시간 동안 참여 선택이 가능합니다.
+    </div>
+    <div class="d-flex gap-2">
+      <button id="deleteAllButton" class="btn btn-outline-danger btn-sm" onclick="confirmAndDeleteAll()">전체 삭제</button>
     </div>
     <div id="bossList"></div>
   </div>
@@ -520,13 +525,13 @@ function displayTotalScores(){
     const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
     let showAll = false;
     function renderList() {
-      const displayList = showAll ? sorted : sorted.slice(0, 10);
+      const displayList = showAll ? sorted : sorted.slice(0, 5);
       const html = displayList.map(([n,s],index)=>`<li><strong>${index + 1}등</strong> ${n}: ${s}점</li>`).join('');
       document.getElementById('scoreSummary').innerHTML =
         `<h5 class='mb-2'>닉네임별 누적 점수</h5>
         <ul>${html}</ul>
-        ${sorted.length > 10 ? `<button id='showMoreScores' class='btn btn-outline-light btn-sm mt-2'>${showAll ? '접기' : '더보기'}</button>` : ''}`;
-      if(sorted.length > 10) {
+        ${sorted.length > 5 ? `<button id='showMoreScores' class='btn btn-outline-light btn-sm mt-2'>${showAll ? '접기' : '더보기'}</button>` : ''}`;
+      if(sorted.length > 5) {
         document.getElementById('showMoreScores').onclick = () => {
           showAll = !showAll;
           renderList();
@@ -544,31 +549,44 @@ window.onload=()=>{checkAdmin();displayTotalScores();loadBosses();};
 function downloadCSV() {
   db.ref("bosses").once("value", (snap) => {
     const data = snap.val();
-    let csvContent = "보스ID,보스오픈시간,닉네임,점수\n";
-
+    // 1. 보스별 참여자 목록 시트
+    let bossRows = [["보스ID","보스오픈시간","닉네임","점수"]];
     const sortedBossIds = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
     for (const bossId of sortedBossIds) {
       const boss = data[bossId];
       const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
-
       if (boss.participants) {
         const sortedParticipants = Object.entries(boss.participants).sort((a, b) => a[0].localeCompare(b[0]));
         for (const [nick, info] of sortedParticipants) {
           const score = info.score || 0;
-          csvContent += `"${bossId}","${openTime}","${nick}","${score}"\n`;
+          bossRows.push([bossId, openTime, nick, score]);
         }
       } else {
-        csvContent += `"${bossId}","${openTime}","",""\n`;
+        bossRows.push([bossId, openTime, "", ""]);
       }
     }
-
-    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "보스참여자목록.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+    // 2. 닉네임별 누적 점수 시트
+    let scoreMap = {};
+    for (const bossId in data) {
+      const boss = data[bossId];
+      if (boss.participants) {
+        for (const nick in boss.participants) {
+          const score = boss.participants[nick].score || 0;
+          scoreMap[nick] = (scoreMap[nick] || 0) + score;
+        }
+      }
+    }
+    let scoreRows = [["닉네임", "누적점수"]];
+    Object.entries(scoreMap).sort((a,b)=>b[1]-a[1]).forEach(([nick, score]) => {
+      scoreRows.push([nick, score]);
+    });
+    // 3. SheetJS로 엑셀 파일 생성
+    const wb = XLSX.utils.book_new();
+    const ws1 = XLSX.utils.aoa_to_sheet(bossRows);
+    const ws2 = XLSX.utils.aoa_to_sheet(scoreRows);
+    XLSX.utils.book_append_sheet(wb, ws1, "보스별참여자");
+    XLSX.utils.book_append_sheet(wb, ws2, "닉네임별누적점수");
+    XLSX.writeFile(wb, "보스참여자_및_누적점수.xlsx");
   });
 }
 </script>
