@@ -403,6 +403,7 @@
     <h1 class="h3 mb-0">대장길드 참여자 체크 Ver 2.0</h1>
     <div class="ms-auto">
       <button id="adminButton" class="btn btn-outline-primary btn-sm" onclick="setAdmin()">관리자 설정</button>
+      <button id="detailEditBtn" class="btn btn-outline-primary btn-sm ms-2" style="display:none;" data-bs-toggle="modal" data-bs-target="#detailEditModal">상세수정</button>
     </div>
     <div id="authInfo" class="d-none mt-2">
       <span class="me-2">로그인: <strong id="authStatus">-</strong></span>
@@ -477,6 +478,67 @@
   </div>
 </div>
 
+<!-- 상세수정 모달 -->
+<div class="modal fade" id="detailEditModal" tabindex="-1" aria-labelledby="detailEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailEditModalLabel">상세 데이터 수정</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="detailEditModalBody">
+        <div id="adminDetailSection">
+          <div class="card mb-4">
+            <div class="card-header">누락 데이터 추가</div>
+            <div class="card-body">
+              <div class="row g-2">
+                <div class="col-12 mb-2"><input id="missingBossId_modal" class="form-control" placeholder="보스 ID"></div>
+                <div class="col"><input id="missingBossTime_modal" class="form-control" type="datetime-local"></div>
+                <div class="col"><input id="missingNick_modal" class="form-control" placeholder="닉네임"></div>
+                <div class="col"><input id="missingScore_modal" class="form-control" type="number" placeholder="점수"></div>
+                <div class="col-auto"><button class="btn btn-primary" onclick="addMissingData_modal()">추가</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="card mb-4">
+            <div class="card-header">참여자 수정</div>
+            <div class="card-body">
+              <select id="bossSelect_modal" class="form-select mb-2" onchange="loadParticipantsTable_modal()">
+                <option value="">보스 선택</option>
+              </select>
+              <table class="table table-striped table-hover">
+                <tbody id="participantTable_modal"></tbody>
+              </table>
+              <div class="row g-2 mb-2">
+                <div class="col"><input id="editNick_modal" class="form-control" readonly placeholder="선택된 닉네임"></div>
+                <div class="col"><input id="editScore_modal" class="form-control" type="number" placeholder="현재 점수"></div>
+                <div class="col-auto"><button class="btn btn-primary" onclick="updateParticipantScore_modal()">점수 수정</button></div>
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col"><input id="newNick_modal" class="form-control" placeholder="새 닉네임"></div>
+                <div class="col-auto"><button class="btn btn-warning" onclick="changeParticipantNick_modal()">닉네임 변경</button></div>
+              </div>
+              <hr/>
+              <div class="row g-2 mb-2">
+                <div class="col"><input id="addNick_modal" class="form-control" placeholder="추가할 닉네임"></div>
+                <div class="col"><input id="addScore_modal" class="form-control" type="number" placeholder="점수"></div>
+                <div class="col-auto"><button class="btn btn-success" onclick="addParticipantToBoss_modal()">참여자 추가</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="card mb-4">
+            <div class="card-header">보스 ID 수정</div>
+            <div class="card-body row g-2">
+              <div class="col"><input id="newBossId_modal" class="form-control" placeholder="새 보스 ID"></div>
+              <div class="col-auto"><button class="btn btn-danger" onclick="changeBossId_modal()">보스 ID 변경</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAY6Ff6uZ-iZ7soeuXBU0mtTKKZZ8gAPck",
@@ -523,8 +585,11 @@ function checkAdmin() {
   document.getElementById("adminSection").classList.toggle("d-none", !isAdmin());
   document.getElementById("authInfo").classList.toggle("d-none", !isAdmin());
   document.getElementById("adminButton").classList.toggle("d-none", isAdmin());
-  document.getElementById("authStatus").textContent = isAdmin() ? localStorage.getItem("admin") : "-";
   document.getElementById("deleteAllButton").style.display = isAdmin() ? "inline-block" : "none";
+  // 상세수정 버튼 표시
+  const detailBtn = document.getElementById("detailEditBtn");
+  if(detailBtn) detailBtn.style.display = isAdmin() ? "inline-block" : "none";
+  document.getElementById("authStatus").textContent = isAdmin() ? localStorage.getItem("admin") : "-";
 }
 
 function openBoss() {
@@ -878,6 +943,140 @@ window.addEventListener('DOMContentLoaded', function() {
     var saved = localStorage.getItem("nickname");
     if(saved) nicknameInput.value = saved;
   }
+});
+</script>
+
+<script>
+// 상세수정 모달용 함수들
+function addMissingData_modal() {
+  const bossId = document.getElementById("missingBossId_modal").value;
+  const timeStr = document.getElementById("missingBossTime_modal").value;
+  const nick = document.getElementById("missingNick_modal").value;
+  const score = parseInt(document.getElementById("missingScore_modal").value) || 0;
+  const timestamp = new Date(timeStr).getTime();
+  if (!bossId || !nick || !timestamp) return alert("모든 값 입력 필요");
+  db.ref("bosses/" + bossId).update({ open:true, timestamp:timestamp });
+  db.ref("bosses/" + bossId + "/participants/" + nick).set({ score:score })
+    .then(() => { alert("누락 데이터 추가 완료"); loadBossList_modal(); });
+}
+function loadBossList_modal() {
+  db.ref("bosses").once("value", snap => {
+    const data = snap.val();
+    const bossSelect = document.getElementById("bossSelect_modal");
+    bossSelect.innerHTML = "<option value=''>보스 선택</option>";
+    for (const bossId in data) {
+      bossSelect.innerHTML += `<option value="${bossId}">${bossId}</option>`;
+    }
+  });
+  // 테이블 초기화
+  document.getElementById("participantTable_modal").innerHTML = "";
+  document.getElementById("editNick_modal").value = "";
+  document.getElementById("editScore_modal").value = "";
+  document.getElementById("newNick_modal").value = "";
+  document.getElementById("addNick_modal").value = "";
+  document.getElementById("addScore_modal").value = "";
+  document.getElementById("newBossId_modal").value = "";
+}
+function loadParticipantsTable_modal() {
+  const bossId = document.getElementById("bossSelect_modal").value;
+  const table = document.getElementById("participantTable_modal");
+  table.innerHTML = "";
+  if (!bossId) return;
+  db.ref("bosses/" + bossId + "/participants").once("value", snap => {
+    const participants = snap.val();
+    for (const nick in participants) {
+      const score = participants[nick].score || 0;
+      table.innerHTML += `<tr>
+        <td>${nick}</td>
+        <td>${score}</td>
+        <td><button class="btn btn-outline-primary btn-table" onclick="selectParticipant_modal(this, '${bossId}', '${nick}', ${score})">선택</button></td>
+      </tr>`;
+    }
+  });
+}
+function selectParticipant_modal(btn, bossId, nick, score) {
+  document.getElementById("editNick_modal").value = nick;
+  document.getElementById("editScore_modal").value = score;
+  document.querySelectorAll("#participantTable_modal tr").forEach(row => row.classList.remove("selected-row"));
+  btn.parentNode.parentNode.classList.add("selected-row");
+}
+function updateParticipantScore_modal() {
+  const bossId = document.getElementById("bossSelect_modal").value;
+  const nick = document.getElementById("editNick_modal").value;
+  const newScore = parseInt(document.getElementById("editScore_modal").value) || 0;
+  if (!bossId || !nick) return alert("보스, 닉네임 선택 필요");
+  db.ref("bosses/" + bossId + "/participants/" + nick).update({ score:newScore })
+    .then(() => {
+      alert("점수 수정 완료");
+      loadParticipantsTable_modal();
+    });
+}
+function changeParticipantNick_modal() {
+  const bossId = document.getElementById("bossSelect_modal").value;
+  const oldNick = document.getElementById("editNick_modal").value;
+  const newNick = document.getElementById("newNick_modal").value;
+  if (!bossId || !oldNick || !newNick) return alert("모든 값 입력 필요");
+  db.ref("bosses/" + bossId + "/participants/" + oldNick).once("value", snap => {
+    const data = snap.val();
+    if (data) {
+      db.ref("bosses/" + bossId + "/participants/" + newNick).set(data);
+      db.ref("bosses/" + bossId + "/participants/" + oldNick).remove()
+        .then(() => {
+          alert("닉네임 변경 완료");
+          loadParticipantsTable_modal();
+        });
+    } else alert("기존 닉네임 데이터 없음");
+  });
+}
+function changeBossId_modal() {
+  const oldBossId = document.getElementById("bossSelect_modal").value;
+  const newBossId = document.getElementById("newBossId_modal").value;
+  if (!oldBossId) return alert("보스를 먼저 선택해주세요.");
+  if (!newBossId) return alert("새 보스 ID를 입력해주세요.");
+  db.ref("bosses/" + newBossId).once("value", snap => {
+    if (snap.exists()) {
+      alert("이미 존재하는 보스 ID입니다. 다른 ID를 입력하세요.");
+    } else {
+      db.ref("bosses/" + oldBossId).once("value", snap => {
+        const data = snap.val();
+        if (data) {
+          db.ref("bosses/" + newBossId).set(data);
+          db.ref("bosses/" + oldBossId).remove()
+            .then(() => {
+              alert("보스 ID 변경 완료");
+              loadBossList_modal();
+              document.getElementById("newBossId_modal").value = "";
+              document.getElementById("bossSelect_modal").value = newBossId;
+              loadParticipantsTable_modal();
+            });
+        } else alert("기존 보스 데이터 없음");
+      });
+    }
+  });
+}
+function addParticipantToBoss_modal() {
+  const bossId = document.getElementById("bossSelect_modal").value;
+  const nick = document.getElementById("addNick_modal").value.trim();
+  const score = parseInt(document.getElementById("addScore_modal").value) || 0;
+  if (!bossId) return alert("보스를 먼저 선택하세요.");
+  if (!nick) return alert("닉네임을 입력하세요.");
+  db.ref("bosses/" + bossId + "/participants/" + nick).set({ score })
+    .then(() => {
+      alert("참여자 추가 완료");
+      document.getElementById("addNick_modal").value = "";
+      document.getElementById("addScore_modal").value = "";
+      loadParticipantsTable_modal();
+    });
+}
+// 모달 오픈 시 데이터 새로고침
+const detailEditModal = document.getElementById('detailEditModal');
+detailEditModal.addEventListener('show.bs.modal', function () {
+  loadBossList_modal();
+  // 입력값 초기화
+  document.getElementById("missingBossId_modal").value = "";
+  document.getElementById("missingBossTime_modal").value = "";
+  document.getElementById("missingNick_modal").value = "";
+  document.getElementById("missingScore_modal").value = "";
 });
 </script>
 </body>
