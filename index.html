@@ -654,35 +654,35 @@ function displayWeeklyScores() {
     const currentHour = now.getHours();
     
     // 이번 주 수요일 9시 계산
-    let startDate = new Date(now);
-    startDate.setHours(9, 0, 0, 0);
-    
-    // 현재가 수요일 9시 이전이면 지난주 수요일 9시로 설정
-    if (currentDay < 3 || (currentDay === 3 && currentHour < 9)) {
-      startDate.setDate(startDate.getDate() - 7);
+    let thisWed = new Date(now);
+    thisWed.setHours(9, 0, 0, 0);
+    // 이번 주 수요일까지 며칠 남았는지 계산 (일요일=0, 수요일=3)
+    const diffToWed = (3 - thisWed.getDay() + 7) % 7;
+    thisWed.setDate(thisWed.getDate() + diffToWed);
+    // 만약 오늘이 수요일이고 9시 이전이면, 지난주 수요일 9시로 이동
+    if (now < thisWed) {
+      thisWed.setDate(thisWed.getDate() - 7);
     }
-    
-    // 이번 주 수요일이 될 때까지 날짜 조정
-    while (startDate.getDay() !== 3) {
-      startDate.setDate(startDate.getDate() - 1);
-    }
-    
-    // 다음 주 수요일 9시 계산
-    const endDate = new Date(startDate);
+    // 시작: 이번 주 수요일 9시
+    const startDate = new Date(thisWed);
+    // 끝: 다음 주 수요일 9시
+    const endDate = new Date(thisWed);
     endDate.setDate(endDate.getDate() + 7);
-    
+    // 집계는 끝-1초까지
+    const endTimestamp = endDate.getTime() - 1000;
     const startTimestamp = startDate.getTime();
-    const endTimestamp = endDate.getTime();
+    // 표기용: 1분 빼서 08:59로
+    const displayEndDate = new Date(endDate.getTime() - 60 * 1000);
     
     // 주간 보스 수 계산
     const weeklyBosses = Object.values(data).filter(boss => 
-      boss.timestamp >= startTimestamp && boss.timestamp < endTimestamp
+      boss.timestamp >= startTimestamp && boss.timestamp <= endTimestamp
     ).length;
     
     // 주간 점수 계산
     for(const id in data) {
       const boss = data[id];
-      if(boss.timestamp >= startTimestamp && boss.timestamp < endTimestamp && boss.participants) {
+      if(boss.timestamp >= startTimestamp && boss.timestamp <= endTimestamp && boss.participants) {
         for(const nick in boss.participants) {
           const score = boss.participants[nick].score || 0;
           scores[nick] = (scores[nick] || 0) + score;
@@ -702,7 +702,7 @@ function displayWeeklyScores() {
         return `<li><strong>${index + 1}등</strong> ${n}: ${s}점 <span style="font-size: 70%">( 건수 : ${participated} | 참여율 : ${participationRate}%)</span></li>`;
       }).join('');
       
-      const periodText = `${startDate.toLocaleDateString('ko-KR', {month: 'long', day: 'numeric'})} (${['일', '월', '화', '수', '목', '금', '토'][startDate.getDay()]}) ${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')} ~ ${endDate.toLocaleDateString('ko-KR', {month: 'long', day: 'numeric'})} (${['일', '월', '화', '수', '목', '금', '토'][endDate.getDay()]}) ${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`;
+      const periodText = `${startDate.getMonth() + 1}월 ${startDate.getDate()}일 (${['일', '월', '화', '수', '목', '금', '토'][startDate.getDay()]}) ${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')} ~ ${displayEndDate.getMonth() + 1}월 ${displayEndDate.getDate()}일 (${['일', '월', '화', '수', '목', '금', '토'][displayEndDate.getDay()]}) ${String(displayEndDate.getHours()).padStart(2, '0')}:${String(displayEndDate.getMinutes()).padStart(2, '0')}`;
       
       document.getElementById('weekly').innerHTML =
         `<h5 class='mb-2'>닉네임별 주간 점수</h5>
