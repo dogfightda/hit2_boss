@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <title>대장길드 참여자 체크 Ver 2.1</title>
+  <title>대장길드 참여자 체크</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.1.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -482,6 +482,21 @@
       }
       .ms-auto {
         margin-left: auto !important;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        width: 100%;
+        justify-content: flex-end;
+      }
+      .ms-auto .btn,
+      .ms-auto .btn-sm {
+        width: auto !important;
+        min-width: 90px !important;
+        max-width: 160px !important;
+        font-size: 0.98rem !important;
+        padding: 0.4rem 0.9rem !important;
+        margin: 0 !important;
+        box-sizing: border-box;
       }
       #adminButton {
         margin-bottom: 0 !important;
@@ -521,14 +536,794 @@
         padding: 0.5rem !important;
       }
     }
+
+    /* 랜덤뽑기 모달 스타일 */
+    .random-draw-modal .modal-content {
+      background: var(--card-background);
+      border-radius: 20px;
+      border: none;
+    }
+
+    .random-draw-modal .modal-header {
+      border-bottom: 1px solid #444;
+      padding: 1rem;
+    }
+
+    .random-draw-modal .modal-body {
+      padding: 1.5rem;
+    }
+
+    .random-draw-modal .modal-title {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .random-draw-modal .btn-close {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M2 2l12 12M14 2L2 14'/%3e%3c/svg%3e") !important;
+      filter: none !important;
+      -webkit-filter: none !important;
+      opacity: 1 !important;
+      color: #fff !important;
+    }
+
+    .random-draw-modal .form-control {
+      background-color: #444;
+      border: 2px solid #555;
+      color: #ffffff;
+      border-radius: 15px;
+      padding: 0.7rem 1.26rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .random-draw-modal .form-control:focus {
+      background-color: #444;
+      border-color: #4f8bfd;
+      color: #ffffff;
+      box-shadow: 0 0 0 0.2rem rgba(79, 139, 253, 0.25);
+    }
+
+    .random-draw-modal .btn {
+      border-radius: 15px;
+      padding: 0.7rem 1.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .random-draw-modal .form-label {
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .random-draw-modal .result-box {
+      background: #444;
+      border-radius: 15px;
+      padding: 1rem;
+      margin-top: 1rem;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #4f8bfd;
+      gap: 0.5rem;
+    }
+
+    .random-draw-modal .result-box div {
+      width: 100%;
+      text-align: center;
+      padding: 0.5rem;
+      background: rgba(79, 139, 253, 0.1);
+      border-radius: 10px;
+    }
+
+    .random-draw-modal .btn-primary {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      border: none;
+      color: white;
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+
+    .random-draw-modal .btn-primary:hover {
+      background: linear-gradient(135deg, #6ee7f7 0%, #4f8bfd 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    /* 랜덤뽑기 애니메이션 스타일 */
+    @keyframes drawAnimation {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .draw-animation {
+      animation: drawAnimation 0.5s ease-in-out;
+    }
+
+    .result-highlight {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 0.5rem 0;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    .distribution-input {
+      background: #444;
+      border: 2px solid #555;
+      border-radius: 15px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .distribution-input input,
+    .distribution-input select {
+      background: #333;
+      border: 1px solid #555;
+      color: white;
+      border-radius: 10px;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .distribution-input label {
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .distribution-history {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .distribution-history::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .distribution-history::-webkit-scrollbar-track {
+      background: #333;
+      border-radius: 4px;
+    }
+
+    .distribution-history::-webkit-scrollbar-thumb {
+      background: #4f8bfd;
+      border-radius: 4px;
+    }
+
+    .distribution-history::-webkit-scrollbar-thumb:hover {
+      background: #6ee7f7;
+    }
+
+    /* 추첨 결과 애니메이션 스타일 */
+    @keyframes resultAnimation {
+      0% { transform: translateY(-20px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes highlightAnimation {
+      0% { background: #4f8bfd; }
+      50% { background: #6ee7f7; }
+      100% { background: #4f8bfd; }
+    }
+
+    .result-item {
+      animation: resultAnimation 0.5s ease-out;
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 0.5rem 0;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    .result-item.highlight {
+      animation: highlightAnimation 1s infinite;
+    }
+
+    .distribution-input-form {
+      background: #444;
+      border: 2px solid #555;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .distribution-input-form .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .distribution-input-form label {
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .distribution-input-form input,
+    .distribution-input-form select {
+      width: 100%;
+      background: #333;
+      border: 1px solid #555;
+      color: white;
+      border-radius: 10px;
+      padding: 0.8rem;
+      font-size: 1rem;
+    }
+
+    .distribution-input-form input:focus,
+    .distribution-input-form select:focus {
+      border-color: #4f8bfd;
+      box-shadow: 0 0 0 0.2rem rgba(79, 139, 253, 0.25);
+    }
+
+    .distribution-input-form .btn-save {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .distribution-input-form .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    @keyframes pop {
+        0% { transform: scale(0.7); }
+        80% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .result-item {
+        animation: pop 0.5s;
+        color: #ff9800;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0.5rem 0;
+    }
+
+    .result-item.pulse {
+        animation: pulse 1s infinite;
+    }
+
+    .distribution-input-form {
+        background: #343a40;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    }
+
+    .distribution-input-form .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .distribution-input-form label {
+        color: #f8f9fa;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .distribution-input-form input,
+    .distribution-input-form select {
+        width: 100%;
+        background: #495057;
+        border: 1px solid #6c757d;
+        color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+
+    .distribution-input-form input:focus,
+    .distribution-input-form select:focus {
+        border-color: #3366ff;
+        outline: none;
+        background: #495057;
+        color: #fff;
+    }
+
+    /* 랜덤뽑기 팝업 디자인 개선 */
+    .random-draw-modal .modal-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #4f8bfd;
+      letter-spacing: 0.02em;
+    }
+    .random-draw-modal .card-header,
+    .random-draw-modal .card-body {
+      font-size: 1.08rem;
+      font-weight: 500;
+    }
+    .random-draw-modal .list-group-item {
+      font-size: 0.84rem !important;
+      font-weight: 500;
+      background: #23272b;
+      border: none;
+      color: #fff;
+      margin-bottom: 0.2rem;
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+    }
+    .random-draw-modal .btn,
+    .random-draw-modal .btn-sm {
+      font-size: 1.08rem;
+      font-weight: 700;
+      border-radius: 10px;
+      min-width: 70px;
+      padding: 0.5rem 1.1rem;
+      margin-left: 0.2rem;
+      margin-right: 0.2rem;
+    }
+    .random-draw-modal .btn-success {
+      background: linear-gradient(135deg, #00bc8c 0%, #4f8bfd 100%);
+      color: #fff;
+      border: none;
+    }
+    .random-draw-modal .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+      color: #fff;
+      border: none;
+    }
+    .random-draw-modal .btn-primary {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: #fff;
+      border: none;
+    }
+    .random-draw-modal .btn-primary:hover,
+    .random-draw-modal .btn-success:hover,
+    .random-draw-modal .btn-danger:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 2px 8px rgba(79,139,253,0.15);
+    }
+    .random-draw-modal .form-control {
+      font-size: 1.08rem;
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      background: #23272b;
+      color: #fff;
+      border: 1.5px solid #4f8bfd;
+    }
+    .random-draw-modal .form-control:focus {
+      border-color: #6ee7f7;
+      background: #23272b;
+      color: #fff;
+      box-shadow: 0 0 0 0.15rem rgba(79,139,253,0.15);
+    }
+    .random-draw-modal .result-box {
+      background: #23272b;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-top: 1rem;
+      min-height: 80px;
+      font-size: 1.18rem;
+      font-weight: 700;
+      color: #4f8bfd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border: 1.5px solid #4f8bfd;
+    }
+    .random-draw-modal .result-item {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ff9800;
+      margin: 0.3rem 0;
+      background: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+    }
+    .random-draw-modal .distribution-input-form {
+      background: #23272b;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1.2rem;
+      border: 1.5px solid #4f8bfd;
+    }
+    .random-draw-modal .distribution-input-form label {
+      color: #4f8bfd;
+      font-weight: 700;
+      font-size: 1.08rem;
+      margin-bottom: 0.3rem;
+    }
+    .random-draw-modal .distribution-input-form input,
+    .random-draw-modal .distribution-input-form select {
+      font-size: 1.08rem;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      background: #23272b;
+      color: #fff;
+      border: 1.5px solid #4f8bfd;
+      margin-bottom: 0.5rem;
+    }
+    .random-draw-modal .distribution-input-form input:focus,
+    .random-draw-modal .distribution-input-form select:focus {
+      border-color: #6ee7f7;
+      background: #23272b;
+      color: #fff;
+      box-shadow: 0 0 0 0.15rem rgba(79,139,253,0.15);
+    }
+    .random-draw-modal .distribution-input-form .btn-save {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: #fff;
+      border: none;
+      font-size: 1.08rem;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      margin-top: 0.5rem;
+    }
+    .random-draw-modal .table {
+      font-size: 1.08rem;
+      background: #23272b;
+      color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .random-draw-modal .table th,
+    .random-draw-modal .table td {
+      background: #23272b;
+      color: #fff;
+      border: none;
+      text-align: center;
+      vertical-align: middle;
+      padding: 0.7rem 0.5rem;
+    }
+    .random-draw-modal .table thead th {
+      color: #4f8bfd;
+      font-weight: 800;
+      font-size: 1.08rem;
+      background: #23272b;
+      border-bottom: 2px solid #4f8bfd;
+    }
+    .random-draw-modal .table-hover tbody tr:hover {
+      background: #2a2e33;
+    }
+    @media (max-width: 900px) {
+      .random-draw-modal .modal-dialog {
+        max-width: 98vw;
+        margin: 0.5rem auto;
+      }
+      .random-draw-modal .modal-body {
+        padding: 0.7rem;
+      }
+      .random-draw-modal .card-body {
+        padding: 0.7rem;
+      }
+      .random-draw-modal .result-box {
+        padding: 0.7rem;
+        font-size: 1.05rem;
+      }
+      .random-draw-modal .distribution-input-form {
+        padding: 0.7rem;
+      }
+      .random-draw-modal .table th,
+      .random-draw-modal .table td {
+        padding: 0.5rem 0.2rem;
+        font-size: 0.98rem;
+      }
+      .random-draw-modal .list-group-item {
+        font-size: 0.98rem;
+        padding: 0.5rem 0.7rem;
+      }
+      .random-draw-modal .btn,
+      .random-draw-modal .btn-sm {
+        font-size: 0.95rem;
+        min-width: 48px;
+        padding: 0.35rem 0.7rem;
+      }
+      .random-draw-modal .drawIdList-item,
+      .random-draw-modal #drawIdList .list-group-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+      .random-draw-modal #drawIdList .btn {
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 0.3rem 0.7rem !important;
+        font-size: 0.95rem !important;
+      }
+      .random-draw-modal .card-header .btn {
+        width: auto !important;
+        min-width: 70px !important;
+        max-width: 140px !important;
+        padding: 0.35rem 0.9rem !important;
+        font-size: 0.95rem !important;
+        margin-left: 0.2rem;
+        margin-right: 0.2rem;
+        box-sizing: border-box;
+      }
+    }
+    .random-draw-modal .card-body .btn-primary {
+      font-size: 1.08rem;
+      font-weight: 700;
+      border-radius: 10px;
+      min-width: 120px;
+      max-width: 180px;
+      padding: 0.5rem 1.2rem;
+      margin-left: 0.2rem;
+      margin-right: 0.2rem;
+      box-sizing: border-box;
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: #fff;
+      border: none;
+      transition: filter 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+    @media (max-width: 900px) {
+      .random-draw-modal .card-body .btn-primary {
+        font-size: 0.98rem;
+        min-width: 110px;
+        max-width: 140px;
+        padding: 0.4rem 1rem;
+        white-space: nowrap;
+      }
+    }
+
+    /* 상세수정 모달 다크 테마 및 폰트 크기 통일 */
+    #detailEditModal .modal-content {
+      background: #23272b;
+      color: #f1f3f5;
+      border-radius: 16px;
+      font-size: 1.08rem;
+    }
+    #detailEditModal .modal-header, #detailEditModal .modal-body {
+      background: #23272b;
+      color: #f1f3f5;
+      font-size: 1.08rem;
+    }
+    #detailEditModal .modal-title {
+      font-size: 1.22rem;
+      font-weight: 800;
+      color: #4f8bfd;
+    }
+    #detailEditModal .card {
+      background: #23272b;
+      color: #f1f3f5;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      font-size: 1.08rem;
+      margin-bottom: 1.1rem;
+    }
+    #detailEditModal .card-header {
+      background: #23272b;
+      color: #4f8bfd;
+      font-weight: 700;
+      font-size: 1.08rem;
+      border-bottom: 1px solid #444;
+      border-radius: 12px 12px 0 0;
+    }
+    #detailEditModal .form-control, #detailEditModal .form-select {
+      background: #2a2e33;
+      color: #f1f3f5;
+      border: 1.5px solid #4f8bfd;
+      font-size: 1.08rem;
+      border-radius: 8px;
+      margin-bottom: 0.2rem;
+    }
+    #detailEditModal .form-control:focus, #detailEditModal .form-select:focus {
+      border-color: #6ee7f7;
+      background: #23272b;
+      color: #fff;
+      box-shadow: 0 0 0 0.15rem rgba(79,139,253,0.15);
+    }
+    #detailEditModal .table {
+      background: #23272b;
+      color: #f1f3f5;
+      font-size: 1.08rem;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #detailEditModal .table th, #detailEditModal .table td {
+      background: #23272b;
+      color: #f1f3f5;
+      border: none;
+      text-align: center;
+      vertical-align: middle;
+      padding: 0.7rem 0.5rem;
+      font-size: 1.08rem;
+    }
+    #detailEditModal .table-striped > tbody > tr:nth-of-type(odd) {
+      background: #262b32;
+    }
+    #detailEditModal .btn {
+      font-size: 1.08rem;
+      font-weight: 700;
+      border-radius: 8px;
+      min-width: 120px;
+      padding: 0.5rem 1.2rem;
+      margin-left: 0.1rem;
+      margin-right: 0.1rem;
+      box-sizing: border-box;
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    @media (max-width: 900px) {
+      #detailEditModal .btn {
+        font-size: 0.98rem;
+        min-width: 90px;
+        padding: 0.35rem 0.9rem;
+        height: 38px;
+      }
+    }
+    #detailEditModal .btn-primary {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: #fff;
+      border: none;
+    }
+    #detailEditModal .btn-success {
+      background: linear-gradient(135deg, #00bc8c 0%, #4f8bfd 100%);
+      color: #fff;
+      border: none;
+    }
+    #detailEditModal .btn-warning {
+      background: linear-gradient(135deg, #facc15 0%, #f59e42 100%);
+      color: #23272b;
+      border: none;
+    }
+    #detailEditModal .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+      color: #fff;
+      border: none;
+    }
+    #detailEditModal .btn:focus, #detailEditModal .btn:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 2px 8px rgba(79,139,253,0.15);
+    }
+    @media (max-width: 900px) {
+      #detailEditModal .modal-content, #detailEditModal .card, #detailEditModal .modal-header, #detailEditModal .modal-body {
+        font-size: 0.98rem;
+        padding: 0.7rem;
+      }
+      #detailEditModal .btn {
+        font-size: 0.98rem;
+        min-width: 70px;
+        padding: 0.35rem 0.7rem;
+      }
+      #detailEditModal .table th, #detailEditModal .table td {
+        font-size: 0.98rem;
+        padding: 0.5rem 0.2rem;
+      }
+    }
+
+    .random-draw-modal .modal-content,
+    .random-draw-modal .modal-header,
+    .random-draw-modal .modal-body,
+    .random-draw-modal .card,
+    .random-draw-modal .card-header,
+    .random-draw-modal .card-body,
+    .random-draw-modal .form-control,
+    .random-draw-modal .form-select,
+    .random-draw-modal .table,
+    .random-draw-modal .table th,
+    .random-draw-modal .table td,
+    #detailEditModal .modal-content,
+    #detailEditModal .modal-header,
+    #detailEditModal .modal-body,
+    #detailEditModal .card,
+    #detailEditModal .card-header,
+    #detailEditModal .card-body,
+    #detailEditModal .form-control,
+    #detailEditModal .form-select,
+    #detailEditModal .table,
+    #detailEditModal .table th,
+    #detailEditModal .table td {
+      font-size: 0.84rem !important;
+    }
+    .random-draw-modal .btn,
+    .random-draw-modal .btn-sm,
+    #detailEditModal .btn {
+      font-size: 0.84rem !important;
+      min-width: 80px !important;
+      padding: 0.48rem 0.96rem !important;
+      border-radius: 12px !important;
+      height: 35px !important;
+    }
+    .random-draw-modal .form-control,
+    .random-draw-modal .form-select,
+    #detailEditModal .form-control,
+    #detailEditModal .form-select {
+      border-radius: 12px !important;
+      padding: 0.56rem 1.01rem !important;
+      font-size: 0.84rem !important;
+    }
+    .random-draw-modal .table,
+    #detailEditModal .table {
+      border-radius: 12px !important;
+      font-size: 0.84rem !important;
+    }
+    @media (max-width: 900px) {
+      .random-draw-modal .btn,
+      .random-draw-modal .btn-sm,
+      #detailEditModal .btn {
+        font-size: 0.78rem !important;
+        min-width: 64px !important;
+        padding: 0.32rem 0.7rem !important;
+        /* height: 28px !important; */
+        line-height: normal !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .random-draw-modal .form-control,
+      .random-draw-modal .form-select,
+      #detailEditModal .form-control,
+      #detailEditModal .form-select {
+        font-size: 0.78rem !important;
+        padding: 0.4rem 0.7rem !important;
+        border-radius: 10px !important;
+      }
+      .random-draw-modal .table,
+      .random-draw-modal .table th,
+      .random-draw-modal .table td,
+      #detailEditModal .table,
+      #detailEditModal .table th,
+      #detailEditModal .table td {
+        font-size: 0.78rem !important;
+      }
+    }
+    .random-draw-modal .list-group-item.d-flex.justify-content-between.align-items-center {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    #bossList ~ div[style*="color:#1976d2"],
+    #bossList ~ div[style*="color: #1976d2"] {
+      color: #fff !important;
+    }
+    .boss-info-notice {
+      color: #fff !important;
+    }
+    @media (max-width: 900px) {
+      #detailEditModal .row.g-2 {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+      }
+      #detailEditModal .row.g-2 > .col,
+      #detailEditModal .row.g-2 > .col-auto {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        display: block !important;
+      }
+    }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-    <h1 class="h3 mb-0">대장길드 참여자 체크 Ver 2.1</h1>
+    <h1 class="h3 mb-0">대장길드 참여자 체크 Ver 2.2</h1>
     <div class="ms-auto">
-      <button id="adminButton" class="btn btn-outline-primary btn-sm" onclick="setAdmin()">관리자 설정</button>
+      <button id="randomButton" class="btn btn-outline-primary btn-sm" onclick="openRandomDraw()">랜덤뽑기</button>
+      <button id="adminButton" class="btn btn-outline-primary btn-sm ms-2" onclick="setAdmin()">관리자 설정</button>
       <button id="detailEditBtn" class="btn btn-outline-primary btn-sm ms-2" style="display:none;" data-bs-toggle="modal" data-bs-target="#detailEditModal">상세수정</button>
     </div>
     <div id="authInfo" class="d-none mt-2" style="margin-top: 0 !important;">
@@ -598,7 +1393,7 @@
       <h5 class="section-title mb-0">오픈된 보스</h5>
       <button class="btn btn-outline-primary btn-sm" onclick="downloadCSV()">CSV 다운로드</button>
     </div>
-    <div style="margin:0.2rem 0 0.5rem 0; color:#1976d2; font-size:0.98rem; font-weight:500;">
+    <div class="boss-info-notice" style="margin:0.2rem 0 0.5rem 0; color:#1976d2; font-size:0.98rem; font-weight:500;">
       안내 : 보스 지정된 오픈시간 후 6시간 동안 참여 선택이 가능합니다.
     </div>
     <div class="d-flex gap-2">
@@ -608,60 +1403,173 @@
   </div>
 </div>
 
-<!-- 상세수정 모달 -->
+<!-- 랜덤뽑기 모달 -->
+<div class="modal fade random-draw-modal" id="randomDrawModal" tabindex="-1" aria-labelledby="randomDrawModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="randomDrawModalLabel">대장길드 랜덤 뽑기</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-4">
+          <!-- 기본 아이디 목록 -->
+          <div class="col-md-6">
+            <div class="card bg-dark">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="text-light">기본 아이디 목록</span>
+                <button class="btn btn-success btn-sm" onclick="addAllBaseIdsToDrawList()">전체추가</button>
+              </div>
+              <div class="card-body">
+                <ul id="baseIdList" class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;"></ul>
+              </div>
+            </div>
+          </div>
+          <!-- 뽑기 대상 목록 -->
+          <div class="col-md-6">
+            <div class="card bg-dark">
+              <div class="card-header">
+                <span class="text-light">뽑기 대상 목록</span>
+              </div>
+              <div class="card-body">
+                <ul id="drawIdList" class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 추첨 영역 -->
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <div class="d-flex gap-3 align-items-center mb-3">
+              <input type="number" id="drawCount" class="form-control" min="1" value="1" placeholder="뽑을 인원 수">
+              <button class="btn btn-primary" onclick="drawRandom()">추첨하기</button>
+            </div>
+            <div id="drawResult" class="result-box text-center py-3">
+              결과가 여기에 표시됩니다
+            </div>
+          </div>
+        </div>
+        <!-- 분배 내역 -->
+        <div class="card bg-dark">
+          <div class="card-header">
+            <span class="text-light">분배 내역</span>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-dark table-hover">
+                <thead>
+                  <tr>
+                    <th class="text-center">날짜</th>
+                    <th class="text-center">닉네임</th>
+                    <th class="text-center">아이템</th>
+                    <th class="text-center" id="actionColumn" style="display: none;">작업</th>
+                  </tr>
+                </thead>
+                <tbody id="adminInputList"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- 분배 내역 입력 폼 (관리자용) -->
+        <div id="distributionInputForm" class="card bg-dark mt-4" style="display: none;">
+          <div class="card-header">
+            <span class="text-light">분배 내역 입력</span>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <input type="date" id="distributionDate" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <select id="distributionNickname" class="form-control">
+                  <option value="">닉네임 선택</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <input type="text" id="distributionItem" class="form-control" placeholder="아이템 입력">
+              </div>
+            </div>
+            <div class="text-end mt-3">
+              <button class="btn btn-primary" onclick="saveDistributionInput()">저장</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 신규 아이디 추가 모달 -->
+<div class="modal fade" id="addIdModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark">
+      <div class="modal-header">
+        <h5 class="modal-title text-light">신규 아이디 추가</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="modalNewId" class="form-control mb-3" placeholder="새로운 아이디를 입력하세요">
+        <div class="text-end">
+          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">취소</button>
+          <button class="btn btn-primary" onclick="addNewIdFromModal()">추가</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 상세수정 모달 리뉴얼: 밝은 Bootstrap 카드/테이블/입력폼/버튼 스타일, 기능 정상화 -->
 <div class="modal fade" id="detailEditModal" tabindex="-1" aria-labelledby="detailEditModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="detailEditModalLabel">상세 데이터 수정</h5>
+        <h5 class="modal-title" id="detailEditModalLabel">상세수정</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body" id="detailEditModalBody">
-        <div id="adminDetailSection">
-          <div class="card mb-4">
-            <div class="card-header">누락 데이터 추가</div>
-            <div class="card-body">
-              <div class="row g-2">
-                <div class="col-12 mb-2"><input id="missingBossId_modal" class="form-control" placeholder="보스 ID"></div>
-                <div class="col"><input id="missingBossTime_modal" class="form-control" type="datetime-local"></div>
-                <div class="col"><input id="missingNick_modal" class="form-control" placeholder="닉네임"></div>
-                <div class="col"><input id="missingScore_modal" class="form-control" type="number" placeholder="점수"></div>
-                <div class="col-auto"><button class="btn btn-primary" onclick="addMissingData_modal()">추가</button></div>
-              </div>
+      <div class="modal-body">
+        <div class="card mb-4">
+          <div class="card-header">누락 데이터 추가</div>
+          <div class="card-body">
+            <div class="row g-2">
+              <div class="col-12 mb-2"><input id="missingBossId_modal" class="form-control" placeholder="보스 ID"></div>
+              <div class="col"><input id="missingBossTime_modal" class="form-control" type="datetime-local"></div>
+              <div class="col"><input id="missingNick_modal" class="form-control" placeholder="닉네임"></div>
+              <div class="col"><input id="missingScore_modal" class="form-control" type="number" placeholder="점수"></div>
+              <div class="col-auto"><button class="btn btn-primary w-100" onclick="addMissingData_modal()">추가</button></div>
             </div>
           </div>
-          <div class="card mb-4">
-            <div class="card-header">참여자 수정</div>
-            <div class="card-body">
-              <select id="bossSelect_modal" class="form-select mb-2" onchange="loadParticipantsTable_modal()">
-                <option value="">보스 선택</option>
-              </select>
-              <table class="table table-striped table-hover">
-                <tbody id="participantTable_modal"></tbody>
-              </table>
-              <div class="row g-2 mb-2">
-                <div class="col"><input id="editNick_modal" class="form-control" readonly placeholder="선택된 닉네임"></div>
-                <div class="col"><input id="editScore_modal" class="form-control" type="number" placeholder="현재 점수"></div>
-                <div class="col-auto"><button class="btn btn-primary" onclick="updateParticipantScore_modal()">점수 수정</button></div>
-              </div>
-              <div class="row g-2 mb-2">
-                <div class="col"><input id="newNick_modal" class="form-control" placeholder="새 닉네임"></div>
-                <div class="col-auto"><button class="btn btn-warning" onclick="changeParticipantNick_modal()">닉네임 변경</button></div>
-              </div>
-              <hr/>
-              <div class="row g-2 mb-2">
-                <div class="col"><input id="addNick_modal" class="form-control" placeholder="추가할 닉네임"></div>
-                <div class="col"><input id="addScore_modal" class="form-control" type="number" placeholder="점수"></div>
-                <div class="col-auto"><button class="btn btn-success" onclick="addParticipantToBoss_modal()">참여자 추가</button></div>
-              </div>
+        </div>
+        <div class="card mb-4">
+          <div class="card-header">참여자 수정</div>
+          <div class="card-body">
+            <select id="bossSelect_modal" class="form-select mb-2" onchange="loadParticipantsTable_modal()">
+              <option value="">보스 선택</option>
+            </select>
+            <table class="table table-striped table-hover">
+              <tbody id="participantTable_modal"></tbody>
+            </table>
+            <div class="row g-2 mb-2">
+              <div class="col"><input id="editNick_modal" class="form-control" readonly placeholder="선택된 닉네임"></div>
+              <div class="col"><input id="editScore_modal" class="form-control" type="number" placeholder="현재 점수"></div>
+              <div class="col-auto"><button class="btn btn-primary w-100" onclick="updateParticipantScore_modal()">점수 수정</button></div>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col"><input id="newNick_modal" class="form-control" placeholder="새 닉네임"></div>
+              <div class="col-auto"><button class="btn btn-warning w-100" onclick="changeParticipantNick_modal()">닉네임 변경</button></div>
+            </div>
+            <hr/>
+            <div class="row g-2 mb-2">
+              <div class="col"><input id="addNick_modal" class="form-control" placeholder="추가할 닉네임"></div>
+              <div class="col"><input id="addScore_modal" class="form-control" type="number" placeholder="점수"></div>
+              <div class="col-auto"><button class="btn btn-success w-100" onclick="addParticipantToBoss_modal()">참여자 추가</button></div>
             </div>
           </div>
-          <div class="card mb-4">
-            <div class="card-header">보스 ID 수정</div>
-            <div class="card-body row g-2">
-              <div class="col"><input id="newBossId_modal" class="form-control" placeholder="새 보스 ID"></div>
-              <div class="col-auto"><button class="btn btn-danger" onclick="changeBossId_modal()">보스 ID 변경</button></div>
-            </div>
+        </div>
+        <div class="card mb-4">
+          <div class="card-header">보스 ID 수정</div>
+          <div class="card-body row g-2">
+            <div class="col"><input id="newBossId_modal" class="form-control" placeholder="새 보스 ID"></div>
+            <div class="col-auto"><button class="btn btn-danger w-100" onclick="changeBossId_modal()">보스 ID 변경</button></div>
           </div>
         </div>
       </div>
@@ -1065,7 +1973,415 @@ function resetShowAll() {
   displayCustomScores();
 }
 
-window.onload=()=>{checkAdmin();displayTotalScores();displayWeeklyScores();displayCustomScores();loadBosses();};
+function openRandomDraw() {
+  const modal = new bootstrap.Modal(document.getElementById('randomDrawModal'));
+  // 모달이 열릴 때 초기화
+  document.getElementById('drawIdList').innerHTML = '';
+  document.getElementById('drawCount').value = '1';
+  document.getElementById('drawResult').textContent = '결과가 여기에 표시됩니다';
+  // 기본 아이디 목록 로드
+  window.initializeAndDisplayDefaultIds();
+  // 분배 내역 로드
+  window.loadDistributionInputs();
+  // 닉네임 드롭다운 옵션 갱신
+  window.refreshDistributionNicknameOptions();
+  // 관리자일 경우 분배내역 입력 폼 표시
+  const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+  document.getElementById('distributionInputForm').style.display = isAdmin ? 'block' : 'none';
+  modal.show();
+}
+
+function drawRandom() {
+    const drawIdList = document.getElementById('drawIdList');
+    const drawCount = parseInt(document.getElementById('drawCount').value);
+    const resultBox = document.getElementById('drawResult');
+
+    // 뽑기 대상 목록에서 아이디 가져오기
+    const participants = Array.from(drawIdList.children).map(li => li.querySelector('span').textContent);
+    
+    if (participants.length === 0) {
+        resultBox.innerHTML = '<div class="text-danger">뽑기 대상이 없습니다.</div>';
+        return;
+    }
+
+    if (isNaN(drawCount) || drawCount < 1) {
+        resultBox.innerHTML = '<div class="text-danger">뽑을 인원 수를 올바르게 입력해주세요.</div>';
+        return;
+    }
+
+    if (drawCount > participants.length) {
+        resultBox.innerHTML = `<div class="text-danger">뽑을 인원 수(${drawCount}명)가 참여자 수(${participants.length}명)보다 많습니다.</div>`;
+        return;
+    }
+
+    // 애니메이션 효과를 위한 준비
+    resultBox.innerHTML = '<div class="draw-animation">뽑는 중...</div>';
+    
+    // 추첨 대상 섞기
+    const shuffled = [...participants].sort(() => Math.random() - 0.5);
+    const winners = shuffled.slice(0, drawCount);
+
+    // 여러 명 뽑을 때 한 명씩 순차적으로 애니메이션
+    async function animateDraw(names, winnerList) {
+        let resultHTML = '';
+        for (let i = 0; i < winnerList.length; i++) {
+            await new Promise(resolve => {
+                let t = 0;
+                const duration = 900 + Math.random() * 600; // 0.9~1.5초
+                let lastName = '';
+                const interval = setInterval(() => {
+                    lastName = names[Math.floor(Math.random() * names.length)];
+                    resultBox.innerHTML = resultHTML + `<span class='inline-block text-2xl md:text-3xl text-accent font-extrabold animate-pulse' style='color:#ff9800;'>${lastName}</span>`;
+                }, 50);
+                setTimeout(() => {
+                    clearInterval(interval);
+                    resultHTML += `<span class='block text-2xl md:text-3xl text-accent font-extrabold mb-1' style='color:#ff9800; animation:pop 0.5s;'>${winnerList[i]}</span>`;
+                    resultBox.innerHTML = resultHTML;
+                    setTimeout(resolve, 350);
+                }, duration);
+            });
+        }
+        if (winnerList.length === 1) {
+            resultBox.innerHTML = `당첨자: <span class='text-accent font-extrabold text-2xl md:text-3xl' style='color:#ff9800; animation:pop 0.5s;'>${winnerList[0]}</span>`;
+        } else {
+            resultBox.innerHTML = `당첨자:<br>` + winnerList.map(w => `<span class='block text-accent font-extrabold text-2xl md:text-3xl' style='color:#ff9800; animation:pop 0.5s;'>${w}</span>`).join('');
+        }
+    }
+    animateDraw(participants, winners);
+}
+
+// 모달이 닫힐 때 입력 필드 초기화
+document.getElementById('randomDrawModal').addEventListener('hidden.bs.modal', function () {
+  document.getElementById('drawIdList').innerHTML = '';
+  document.getElementById('drawCount').value = '1';
+  document.getElementById('drawResult').textContent = '결과가 여기에 표시됩니다';
+});
+
+// 기본 아이디 목록 초기화 함수
+window.initializeAndDisplayDefaultIds = async function() {
+  const baseIdList = document.getElementById('baseIdList');
+  try {
+    const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
+    let data = snapshot.val();
+    
+    // Firebase에 데이터가 없는 경우 초기 데이터 설정
+    if (!data) {
+      const initialData = {
+        name: '기본 아이디 목록',
+        participants: [
+          "채리대장", "총괄대장", "곰도리젤리", "수달대장", "가든대장",
+          "그냥대장", "내사랑정희", "리샤대장", "호구대장", "뽀빠이대장",
+          "진짜대장", "판다대장", "폭포대장", "화기대장", "기본원칙돌쇠대장",
+          "쭈니대장", "캇뚜대장", "열정대장", "예스대장", "츄하이대장",
+          "빠루대장", "입딜대장", "가챠대장", "내가대장", "향기대장"
+        ],
+        type: 'randomDraw',
+        createdAt: Date.now()
+      };
+      await db.ref('randomDrawLists/defaultIds').set(initialData);
+      data = initialData;
+    }
+
+    baseIdList.innerHTML = '';
+    if (!data.participants || data.participants.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'list-group-item text-center text-danger';
+      li.textContent = '기본 아이디 목록을 불러오는데 실패했습니다.';
+      baseIdList.appendChild(li);
+      return;
+    }
+
+    data.participants.sort().forEach((id) => {
+      const li = document.createElement('li');
+      li.className = 'list-group-item d-flex justify-content-between align-items-center';
+      const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+      li.innerHTML = `
+        <span class="text-light">${id}</span>
+        <div class="btn-group">
+          <button class="btn btn-success btn-sm" onclick="addToDrawList('${id}')">추가</button>
+          ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="removeBaseId('${id}')">삭제</button>` : ''}
+        </div>
+      `;
+      baseIdList.appendChild(li);
+    });
+
+    // [신규 아이디 추가] 버튼
+    const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+    if (isAdmin) {
+      const addBtnLi = document.createElement('li');
+      addBtnLi.className = 'list-group-item text-center';
+      addBtnLi.innerHTML = `<button class="btn btn-primary btn-sm w-100" onclick="openAddIdModal()">+ 신규 아이디 추가</button>`;
+      baseIdList.appendChild(addBtnLi);
+    }
+  } catch (error) {
+    console.error('기본 아이디 목록 로드 오류:', error);
+    baseIdList.innerHTML = `
+      <li class="list-group-item text-center text-danger">
+        기본 아이디 목록을 불러오는데 실패했습니다.
+      </li>
+    `;
+  }
+};
+
+// 뽑기 대상 목록에 아이디 추가
+window.addToDrawList = function(id) {
+  const drawIdList = document.getElementById('drawIdList');
+  const current = Array.from(drawIdList.children).map(li => li.querySelector('span').textContent);
+  if (current.includes(id)) return;
+  const li = document.createElement('li');
+  li.className = 'list-group-item d-flex justify-content-between align-items-center';
+  li.innerHTML = `
+    <span class="text-light">${id}</span>
+    <button class="btn btn-outline-light btn-sm" onclick="removeDrawId(this)">제거</button>
+  `;
+  drawIdList.appendChild(li);
+  // 이름순 정렬
+  const items = Array.from(drawIdList.children);
+  items.sort((a, b) => a.querySelector('span').textContent.localeCompare(b.querySelector('span').textContent));
+  items.forEach(item => drawIdList.appendChild(item));
+};
+
+// 뽑기 대상 목록에서 아이디 제거
+window.removeDrawId = function(btn) {
+  btn.closest('li').remove();
+};
+
+// 기본 아이디 삭제
+window.removeBaseId = async function(id) {
+  if (!confirm('정말로 이 ID를 삭제하시겠습니까?')) return;
+  try {
+    const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
+    let data = snapshot.val();
+    if (data && data.participants) {
+      data.participants = data.participants.filter(item => item !== id);
+      await db.ref('randomDrawLists/defaultIds').update({
+        participants: data.participants
+      });
+      await window.initializeAndDisplayDefaultIds();
+      await window.refreshDistributionNicknameOptions();
+    }
+  } catch (error) {
+    console.error('ID 삭제 오류:', error);
+    alert('ID 삭제 중 오류가 발생했습니다.');
+  }
+};
+
+// 전체 추가
+window.addAllBaseIdsToDrawList = async function() {
+  const drawIdList = document.getElementById('drawIdList');
+  try {
+    const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
+    let data = snapshot.val();
+    if (!data || !data.participants) {
+      alert('기본 아이디 목록을 불러오는데 실패했습니다.');
+      return;
+    }
+    const current = Array.from(drawIdList.children).map(li => li.querySelector('span').textContent);
+    data.participants.forEach(id => {
+      if (!current.includes(id)) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+          <span class="text-light">${id}</span>
+          <button class="btn btn-outline-light btn-sm" onclick="removeDrawId(this)">제거</button>
+        `;
+        drawIdList.appendChild(li);
+      }
+    });
+    // 이름순 정렬
+    const items = Array.from(drawIdList.children);
+    items.sort((a, b) => a.querySelector('span').textContent.localeCompare(b.querySelector('span').textContent));
+    items.forEach(item => drawIdList.appendChild(item));
+  } catch (error) {
+    console.error('전체 추가 오류:', error);
+    alert('전체 추가 중 오류가 발생했습니다.');
+  }
+};
+
+// 분배 내역 로드
+window.loadDistributionInputs = async function() {
+  const inputList = document.getElementById('adminInputList');
+  const actionColumn = document.getElementById('actionColumn');
+  const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+  
+  try {
+    const snapshot = await db.ref('randomDrawLists/distributionInputs').once('value');
+    const inputs = snapshot.val() || {};
+    
+    inputList.innerHTML = '';
+    actionColumn.style.display = isAdmin ? 'table-cell' : 'none';
+    
+    if (Object.keys(inputs).length === 0) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td colspan="${isAdmin ? '4' : '3'}" class="text-center py-4">
+          <div class="text-muted">입력된 내역이 없습니다.</div>
+        </td>
+      `;
+      inputList.appendChild(tr);
+      return;
+    }
+
+    Object.entries(inputs)
+      .sort((a, b) => b[1].timestamp - a[1].timestamp)
+      .forEach(([key, data]) => {
+        const tr = document.createElement('tr');
+        tr.className = 'distribution-row';
+        tr.innerHTML = `
+          <td class="text-center">${data.date}</td>
+          <td class="text-center">${data.nickname}</td>
+          <td class="text-center">${data.item}</td>
+          ${isAdmin ? `
+            <td class="text-center">
+              <button class="btn btn-danger btn-sm" onclick="deleteDistributionInput('${key}')">
+                <i class="fas fa-trash"></i> 삭제
+              </button>
+            </td>
+          ` : ''}
+        `;
+        inputList.appendChild(tr);
+      });
+  } catch (error) {
+    console.error('데이터 로드 중 오류:', error);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td colspan="${isAdmin ? '4' : '3'}" class="text-center py-4">
+        <div class="text-danger">데이터를 불러오는 중 오류가 발생했습니다.</div>
+      </td>
+    `;
+    inputList.appendChild(tr);
+  }
+};
+
+// 닉네임 드롭다운 옵션 갱신
+window.refreshDistributionNicknameOptions = async function() {
+  const nicknameSelect = document.getElementById('distributionNickname');
+  if (!nicknameSelect) return;
+  nicknameSelect.innerHTML = '<option value="">닉네임 선택</option>';
+  try {
+    const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
+    let data = snapshot.val();
+    let ids = (data && data.participants) ? data.participants : [];
+    ids.sort().forEach(id => {
+      const option = document.createElement('option');
+      option.value = id;
+      option.textContent = id;
+      nicknameSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error('닉네임 옵션 갱신 오류:', error);
+    alert('닉네임 목록을 불러오는데 실패했습니다.');
+  }
+};
+
+// 분배 내역 저장
+window.saveDistributionInput = async function() {
+  const date = document.getElementById('distributionDate').value;
+  const nickname = document.getElementById('distributionNickname').value;
+  const item = document.getElementById('distributionItem').value;
+
+  if (!date || !nickname || !item) {
+    alert('모든 필드를 입력해주세요!');
+    return;
+  }
+
+  try {
+    const newInput = {
+      date,
+      nickname,
+      item,
+      timestamp: Date.now()
+    };
+
+    await db.ref('randomDrawLists/distributionInputs').push(newInput);
+    
+    // 입력 필드 초기화
+    document.getElementById('distributionDate').value = '';
+    document.getElementById('distributionNickname').value = '';
+    document.getElementById('distributionItem').value = '';
+
+    // 성공 메시지 표시
+    const successMsg = document.createElement('div');
+    successMsg.className = 'alert alert-success mt-3';
+    successMsg.textContent = '분배 내역이 저장되었습니다.';
+    document.getElementById('distributionInputForm').appendChild(successMsg);
+    
+    // 3초 후 메시지 제거
+    setTimeout(() => {
+      successMsg.remove();
+    }, 3000);
+
+    // 목록 새로고침
+    await loadDistributionInputs();
+  } catch (error) {
+    console.error('저장 중 오류:', error);
+    alert('저장 중 오류가 발생했습니다: ' + error.message);
+  }
+};
+
+// 분배 내역 삭제
+window.deleteDistributionInput = async function(key) {
+  if (!confirm('정말로 이 항목을 삭제하시겠습니까?')) return;
+  
+  try {
+    await db.ref(`randomDrawLists/distributionInputs/${key}`).remove();
+    await loadDistributionInputs();
+  } catch (error) {
+    console.error('삭제 중 오류:', error);
+    alert('삭제 중 오류가 발생했습니다: ' + error.message);
+  }
+};
+
+// 신규 아이디 추가 모달 열기
+window.openAddIdModal = function() {
+  const modal = new bootstrap.Modal(document.getElementById('addIdModal'));
+  modal.show();
+};
+
+// 신규 아이디 추가
+window.addNewIdFromModal = async function() {
+  const input = document.getElementById('modalNewId');
+  const newId = input.value.trim();
+  if (!newId) {
+    alert('아이디를 입력하세요.');
+    return;
+  }
+  try {
+    const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
+    let data = snapshot.val();
+    if (!data || !data.participants) {
+      alert('기본 아이디 목록을 불러오는데 실패했습니다.');
+      return;
+    }
+    let ids = data.participants;
+    if (ids.includes(newId)) {
+      alert('이미 존재하는 아이디입니다.');
+      return;
+    }
+    ids.push(newId);
+    await db.ref('randomDrawLists/defaultIds').update({ participants: ids });
+    await window.initializeAndDisplayDefaultIds();
+    await window.refreshDistributionNicknameOptions();
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addIdModal'));
+    modal.hide();
+    input.value = '';
+  } catch (error) {
+    console.error('아이디 추가 오류:', error);
+    alert('아이디 추가 중 오류가 발생했습니다.');
+  }
+};
+
+window.onload = () => {
+  checkAdmin();
+  displayTotalScores();
+  displayWeeklyScores();
+  displayCustomScores();
+  loadBosses();
+  // 랜덤 뽑기 관련 초기화
+  window.initializeAndDisplayDefaultIds();
+  window.loadDistributionInputs();
+  window.refreshDistributionNicknameOptions();
+};
 </script>
 
 <script>
