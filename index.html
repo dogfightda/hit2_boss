@@ -1315,6 +1315,12 @@
         display: block !important;
       }
     }
+    @media (max-width: 1000px) {
+      .random-draw-modal .modal-dialog {
+        max-width: 98vw;
+        margin: 0.5rem auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -2093,13 +2099,15 @@ window.initializeAndDisplayDefaultIds = async function() {
 
     data.participants.sort().forEach((id) => {
       const li = document.createElement('li');
-      li.className = 'list-group-item d-flex justify-content-between align-items-center';
+      li.className = 'list-group-item p-0';
       const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
       li.innerHTML = `
-        <span class="text-light">${id}</span>
-        <div class="btn-group">
-          <button class="btn btn-success btn-sm" onclick="addToDrawList('${id}')">추가</button>
-          ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="removeBaseId('${id}')">삭제</button>` : ''}
+        <div class="d-flex flex-sm-row flex-column align-items-sm-center align-items-stretch w-100 p-2">
+          <span class="text-light flex-grow-1 text-truncate" style="min-width:0;max-width:180px;white-space:nowrap;overflow:hidden;">${id}</span>
+          <div class="d-flex flex-sm-row flex-column gap-2 ms-auto" style="min-width:90px;max-width:180px;">
+            <button class="btn btn-success btn-sm" style="width:auto;max-width:160px;" onclick="addToDrawList('${id}')">추가</button>
+            ${isAdmin ? `<button class="btn btn-danger btn-sm" style="width:auto;max-width:160px;" onclick="removeBaseId('${id}')">삭제</button>` : ''}
+          </div>
         </div>
       `;
       baseIdList.appendChild(li);
