@@ -1397,7 +1397,7 @@
   <div class="card p-4">
     <div class="d-flex justify-content-between align-items-center mb-2">
       <h5 class="section-title mb-0">오픈된 보스</h5>
-      <button class="btn btn-outline-primary btn-sm" onclick="downloadCSV()">CSV 다운로드</button>
+      <button class="btn btn-outline-primary btn-sm" onclick="downloadDistributionCSV()" style="display: flex; align-items: center; justify-content: center; height: 100%; line-height: 1.2;">CSV 다운로드</button>
     </div>
     <div class="boss-info-notice" style="margin:0.2rem 0 0.5rem 0; color:#1976d2; font-size:0.98rem; font-weight:500;">
       안내 : 보스 지정된 오픈시간 후 6시간 동안 참여 선택이 가능합니다.
@@ -1457,8 +1457,9 @@
         </div>
         <!-- 분배 내역 -->
         <div class="card bg-dark">
-          <div class="card-header">
+          <div class="card-header d-flex justify-content-between align-items-center">
             <span class="text-light">분배 내역</span>
+            <button class="btn btn-outline-primary btn-sm" onclick="downloadDistributionCSV()">CSV 다운로드</button>
           </div>
           <div class="card-body">
             <div class="table-responsive">
@@ -2230,17 +2231,29 @@ window.loadDistributionInputs = async function() {
       return;
     }
 
+    // 닉네임 등장 횟수 집계
+    const nicknameCount = {};
+    Object.values(inputs).forEach(data => {
+      nicknameCount[data.nickname] = (nicknameCount[data.nickname] || 0) + 1;
+    });
+
     Object.entries(inputs)
       .sort((a, b) => b[1].timestamp - a[1].timestamp)
       .forEach(([key, data]) => {
+        const isDuplicated = nicknameCount[data.nickname] > 1;
         const tr = document.createElement('tr');
         tr.className = 'distribution-row';
+        if (isDuplicated) {
+          tr.style.backgroundColor = '#ffd166';
+          tr.style.color = '#23272b';
+          tr.style.fontWeight = 'bold';
+        }
         tr.innerHTML = `
-          <td class="text-center">${data.date}</td>
-          <td class="text-center">${data.nickname}</td>
-          <td class="text-center">${data.item}</td>
+          <td class="text-center" style="${isDuplicated ? 'background-color: #ffd166 !important; color: #23272b !important; font-weight: bold !important;' : ''}">${data.date}</td>
+          <td class="text-center" style="${isDuplicated ? 'background-color: #ffd166 !important; color: #23272b !important; font-weight: bold !important;' : ''}">${data.nickname}</td>
+          <td class="text-center" style="${isDuplicated ? 'background-color: #ffd166 !important; color: #23272b !important; font-weight: bold !important;' : ''}">${data.item}</td>
           ${isAdmin ? `
-            <td class="text-center">
+            <td class="text-center" style="${isDuplicated ? 'background-color: #ffd166 !important; color: #23272b !important; font-weight: bold !important;' : ''}">
               <button class="btn btn-danger btn-sm" onclick="deleteDistributionInput('${key}')">
                 <i class="fas fa-trash"></i> 삭제
               </button>
@@ -2584,6 +2597,43 @@ detailEditModal.addEventListener('show.bs.modal', function () {
   document.getElementById("missingNick_modal").value = "";
   document.getElementById("missingScore_modal").value = "";
 });
+</script>
+
+<script>
+// CSV 다운로드 함수 추가
+function downloadDistributionCSV() {
+  db.ref('randomDrawLists/distributionInputs').once('value', (snap) => {
+    const inputs = snap.val() || {};
+    
+    // BOM 추가 및 CSV 헤더
+    let csvContent = '\ufeff날짜,닉네임,아이템\n';
+    
+    // 데이터 정렬 및 CSV 행 추가
+    Object.entries(inputs)
+      .sort((a, b) => b[1].timestamp - a[1].timestamp)
+      .forEach(([_, data]) => {
+        // CSV 형식에 맞게 데이터 처리 (쉼표가 있는 경우 따옴표로 감싸기)
+        const date = data.date || '';
+        const nickname = data.nickname ? `"${data.nickname.replace(/"/g, '""')}"` : '';
+        const item = data.item ? `"${data.item.replace(/"/g, '""')}"` : '';
+        
+        csvContent += `${date},${nickname},${item}\n`;
+      });
+    
+    // CSV 파일 다운로드 (UTF-8 with BOM)
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8-sig' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `분배내역_${new Date().toLocaleDateString()}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+}
 </script>
 </body>
 </html>
