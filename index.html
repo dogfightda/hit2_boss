@@ -2,10 +2,11 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <title>대장길드 참여자 체크 Ver 2.4</title>
+  <title>대장길드 참여자 체크 Ver 2.5</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.1.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
@@ -1321,14 +1322,131 @@
         margin: 0.5rem auto;
       }
     }
+
+    /* 당번신청 팝업 전용 스타일 */
+    #dutySelectorModal .modal-content {
+      background: #23272b;
+      border-radius: 18px;
+      border: none;
+    }
+    #dutySelectorModal .modal-header {
+      border-bottom: 1px solid #333;
+      background: #23272b;
+    }
+    #dutySelectorModal .modal-title {
+      color: #4f8bfd;
+      font-weight: 800;
+    }
+    #dutySelectorModal .form-control {
+      background: #2a2e33;
+      color: #fff;
+      border: 1.5px solid #4f8bfd;
+      border-radius: 10px;
+    }
+    #dutySelectorModal .card {
+      background: #23272b;
+      border-radius: 12px;
+      border: 1.5px solid #4f8bfd;
+      margin-bottom: 1rem;
+    }
+    #dutySelectorModal .date-card {
+      background: #23272b;
+      border-radius: 10px;
+      border: 1px solid #444;
+      margin-bottom: 1.1rem;
+      padding: 1rem 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    #dutySelectorModal .date-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #fff;
+      margin-right: 20px;
+    }
+    #dutySelectorModal .date-card.today {
+      border: 2px solid #4f8bfd;
+      background: #222b3a;
+    }
+    #dutySelectorModal .duty-button {
+      background: #4f8bfd;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      min-width: 90px;
+      width: auto;
+      flex-grow: 0;
+      max-width: 100%;
+      margin-right: 0;
+      transition: background 0.2s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.8rem;
+    }
+    #dutySelectorModal .duty-button:disabled {
+      background: #666;
+      color: #fff;
+      font-size: 0.8rem;
+    }
+    #dutySelectorModal .duty-cancel-x {
+      color: #ff4444;
+      font-size: 1.2rem;
+      font-weight: 900;
+      margin-left: 6px;
+      margin-right: 5px;
+      cursor: pointer;
+      transition: color 0.2s;
+      vertical-align: middle;
+      user-select: none;
+    }
+    #dutySelectorModal .duty-cancel-x:hover {
+      color: #ff0000;
+      text-shadow: 0 0 4px #ff4444;
+    }
+    #dutySelectorModal .badge {
+      font-size: 0.95em;
+      border-radius: 6px;
+      padding: 0.3em 0.7em;
+    }
+    /* 팝업 내 모든 버튼 한 줄 표기 */
+    #dutySelectorModal .btn,
+    #dutySelectorModal button {
+      white-space: nowrap !important;
+      min-width: 90px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: min-content;
+      vertical-align: middle;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #dutySelectorModal .modal-dialog {
+      max-width: 800px;
+      width: 100%;
+    }
+    @media (max-width: 800px) {
+      #dutySelectorModal .modal-dialog {
+        max-width: 98vw;
+        width: 98vw;
+        margin: 0.5rem auto;
+      }
+    }
+    #dutySelectorModal .buttons-container .d-flex {
+      width: auto;
+      margin-bottom: 0.3rem;
+    }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-    <h1 class="h3 mb-0">대장길드 참여자 체크 Ver 2.4</h1>
+    <h1 class="h3 mb-0">대장길드 참여자 체크 Ver 2.5</h1>
     <div class="ms-auto">
       <button id="randomButton" class="btn btn-outline-primary btn-sm" onclick="openRandomDraw()">랜덤뽑기</button>
+      <button id="dutySelectorButton" class="btn btn-outline-primary btn-sm ms-2" onclick="openDutySelectorModal()">당번신청</button>
       <button id="adminButton" class="btn btn-outline-primary btn-sm ms-2" onclick="setAdmin()">관리자 설정</button>
       <button id="detailEditBtn" class="btn btn-outline-primary btn-sm ms-2" style="display:none;" data-bs-toggle="modal" data-bs-target="#detailEditModal">상세수정</button>
     </div>
@@ -1579,6 +1697,21 @@
             <div class="col-auto"><button class="btn btn-danger w-100" onclick="changeBossId_modal()">보스 ID 변경</button></div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 당번신청 모달 -->
+<div class="modal fade" id="dutySelectorModal" tabindex="-1" aria-labelledby="dutySelectorModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="background:#23272b;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dutySelectorModalLabel">당번 정하기 시스템</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="dutySelectorBody">
+        <!-- duty_selector.html의 모든 UI가 여기에 동적으로 렌더링됩니다 -->
       </div>
     </div>
   </div>
@@ -2145,8 +2278,18 @@ window.initializeAndDisplayDefaultIds = async function() {
         <div class="d-flex flex-sm-row flex-column align-items-sm-center align-items-stretch w-100 p-2">
           <span class="text-light flex-grow-1 text-truncate" style="min-width:0;max-width:180px;white-space:nowrap;overflow:hidden;">${id}</span>
           <div class="d-flex flex-sm-row flex-column gap-2 ms-auto" style="min-width:90px;max-width:180px;">
-            <button class="btn btn-success btn-sm" style="width:auto;max-width:160px;" onclick="addToDrawList('${id}')">추가</button>
-            ${isAdmin ? `<button class="btn btn-danger btn-sm" style="width:auto;max-width:160px;" onclick="removeBaseId('${id}')">삭제</button>` : ''}
+            <button class="btn btn-success btn-sm"
+              style="width:28px;height:28px;min-width:28px;min-height:28px;max-width:28px;max-height:28px;padding:0!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem!important;"
+              onclick="addToDrawList('${id}')">
+              <i class="fas fa-plus"></i>
+            </button>
+            ${isAdmin ? `
+              <button class="btn btn-danger btn-sm"
+                style="width:28px;height:28px;min-width:28px;min-height:28px;max-width:28px;max-height:28px;padding:0!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem!important;"
+                onclick="removeBaseId('${id}')">
+                <i class="fas fa-trash"></i>
+              </button>
+            ` : ''}
           </div>
         </div>
       `;
@@ -2282,17 +2425,15 @@ window.loadDistributionInputs = async function() {
         const isDuplicated = nicknameCount[data.nickname] > 1;
         const tr = document.createElement('tr');
         tr.className = 'distribution-row';
-        if (isDuplicated) {
-          tr.style.backgroundColor = '#ffd166';
-          tr.style.color = '#23272b';
-          tr.style.fontWeight = 'bold';
-        }
         tr.innerHTML = `
-          <td class="text-center" style="${isDuplicated ? 'background-color: #ffd166 !important; color: #23272b !important; font-weight: bold !important;' : ''}">${data.date}</td>
-          <td class="text-center" style="${isDuplicated ? 'background-color: #ffd166 !important; color: #23272b !important; font-weight: bold !important;' : ''}">${data.nickname}</td>
-          <td class="text-center" style="${isDuplicated ? 'background-color: #ffd166 !important; color: #23272b !important; font-weight: bold !important;' : ''}">${data.item}</td>
+          <td class="text-center">${data.date}</td>
+          <td class="text-center">
+            ${data.nickname}
+            ${isDuplicated ? `<span class="ms-1" style="color: #ff4444; font-weight: 700;">(${nicknameCount[data.nickname]})</span>` : ''}
+          </td>
+          <td class="text-center">${data.item}</td>
           ${isAdmin ? `
-            <td class="text-center" style="${isDuplicated ? 'background-color: #ffd166 !important; color: #23272b !important; font-weight: bold !important;' : ''}">
+            <td class="text-center">
               <button class="btn btn-danger btn-sm" onclick="deleteDistributionInput('${key}')">
                 <i class="fas fa-trash"></i> 삭제
               </button>
@@ -2442,6 +2583,306 @@ window.onload = () => {
   window.loadDistributionInputs();
   window.refreshDistributionNicknameOptions();
 };
+
+function openDutySelectorModal() {
+  renderDutySelectorUI();
+  var modal = new bootstrap.Modal(document.getElementById('dutySelectorModal'));
+  modal.show();
+}
+
+function renderDutySelectorUI() {
+  // 닉네임 불러오기
+  const nickname = localStorage.getItem('nickname');
+  if (!nickname) {
+    document.getElementById('dutySelectorBody').innerHTML = `
+      <div class="alert alert-warning mb-3">닉네임을 먼저 저장해 주세요.</div>
+    `;
+    return;
+  }
+  document.getElementById('dutySelectorBody').innerHTML = `
+    <div id="dutySelector_adminArea" style="display:none;">
+      <div class="card p-3 mb-3 bg-dark">
+        <h5 class="mb-2" style="color:#4a90e2;">날짜 오픈 설정</h5>
+        <div class="row g-2 mb-2">
+          <div class="col-md-4"><input type="date" id="dutySelector_startDate" class="form-control"></div>
+          <div class="col-md-4"><input type="date" id="dutySelector_endDate" class="form-control"></div>
+          <div class="col-md-4"><input type="number" id="dutySelector_maxParticipants" class="form-control" placeholder="일일 최대 인원"></div>
+        </div>
+        <div class="d-flex gap-2 mb-2">
+          <button class="btn btn-primary btn-sm" onclick="dutySelector_openDates()">오픈하기</button>
+          <button class="btn btn-info btn-sm" onclick="dutySelector_resetDuty()">당번 초기화</button>
+          <button class="btn btn-danger btn-sm" onclick="dutySelector_resetAll()">전체 초기화</button>
+        </div>
+        <hr class="my-2" style="border-color: rgba(255,255,255,0.1);">
+        <h5 class="mb-2" style="color:#4a90e2;">전체 시간 설정</h5>
+        <div class="d-flex gap-2">
+          <input type="time" id="dutySelector_globalTime" class="form-control" placeholder="전체 시간 입력">
+          <button class="btn btn-primary btn-sm" onclick="dutySelector_saveGlobalTime()">전체 시간 저장</button>
+        </div>
+      </div>
+    </div>
+    <div id="dutySelector_dateList"></div>
+  `;
+  // 관리자 UI 노출 여부
+  const isAdmin = localStorage.getItem('admin') === 'dogfightda@gmail.com';
+  document.getElementById('dutySelector_adminArea').style.display = isAdmin ? 'block' : 'none';
+  // 설정 데이터 불러오기 및 날짜 리스트 표시
+  dutySelector_loadSettingsAndDisplayDates();
+}
+
+function dutySelector_saveNickname() {
+  const nickname = document.getElementById('dutySelector_nickname').value.trim();
+  if (!nickname) {
+    alert('닉네임을 입력해주세요.');
+    return;
+  }
+  localStorage.setItem('duty_selector_nickname', nickname);
+  alert('닉네임이 저장되었습니다.');
+}
+
+// 파이어베이스 연동 및 날짜별 카드, 참가/취소, 시간 입력, 초기화 등 모든 기능 구현
+function dutySelector_loadSettingsAndDisplayDates() {
+  // settings 불러오기
+  firebase.database().ref('duty_selector/settings').on('value', (snapshot) => {
+    const data = snapshot.val();
+    const isAdmin = localStorage.getItem('admin') === 'dogfightda@gmail.com';
+    // 관리자라면 입력값 세팅
+    if (isAdmin && data) {
+      document.getElementById('dutySelector_startDate').value = new Date(data.startDate).toISOString().split('T')[0];
+      document.getElementById('dutySelector_endDate').value = new Date(data.endDate).toISOString().split('T')[0];
+      document.getElementById('dutySelector_maxParticipants').value = data.maxParticipants;
+    }
+    // 날짜별 카드 표시
+    if (data) {
+      dutySelector_displayDates(data);
+    } else {
+      document.getElementById('dutySelector_dateList').innerHTML = '';
+      if (isAdmin) {
+        document.getElementById('dutySelector_startDate').value = '';
+        document.getElementById('dutySelector_endDate').value = '';
+        document.getElementById('dutySelector_maxParticipants').value = '';
+      }
+    }
+  });
+}
+
+function dutySelector_openDates() {
+  const start = new Date(document.getElementById('dutySelector_startDate').value);
+  const end = new Date(document.getElementById('dutySelector_endDate').value);
+  const max = document.getElementById('dutySelector_maxParticipants').value;
+  if (!start || !end || !max) {
+    alert('모든 필드를 입력해주세요.');
+    return;
+  }
+  const dutyData = {
+    startDate: start.getTime(),
+    endDate: end.getTime(),
+    maxParticipants: parseInt(max),
+    createdAt: Date.now()
+  };
+  firebase.database().ref('duty_selector/settings').set(dutyData)
+    .then(() => {
+      alert('날짜 오픈 설정이 저장되었습니다.');
+    })
+    .catch((error) => {
+      alert('저장 중 오류가 발생했습니다.');
+    });
+}
+
+function dutySelector_resetDuty() {
+  if (!confirm('정말로 모든 당번 정보를 초기화하시겠습니까?')) return;
+  firebase.database().ref('duty_selector/participants').remove()
+    .then(() => {
+      alert('모든 당번 정보가 초기화되었습니다.');
+    })
+    .catch((error) => {
+      alert('초기화 중 오류가 발생했습니다.');
+    });
+}
+
+function dutySelector_resetAll() {
+  if (!confirm('정말로 모든 설정과 당번 정보를 초기화하시겠습니까?\n날짜 설정과 당번 정보가 모두 삭제됩니다.')) return;
+  firebase.database().ref('duty_selector').remove()
+    .then(() => {
+      document.getElementById('dutySelector_startDate').value = '';
+      document.getElementById('dutySelector_endDate').value = '';
+      document.getElementById('dutySelector_maxParticipants').value = '';
+      document.getElementById('dutySelector_dateList').innerHTML = '';
+      alert('모든 설정과 당번 정보가 초기화되었습니다.');
+    })
+    .catch((error) => {
+      alert('초기화 중 오류가 발생했습니다.');
+    });
+}
+
+function dutySelector_saveGlobalTime() {
+  const globalTime = document.getElementById('dutySelector_globalTime').value;
+  if (!globalTime) {
+    alert('시간을 입력해주세요.');
+    return;
+  }
+  firebase.database().ref('duty_selector/settings').once('value')
+    .then((snapshot) => {
+      const settings = snapshot.val();
+      if (!settings) {
+        alert('먼저 날짜를 설정해주세요.');
+        return;
+      }
+      const startDate = new Date(settings.startDate);
+      const endDate = new Date(settings.endDate);
+      const promises = [];
+      for (let dt = new Date(startDate); dt <= endDate; dt.setDate(dt.getDate() + 1)) {
+        const dateKey = dt.toISOString().split('T')[0];
+        promises.push(firebase.database().ref(`duty_selector/times/${dateKey}`).set(globalTime));
+      }
+      Promise.all(promises)
+        .then(() => {
+          alert('모든 날짜의 시간이 설정되었습니다.');
+          dutySelector_loadSettingsAndDisplayDates();
+        })
+        .catch((error) => {
+          alert('시간 설정 중 오류가 발생했습니다.');
+        });
+    });
+}
+
+function dutySelector_displayDates(dutyData) {
+  const dateList = document.getElementById('dutySelector_dateList');
+  dateList.innerHTML = '';
+  const currentNickname = localStorage.getItem('nickname');
+  const isAdmin = localStorage.getItem('admin') === 'dogfightda@gmail.com';
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  for (let dt = new Date(dutyData.startDate); dt <= new Date(dutyData.endDate); dt.setDate(dt.getDate() + 1)) {
+    const day = new Date(dt);
+    const card = document.createElement('div');
+    card.className = 'date-card';
+    const isToday = day.getFullYear() === today.getFullYear() && day.getMonth() === today.getMonth() && day.getDate() === today.getDate();
+    if (isToday) card.classList.add('today');
+    const dateText = day.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+    const dateKey = day.toISOString().split('T')[0];
+    firebase.database().ref(`duty_selector/times/${dateKey}`).once('value').then((timeSnap) => {
+      const savedTime = timeSnap.val();
+      let timeHtml = '';
+      if (isAdmin) {
+        timeHtml = `<div class="d-flex gap-2 align-items-center"><input type="time" id="dutySelector_timeInput_${dateKey}" class="form-control my-2" placeholder="시간 입력"${savedTime ? ` value="${savedTime}"` : ''}><button class="btn btn-primary btn-sm" onclick="dutySelector_saveTime('${dateKey}')">시간 저장</button></div>`;
+      } else if (savedTime) {
+        timeHtml = `<span class="badge bg-info text-dark ms-2">당번 타임 ${savedTime}</span>`;
+      }
+      card.innerHTML = `<div class="d-flex align-items-center"><div class="date-title mb-0">${dateText}</div>${timeHtml}</div><div class="buttons-container"></div>`;
+      // 참가자 정보 표시
+      const participantsRef = firebase.database().ref(`duty_selector/participants/${dateKey}`);
+      participantsRef.on('value', (snapshot) => {
+        const participants = snapshot.val() || {};
+        const buttonsContainer = card.querySelector('.buttons-container') || document.createElement('div');
+        buttonsContainer.className = 'buttons-container d-flex flex-wrap gap-1 mt-2';
+        buttonsContainer.innerHTML = '';
+        for (let i = 0; i < dutyData.maxParticipants; i++) {
+          const buttonGroup = document.createElement('div');
+          buttonGroup.className = 'd-flex align-items-center';
+          buttonGroup.style.width = 'auto';
+          const btn = document.createElement('button');
+          btn.className = 'btn duty-button btn-sm';
+          if (participants[i]) {
+            btn.innerHTML = participants[i].nickname;
+            btn.disabled = true;
+            buttonGroup.appendChild(btn);
+            if (isAdmin || participants[i].nickname === currentNickname) {
+              const cancelX = document.createElement('span');
+              cancelX.className = 'duty-cancel-x';
+              cancelX.innerHTML = '&times;';
+              cancelX.title = '취소';
+              cancelX.onclick = function() {
+                if (confirm('정말로 취소하시겠습니까?')) {
+                  participantsRef.child(i).remove()
+                    .catch(() => alert('취소 중 오류가 발생했습니다.'));
+                }
+              };
+              buttonGroup.appendChild(cancelX);
+            }
+          } else {
+            btn.innerHTML = '+';
+            btn.onclick = function() {
+              const nickname = localStorage.getItem('nickname');
+              if (!nickname) {
+                alert('닉네임을 입력하세요.');
+                return;
+              }
+              participantsRef.once('value')
+                .then((snapshot) => {
+                  const currentParticipants = snapshot.val() || {};
+                  for (const key in currentParticipants) {
+                    if (currentParticipants[key].nickname === nickname) {
+                      alert('이미 다른 날짜에 등록된 닉네임입니다.');
+                      return;
+                    }
+                  }
+                  firebase.database().ref('duty_selector/participants').once('value')
+                    .then((allSnapshot) => {
+                      const allParticipants = allSnapshot.val() || {};
+                      for (const date in allParticipants) {
+                        for (const key in allParticipants[date]) {
+                          if (allParticipants[date][key].nickname === nickname) {
+                            alert('이미 다른 날짜에 등록된 닉네임입니다.');
+                            return;
+                          }
+                        }
+                      }
+                      if (currentParticipants[i]) {
+                        alert('이미 다른 사용자가 선택했습니다.');
+                        return;
+                      }
+                      const participantData = {
+                        nickname: nickname,
+                        timestamp: Date.now()
+                      };
+                      participantsRef.child(i).set(participantData)
+                        .then(() => {
+                          btn.innerHTML = nickname;
+                          btn.disabled = true;
+                          if (isAdmin || nickname === currentNickname) {
+                            const cancelX = document.createElement('span');
+                            cancelX.className = 'duty-cancel-x';
+                            cancelX.innerHTML = '&times;';
+                            cancelX.title = '취소';
+                            cancelX.onclick = function() {
+                              if (confirm('정말로 취소하시겠습니까?')) {
+                                participantsRef.child(i).remove()
+                                  .catch(() => alert('취소 중 오류가 발생했습니다.'));
+                              }
+                            };
+                            buttonGroup.appendChild(cancelX);
+                          }
+                        })
+                        .catch((error) => {
+                          alert('저장 중 오류가 발생했습니다.');
+                        });
+                    });
+                });
+            };
+            buttonGroup.appendChild(btn);
+          }
+          buttonsContainer.appendChild(buttonGroup);
+        }
+        if (!card.querySelector('.buttons-container')) {
+          card.appendChild(buttonsContainer);
+        }
+      });
+      dateList.appendChild(card);
+    });
+  }
+}
+
+function dutySelector_saveTime(dateKey) {
+  const timeInput = document.getElementById('dutySelector_timeInput_' + dateKey);
+  const time = timeInput.value;
+  if (!time) {
+    alert('시간을 입력해주세요.');
+    return;
+  }
+  firebase.database().ref(`duty_selector/times/${dateKey}`).set(time)
+    .then(() => { alert('시간이 저장되었습니다.'); })
+    .catch((error) => { alert('저장 중 오류가 발생했습니다.'); });
+}
 </script>
 
 <script>
