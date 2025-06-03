@@ -1438,6 +1438,87 @@
       width: auto;
       margin-bottom: 0.3rem;
     }
+    #dutySelectorModal .btn-close {
+      filter: brightness(0) invert(1);
+      opacity: 0.8;
+    }
+    #dutySelectorModal .btn-close:hover {
+      opacity: 1;
+    }
+
+    /* 중복 제거된 모달 공통 스타일 */
+    .modal-content {
+      background: #23272b;
+      border-radius: 18px;
+      border: none;
+      font-size: 0.84rem;
+    }
+    .modal-header {
+      border-bottom: 1px solid #333;
+      background: #23272b;
+      font-size: 0.84rem;
+    }
+    .modal-title {
+      color: #4f8bfd;
+      font-weight: 800;
+    }
+    .modal-body {
+      font-size: 0.84rem;
+    }
+    .btn-close {
+      filter: brightness(0) invert(1);
+      opacity: 0.8;
+    }
+    .btn-close:hover {
+      opacity: 1;
+    }
+    
+    /* 모든 모달에서 공통으로 사용되는 폼 스타일 */
+    .modal .form-control, .modal .form-select {
+      background: #2a2e33;
+      color: #fff;
+      border: 1.5px solid #4f8bfd;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      padding: 0.56rem 1.01rem;
+    }
+    .modal .form-control:focus, .modal .form-select:focus {
+      border-color: #6ee7f7;
+      background: #23272b;
+      color: #fff;
+      box-shadow: 0 0 0 0.15rem rgba(79,139,253,0.15);
+    }
+    
+    /* 모든 모달에서 공통으로 사용되는 버튼 스타일 */
+    .modal .btn {
+      font-size: 0.84rem;
+      font-weight: 700;
+      border-radius: 12px;
+      min-width: 80px;
+      padding: 0.48rem 0.96rem;
+      height: 35px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* 모바일에서 모달 버튼 최적화 */
+    @media (max-width: 900px) {
+      .modal .btn {
+        font-size: 0.78rem;
+        min-width: 64px;
+        padding: 0.32rem 0.7rem;
+        line-height: normal;
+      }
+      .modal .form-control, .modal .form-select {
+        font-size: 0.78rem;
+        padding: 0.4rem 0.7rem;
+        border-radius: 10px;
+      }
+      .modal-content {
+        font-size: 0.78rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1730,12 +1811,100 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// 공통 유틸리티 함수들 추가
+const Utils = {
+  // 로딩 표시 관리
+  showLoading: function(message = '처리 중...') {
+    // 로딩 표시 로직
+  },
+  
+  hideLoading: function() {
+    // 로딩 숨김 로직
+  },
+  
+  // 에러 메시지 표준화
+  showError: function(message) {
+    alert(`❌ ${message}`);
+  },
+  
+  // 성공 메시지 표준화
+  showSuccess: function(message) {
+    alert(`✅ ${message}`);
+  },
+  
+  // 확인 대화상자 표준화
+  confirm: function(message) {
+    return confirm(`⚠️ ${message}`);
+  },
+  
+  // 날짜 포맷팅
+  formatDate: function(timestamp) {
+    return new Date(timestamp).toLocaleString("ko-KR");
+  },
+  
+  // 닉네임 검증
+  validateNickname: function(nickname) {
+    if (!nickname || nickname.trim() === '') {
+      this.showError('닉네임을 입력해주세요.');
+      return false;
+    }
+    return true;
+  }
+};
+
+// Firebase 작업 공통 함수들
+const FirebaseUtils = {
+  // 안전한 Firebase 참조 생성
+  safeRef: function(path) {
+    try {
+      return db.ref(path);
+    } catch (error) {
+      Utils.showError('데이터베이스 연결 오류가 발생했습니다.');
+      console.error('Firebase ref error:', error);
+      return null;
+    }
+  },
+  
+  // 안전한 데이터 읽기
+  safeRead: async function(path) {
+    try {
+      const ref = this.safeRef(path);
+      if (!ref) return null;
+      const snapshot = await ref.once('value');
+      return snapshot.val();
+    } catch (error) {
+      Utils.showError('데이터를 읽는 중 오류가 발생했습니다.');
+      console.error('Firebase read error:', error);
+      return null;
+    }
+  },
+  
+  // 안전한 데이터 쓰기
+  safeWrite: async function(path, data) {
+    try {
+      const ref = this.safeRef(path);
+      if (!ref) return false;
+      await ref.set(data);
+      return true;
+    } catch (error) {
+      Utils.showError('데이터를 저장하는 중 오류가 발생했습니다.');
+      console.error('Firebase write error:', error);
+      return false;
+    }
+  }
+};
+
 function saveNickname() {
   let nickname = document.getElementById("nickname").value;
   nickname = nickname.replace(/\s/g, "");
+  
+  if (!Utils.validateNickname(nickname)) {
+    return;
+  }
+  
   localStorage.setItem("nickname", nickname);
   document.getElementById("nickname").value = nickname;
-  alert("닉네임이 성공적으로 저장되었습니다.");
+  Utils.showSuccess("닉네임이 성공적으로 저장되었습니다.");
 }
 
 function setAdmin() {
@@ -1743,15 +1912,17 @@ function setAdmin() {
   const password = prompt("관리자 비밀번호를 입력해주세요:");
   if (email === "dogfightda@gmail.com" && password === "0716") {
     localStorage.setItem("admin", email);
-    alert("관리자 인증이 완료되었습니다.");
+    Utils.showSuccess("관리자 인증이 완료되었습니다.");
     checkAdmin();
     location.reload();
-  } else alert("관리자 인증에 실패했습니다. 이메일과 비밀번호를 다시 확인해주세요.");
+  } else {
+    Utils.showError("관리자 인증에 실패했습니다. 이메일과 비밀번호를 다시 확인해주세요.");
+  }
 }
 
 function logout() {
   localStorage.removeItem("admin");
-  alert("로그아웃이 완료되었습니다.");
+  Utils.showSuccess("로그아웃이 완료되었습니다.");
   location.reload();
 }
 
@@ -1777,39 +1948,108 @@ function openBoss() {
   const timeInput = document.getElementById("bossTime").value;
   const timestamp = timeInput ? new Date(timeInput).getTime() : Date.now();
 
-  if (!bossId) return alert("보스 이름을 입력해주세요.");
-  if (!scoreInput || isNaN(score)) return alert("점수를 올바른 숫자로 입력해주세요.");
-  db.ref("bosses/"+bossId).set({open:true,timestamp:timestamp,score}).then(()=>location.reload());
+  if (!bossId) {
+    Utils.showError("보스 이름을 입력해주세요.");
+    return;
+  }
+  if (!scoreInput || isNaN(score)) {
+    Utils.showError("점수를 올바른 숫자로 입력해주세요.");
+    return;
+  }
+  
+  Utils.showLoading("보스를 오픈하는 중...");
+  db.ref("bosses/"+bossId).set({open:true,timestamp:timestamp,score})
+    .then(() => {
+      Utils.hideLoading();
+      Utils.showSuccess("보스가 성공적으로 오픈되었습니다.");
+      location.reload();
+    })
+    .catch((error) => {
+      Utils.hideLoading();
+      Utils.showError("보스 오픈 중 오류가 발생했습니다.");
+      console.error(error);
+    });
 }
 
 function participate(bossId){
-  const nickname=localStorage.getItem("nickname");
-  if(!nickname)return alert("닉네임을 먼저 저장해주세요.");
+  const nickname = localStorage.getItem("nickname");
+  if (!Utils.validateNickname(nickname)) return;
+  
   db.ref(`bosses/${bossId}/score`).once("value",snap=>{
     const score=snap.val()||0;
-    db.ref(`bosses/${bossId}/participants/${nickname}`).set({score}).then(()=>location.reload());
+    db.ref(`bosses/${bossId}/participants/${nickname}`).set({score})
+      .then(() => {
+        Utils.showSuccess("보스 참여가 완료되었습니다.");
+        location.reload();
+      })
+      .catch((error) => {
+        Utils.showError("참여 처리 중 오류가 발생했습니다.");
+        console.error(error);
+      });
   });
 }
 
 function cancelParticipation(bossId){
   const nickname = localStorage.getItem("nickname");
-  if (!nickname) return alert("닉네임을 먼저 저장해주세요.");
-  if (confirm("정말로 보스 참여를 취소하시겠습니까?")) {
-    db.ref(`bosses/${bossId}/participants/${nickname}`).remove().then(()=>location.reload());
+  if (!Utils.validateNickname(nickname)) return;
+  
+  if (Utils.confirm("정말로 보스 참여를 취소하시겠습니까?")) {
+    db.ref(`bosses/${bossId}/participants/${nickname}`).remove()
+      .then(() => {
+        Utils.showSuccess("보스 참여가 취소되었습니다.");
+        location.reload();
+      })
+      .catch((error) => {
+        Utils.showError("참여 취소 중 오류가 발생했습니다.");
+        console.error(error);
+      });
   }
 }
 
 function deleteBoss(bossId){
-  if(confirm("해당 보스 정보를 삭제하시겠습니까?"))db.ref("bosses/"+bossId).remove().then(()=>location.reload());
+  if(Utils.confirm("해당 보스 정보를 삭제하시겠습니까?")) {
+    db.ref("bosses/"+bossId).remove()
+      .then(() => {
+        Utils.showSuccess("보스가 삭제되었습니다.");
+        location.reload();
+      })
+      .catch((error) => {
+        Utils.showError("보스 삭제 중 오류가 발생했습니다.");
+        console.error(error);
+      });
+  }
 }
 
 function deleteParticipant(bossId,nick){
-  if(confirm("해당 참여자의 정보를 삭제하시겠습니까?"))db.ref(`bosses/${bossId}/participants/${nick}`).remove().then(()=>location.reload());
+  if(Utils.confirm("해당 참여자의 정보를 삭제하시겠습니까?")) {
+    db.ref(`bosses/${bossId}/participants/${nick}`).remove()
+      .then(() => {
+        Utils.showSuccess("참여자가 삭제되었습니다.");
+        location.reload();
+      })
+      .catch((error) => {
+        Utils.showError("참여자 삭제 중 오류가 발생했습니다.");
+        console.error(error);
+      });
+  }
 }
 
 function confirmAndDeleteAll(){
-  if(!isAdmin()){ alert("관리자만 삭제할 수 있는 기능입니다."); return; }
-  if(confirm("모든 보스 정보와 참여자 정보가 삭제됩니다. 정말로 진행하시겠습니까?")) db.ref("bosses").remove().then(()=>location.reload());
+  if(!isAdmin()){ 
+    Utils.showError("관리자만 삭제할 수 있는 기능입니다."); 
+    return; 
+  }
+  if(Utils.confirm("모든 보스 정보와 참여자 정보가 삭제됩니다. 정말로 진행하시겠습니까?")) {
+    db.ref("bosses").remove()
+      .then(() => {
+        Utils.showSuccess("모든 데이터가 삭제되었습니다.");
+        location.reload();
+      })
+      .catch((error) => {
+        Utils.showError("데이터 삭제 중 오류가 발생했습니다.");
+        console.error(error);
+      });
+  }
 }
 
 function loadBosses(){
