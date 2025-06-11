@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <title>대장길드 참여자 체크 Ver 2.5</title>
+  <title>대장길드 참여자 체크 Ver 2.6</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.1.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1519,13 +1519,27 @@
         font-size: 0.78rem;
       }
     }
+
+    /* 자금현황 모달 가로폭을 랜덤뽑기 모달과 동일하게 */
+    #fundStatusModal .modal-dialog {
+      max-width: 900px;
+      width: 98vw;
+    }
+    @media (max-width: 1000px) {
+      #fundStatusModal .modal-dialog {
+        max-width: 98vw;
+        width: 98vw;
+        margin: 0.5rem auto;
+      }
+    }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-    <h1 class="h3 mb-0">대장길드 참여자 체크 Ver 2.5</h1>
+    <h1 class="h3 mb-0">대장길드 참여자 체크 Ver 2.6</h1>
     <div class="ms-auto">
+      <button id="fundStatusButton" class="btn btn-outline-primary btn-sm me-2" onclick="openFundStatusModal()">자금현황</button>
       <button id="randomButton" class="btn btn-outline-primary btn-sm" onclick="openRandomDraw()">랜덤뽑기</button>
       <button id="dutySelectorButton" class="btn btn-outline-primary btn-sm ms-2" onclick="openDutySelectorModal()">당번신청</button>
       <button id="adminButton" class="btn btn-outline-primary btn-sm ms-2" onclick="setAdmin()">관리자 설정</button>
@@ -1793,6 +1807,53 @@
       </div>
       <div class="modal-body" id="dutySelectorBody">
         <!-- duty_selector.html의 모든 UI가 여기에 동적으로 렌더링됩니다 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 자금현황 모달 -->
+<div class="modal fade" id="fundStatusModal" tabindex="-1" aria-labelledby="fundStatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fundStatusModalLabel">길드자금현황</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-end mb-2">
+          <button class="btn btn-outline-primary btn-sm me-2" onclick="downloadFundStatusCSV()">CSV 다운로드</button>
+          <button id="fundResetButton" class="btn btn-danger btn-sm" style="display:none;" onclick="resetFundStatus()">전체 초기화</button>
+        </div>
+        <div id="fundStatusInputForm" class="mb-3" style="display:none;">
+          <div class="row g-2">
+            <div class="col-md-3"><input type="text" id="fundContent" class="form-control" placeholder="내용"></div>
+            <div class="col-md-2"><input type="number" id="fundAmount" class="form-control" placeholder="금액"></div>
+            <div class="col-md-2">
+              <select id="fundType" class="form-control">
+                <option value="증가">증가</option>
+                <option value="감소">감소</option>
+              </select>
+            </div>
+            <div class="col-md-3"><input type="text" id="fundNote" class="form-control" placeholder="비고"></div>
+            <div class="col-md-2"><button class="btn btn-primary w-100" onclick="saveFundStatus()">저장</button></div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-dark table-hover">
+            <thead>
+              <tr>
+                <th>내용</th>
+                <th style="width: 120px;">금액</th>
+                <th style="width: 70px;">증감</th>
+                <th style="width: 120px;">잔액</th>
+                <th>비고</th>
+                <th id="fundActionColumn" style="width: 20px; display:none;">작업</th>
+              </tr>
+            </thead>
+            <tbody id="fundStatusTable"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -2674,9 +2735,7 @@ window.loadDistributionInputs = async function() {
           <td class="text-center">${data.item}</td>
           ${isAdmin ? `
             <td class="text-center">
-              <button class="btn btn-danger btn-sm" onclick="deleteDistributionInput('${key}')">
-                <i class="fas fa-trash"></i> 삭제
-              </button>
+              <button class="btn btn-link p-0" title='삭제' onclick='deleteDistributionInput('${key}')'><i class="fas fa-xmark text-danger"></i></button>
             </td>
           ` : ''}
         `;
@@ -3122,6 +3181,119 @@ function dutySelector_saveTime(dateKey) {
   firebase.database().ref(`duty_selector/times/${dateKey}`).set(time)
     .then(() => { alert('시간이 저장되었습니다.'); })
     .catch((error) => { alert('저장 중 오류가 발생했습니다.'); });
+}
+
+function openFundStatusModal() {
+  const modal = new bootstrap.Modal(document.getElementById('fundStatusModal'));
+  // 관리자 여부에 따라 입력 폼 표시
+  const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+  document.getElementById('fundStatusInputForm').style.display = isAdmin ? 'block' : 'none';
+  document.getElementById('fundActionColumn').style.display = isAdmin ? '' : 'none';
+  document.getElementById('fundResetButton').style.display = isAdmin ? 'inline-block' : 'none';
+  loadFundStatusTable();
+  modal.show();
+}
+
+function loadFundStatusTable() {
+  db.ref('fundStatus/records').once('value', (snap) => {
+    const records = snap.val() || {};
+    const sorted = Object.entries(records).sort((a, b) => a[1].timestamp - b[1].timestamp);
+    let balance = 0;
+    const rows = sorted.map(([key, data]) => {
+      let amount = parseInt(data.amount) || 0;
+      if (data.type === '증가') {
+        balance += amount;
+      } else {
+        balance -= amount;
+      }
+      return `<tr>
+        <td>${data.content || ''}</td>
+        <td>${amount.toLocaleString()}잼</td>
+        <td>${data.type}</td>
+        <td>${balance.toLocaleString()}잼</td>
+        <td>${data.note || ''}</td>
+        ${localStorage.getItem("admin") === "dogfightda@gmail.com" ? `<td><button class='btn btn-link p-0' title='삭제' onclick='deleteFundStatus("${key}")'><i class="fas fa-xmark text-danger"></i></button></td>` : ''}
+      </tr>`;
+    }).join('');
+    document.getElementById('fundStatusTable').innerHTML = rows || `<tr><td colspan="6" class="text-center">내역이 없습니다.</td></tr>`;
+  });
+}
+
+function saveFundStatus() {
+  const content = document.getElementById('fundContent').value.trim();
+  const amount = parseInt(document.getElementById('fundAmount').value);
+  const type = document.getElementById('fundType').value;
+  const note = document.getElementById('fundNote').value.trim();
+  if (!content || isNaN(amount) || amount <= 0) {
+    alert('내용과 금액을 올바르게 입력하세요.');
+    return;
+  }
+  const newRecord = {
+    content,
+    amount,
+    type,
+    note,
+    timestamp: Date.now()
+  };
+  db.ref('fundStatus/records').push(newRecord).then(() => {
+    document.getElementById('fundContent').value = '';
+    document.getElementById('fundAmount').value = '';
+    document.getElementById('fundType').value = '증가';
+    document.getElementById('fundNote').value = '';
+    loadFundStatusTable();
+  });
+}
+
+function deleteFundStatus(key) {
+  if (!confirm('정말로 삭제하시겠습니까?')) return;
+  db.ref('fundStatus/records/' + key).remove().then(() => {
+    loadFundStatusTable();
+  });
+}
+
+// 자금현황 CSV 다운로드
+function downloadFundStatusCSV() {
+  db.ref('fundStatus/records').once('value', (snap) => {
+    const records = snap.val() || {};
+    const sorted = Object.entries(records).sort((a, b) => a[1].timestamp - b[1].timestamp);
+    let balance = 0;
+    let csvContent = '\ufeff내용,금액(잼),증감,잔액(잼),비고\n';
+    sorted.forEach(([_, data]) => {
+      let amount = parseInt(data.amount) || 0;
+      if (data.type === '증가') {
+        balance += amount;
+      } else {
+        balance -= amount;
+      }
+      // 쉼표, 따옴표 처리 및 단위 제거
+      const content = data.content ? `"${data.content.replace(/"/g, '""')}"` : '';
+      const type = data.type;
+      const note = data.note ? `"${data.note.replace(/"/g, '""')}"` : '';
+      csvContent += `${content},${amount},${type},${balance},${note}\n`;
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8-sig' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `자금현황_${y}${m}${d}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+}
+
+// 자금현황 전체 초기화 (관리자만)
+function resetFundStatus() {
+  if (!confirm('정말로 모든 자금현황 내역을 삭제하시겠습니까?')) return;
+  db.ref('fundStatus/records').remove().then(() => {
+    loadFundStatusTable();
+    alert('전체 초기화가 완료되었습니다.');
+  });
 }
 </script>
 
