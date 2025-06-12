@@ -1767,7 +1767,7 @@
       font-size: 1.08rem;
       font-weight: 600;
       text-align: left;
-      padding: 1rem 1.2rem;
+      padding: 0.6rem 1.2rem !important;
       border-bottom: 1px solid #333;
       transition: background 0.15s;
       cursor: pointer;
@@ -1920,6 +1920,16 @@
     @media (max-width: 600px) {
       #fundStatusModal th {
         color: #fff !important;
+      }
+    }
+
+    @media (min-width: 1000px) {
+      #fundStatusModal .table-responsive,
+      #fundStatusModal .table-responsive table,
+      .random-draw-modal .table-responsive,
+      .random-draw-modal .table-responsive table {
+        width: 100% !important;
+        min-width: 0 !important;
       }
     }
   </style>
@@ -3778,14 +3788,7 @@ function updateScrollHintVisibility() {
     if (hint && hint.classList.contains('scroll-hint')) {
       // 실제로 스크롤 이동이 가능한지 체크
       const canScroll = wrapper.scrollWidth > wrapper.clientWidth + 1;
-      let moved = false;
       if (canScroll) {
-        const prev = wrapper.scrollLeft;
-        wrapper.scrollLeft = 1;
-        moved = wrapper.scrollLeft === 1;
-        wrapper.scrollLeft = prev;
-      }
-      if (canScroll && moved) {
         hint.style.display = 'block';
       } else {
         hint.style.display = 'none';
