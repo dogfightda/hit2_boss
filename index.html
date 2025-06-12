@@ -1932,6 +1932,44 @@
         min-width: 0 !important;
       }
     }
+
+    .drawer-menu-apk-btn {
+      width: 100%;
+      background: linear-gradient(90deg, #4f8bfd 60%, #6ee7f7 100%);
+      color: #fff !important;
+      font-size: 1.08rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      margin: 12px 0 0 0;
+      box-shadow: 0 2px 8px rgba(79,139,253,0.10);
+      cursor: pointer;
+      transition: background 0.18s, box-shadow 0.18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3em;
+      flex-direction: column;
+    }
+    .drawer-menu-apk-btn:hover {
+      background: linear-gradient(90deg, #6ee7f7 60%, #4f8bfd 100%);
+      box-shadow: 0 4px 16px rgba(79,139,253,0.18);
+    }
+    .drawer-menu-apk-btn .apk-icon {
+      font-size: 1.25em;
+      margin-bottom: 0.1em;
+    }
+    .drawer-menu-apk-btn .apk-title {
+      font-size: 0.96rem;
+      font-weight: 700;
+    }
+    .drawer-menu-apk-btn .apk-download {
+      font-size: 0.88rem;
+      font-weight: 400;
+      margin-top: 0.1em;
+    }
   </style>
 </head>
 <body>
@@ -1948,6 +1986,7 @@
       <button class="btn btn-link text-light p-0 drawer-close-btn" onclick="closeDrawerMenu()" aria-label="메뉴 닫기">&times;</button>
     </div>
     <ul class="drawer-menu-list">
+      <li><button class="drawer-menu-btn" onclick="window.open('https://dogfightda.github.io/boss_cut/', '_blank')" style= "margin-top: 10px;">리젠 타이머 Web</button></li>
       <li><button class="drawer-menu-btn" onclick="openFundStatusModal();closeDrawerMenu();">자금현황</button></li>
       <li><button class="drawer-menu-btn" onclick="openRandomDraw();closeDrawerMenu();">랜덤뽑기</button></li>
       <li><button class="drawer-menu-btn" onclick="openDutySelectorModal();closeDrawerMenu();">당번신청</button></li>
@@ -1956,6 +1995,13 @@
       <li><button class="drawer-menu-btn" onclick="window.open('https://dogfightda.github.io/hit2/', '_blank')">캐릭터 검색</button></li>
       <li><button id="adminButtonDrawer" class="drawer-menu-btn" onclick="setAdmin();closeDrawerMenu();">관리자 로그인</button></li>
       <li><button id="authInfoDrawer" class="drawer-menu-btn" style="display:none;" onclick="logout();closeDrawerMenu();">로그아웃</button></li>
+      <li>
+        <button class="drawer-menu-apk-btn" onclick="downloadApk()">
+          <span class="apk-icon">&#128190;</span>
+          <span class="apk-title">리젠 타이머</span>
+          <span class="apk-download">APK 다운로드</span>
+        </button>
+      </li>
     </ul>
   </nav>
 
@@ -3795,6 +3841,15 @@ function updateScrollHintVisibility() {
       }
     }
   });
+}
+
+function downloadApk() {
+  const link = document.createElement('a');
+  link.href = 'Regen_Timer.apk';
+  link.download = 'Regen_Timer.apk';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 </script>
 
