@@ -1,17 +1,4026 @@
-        <div class="table-responsive">
-          <table class="table table-dark table-hover">
-Uncaught TypeError TypeError: Cannot read properties of null (reading 'style')
-    at openFundStatusModal (c:\ok1465\참여자체크\index.html:3596:46)
-    at onclick (c:\ok1465\참여자체크\index.html:1883:94)
-index.html:3596
-Uncaught TypeError TypeError: Cannot read properties of null (reading 'style')
-    at openFundStatusModal (c:\ok1465\참여자체크\index.html:3596:46)
-    at onclick (c:\ok1465\참여자체크\index.html:1883:94)
-index.html:3596
-Uncaught TypeError TypeError: Cannot read properties of null (reading 'style')
-    at openFundStatusModal (c:\ok1465\참여자체크\index.html:3596:46)
-    at onclick (c:\ok1465\참여자체크\index.html:1883:94)
-index.html:3596
-Uncaught TypeError TypeError: Cannot read properties of null (reading 'style')
-    at openFundStatusModal (c:\ok1465\참여자체크\index.html:3596:46)
-    at onclick (c:\ok1465\참여자체크\index.html:1883:94)
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>대장길드 참여자 체크 Ver 2.7</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.1.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4f8bfd;
+      --secondary-color: #444;
+      --background-color: #222;
+      --card-background: #303030;
+      --text-primary: #ffffff;
+      --text-secondary: #ffffff;
+      --danger-color: #ff6b6b;
+      --success-color: #00bc8c;
+    }
+
+    body {
+      background-color: var(--background-color);
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 10.08px;
+      padding: 1.4rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background-color: var(--card-background);
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .card.p-4 {
+      padding: 0.75rem !important;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .admin-delete {
+      color: var(--danger-color);
+      cursor: pointer;
+      margin-left: 0.5rem;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+
+    .admin-delete:hover {
+      opacity: 1;
+    }
+
+    .btn {
+      border-radius: 15px;
+      padding: 0.63rem 1.26rem;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      font-size: 0.648rem;
+      letter-spacing: 0.5px;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      border: none;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #6ee7f7 0%, #4f8bfd 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+      border: none;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #ff8787 0%, #ff6b6b 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #666 0%, #444 100%);
+      border: none;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, #444 0%, #666 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-outline-primary {
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+      background: transparent;
+    }
+
+    .btn-outline-primary:hover {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    .btn-disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .boss-card {
+      padding: 0.75rem;
+    }
+
+    .boss-card .btn {
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+    }
+
+    .section-title {
+      font-size: 1.152rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 0.84rem;
+      position: relative;
+      padding-bottom: 0.35rem;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: #4f8bfd;
+      border-radius: 3px;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+      margin-bottom: 0;
+    }
+
+    li {
+      margin-bottom: 0.7rem;
+      color: #ffffff;
+      font-size: 1.035rem;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .btn-action-group {
+      display: flex;
+      gap: 0.7rem;
+      margin-top: 0.7rem;
+    }
+
+    .form-control {
+      background-color: #444;
+      border: 2px solid #555;
+      color: #ffffff;
+      border-radius: 15px;
+      padding: 0.7rem 1.26rem;
+      font-size: 0.712rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .form-control::placeholder {
+      color: #ffffff;
+      opacity: 0.7;
+      font-weight: 500;
+    }
+
+    .form-control:focus {
+      background-color: #444;
+      border-color: #4f8bfd;
+      color: #ffffff;
+      box-shadow: 0 0 0 0.2rem rgba(79, 139, 253, 0.25);
+    }
+
+    .input-group {
+      gap: 0.8rem;
+    }
+
+    .input-group .btn {
+      border-radius: 15px !important;
+    }
+
+    .input-group .form-control {
+      border-radius: 15px !important;
+    }
+
+    .text-muted {
+      color: #ffffff !important;
+      font-size: 0.99rem !important;
+      font-weight: 500 !important;
+      opacity: 0.9;
+    }
+
+    h1 {
+      font-weight: 800;
+      color: #4f8bfd;
+      font-size: 1.728rem;
+      margin-bottom: 1.05rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    #scoreSummary {
+      background: linear-gradient(135deg, #303030 0%, #222 100%);
+      border-radius: 15px;
+      padding: 1.5rem;
+    }
+
+    #scoreSummary h5 {
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.08rem;
+      margin-bottom: 0.7rem;
+    }
+
+    #scoreSummary li {
+      font-size: 0.864rem;
+      font-weight: 600;
+      margin-bottom: 0.7rem;
+      color: #ffffff;
+    }
+
+    #scoreSummary li strong {
+      color: #4f8bfd;
+      font-weight: 800;
+    }
+
+    .participant-list {
+      margin-top: 0.7rem;
+      padding: 0.84rem;
+      background-color: #444;
+      border-radius: 10px;
+    }
+
+    .participant-list li {
+      font-size: 0.864rem;
+      font-weight: 600;
+      margin-bottom: 0.56rem;
+      color: #ffffff;
+    }
+
+    .participant-list .text-muted {
+      font-size: 0.864rem;
+      opacity: 0.9;
+      color: #ffffff;
+    }
+
+    .nav-tabs {
+      border: none;
+      margin-bottom: 1.05rem;
+      gap: 0.5rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .sort-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-left: auto;
+    }
+
+    .sort-btn {
+      background: #444;
+      border: none;
+      color: #ffffff;
+      font-weight: 600;
+      padding: 0.4rem 0.8rem;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      font-size: 0.712rem;
+      cursor: pointer;
+    }
+
+    .sort-btn:hover {
+      background: #555;
+    }
+
+    .sort-btn.active {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    .nav-tabs .nav-link {
+      border: none;
+      color: #ffffff;
+      font-weight: 700;
+      padding: 0.81rem 1.62rem;
+      border-radius: 15px;
+      background: #444;
+      transition: all 0.3s ease;
+      font-size: 0.712rem;
+    }
+
+    .nav-tabs .nav-link:hover {
+      color: var(--primary-color);
+      background: #555;
+    }
+
+    .nav-tabs .nav-link.active {
+      color: white;
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+      font-weight: 800;
+    }
+
+    #showMoreScores, #showMoreWeeklyScores, #showMoreCustomScores {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: white !important;
+      border: none !important;
+      font-weight: 600;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    #showMoreScores:hover, #showMoreWeeklyScores:hover, #showMoreCustomScores:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    .btn-participate {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%) !important;
+      color: white !important;
+      border: none !important;
+      font-weight: 600;
+      padding: 0.6rem 1.2rem;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .btn-participate:hover {
+      background: linear-gradient(135deg, #6ee7f7 0%, #4f8bfd 100%) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    .btn-cancel-red {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%) !important;
+      color: white !important;
+      border: none !important;
+      font-weight: 600;
+      padding: 0.6rem 1.2rem;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .btn-cancel-red:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+    }
+
+    .card-title {
+      font-size: 1.17rem !important;
+      font-weight: 700 !important;
+      color: #ffffff !important;
+      margin-bottom: 0.7rem !important;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 0.7rem;
+      }
+      .container {
+        padding: 0;
+        max-width: 100vw;
+      }
+      .card {
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        padding: 1rem !important;
+      }
+      .boss-card {
+        padding: 0.5rem !important;
+      }
+      .section-title, h1, h5 {
+        font-size: 1.26rem !important;
+      }
+      .input-group {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      .input-group > input,
+      .input-group > button,
+      .input-group > .form-control,
+      .input-group > .btn {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box;
+        border-radius: 15px !important;
+      }
+      .form-control {
+        font-size: 0.9rem;
+        padding: 0.8rem;
+      }
+      .btn, .btn-sm, .btn-action-group .btn, .btn-action-group .btn-sm {
+        width: 100% !important;
+        font-size: 0.9rem !important;
+        padding: 0.8rem !important;
+        min-width: 0 !important;
+        box-sizing: border-box;
+      }
+      /* 로그아웃 버튼만 예외 처리 */
+      #authInfo .btn, #authInfo button {
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.81rem !important;
+        white-space: nowrap;
+      }
+      /* CSV 다운로드 버튼 예외 처리 */
+      .d-flex.justify-content-between.align-items-center.mb-2 > .btn,
+      .d-flex.justify-content-between.align-items-center.mb-2 > button {
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.9rem !important;
+        white-space: nowrap;
+      }
+      .btn-action-group {
+        gap: 0.5rem;
+        margin-top: 0.8rem;
+        margin-bottom: 0.8rem;
+      }
+      .participant-list li {
+        font-size: 0.864rem;
+      }
+      .participant-list .text-muted {
+        font-size: 0.864rem;
+      }
+      #scoreSummary {
+        padding: 1rem !important;
+        font-size: 0.95rem;
+      }
+      .card-title {
+        margin-bottom: 0.8rem !important;
+      }
+      .text-muted.mb-3 {
+        margin-bottom: 0.8rem !important;
+      }
+      .d-flex.justify-content-between.align-items-center.mb-4 {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        gap: 0.8rem;
+      }
+      .ms-auto {
+        margin-left: auto !important;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        width: 100%;
+        justify-content: flex-end;
+      }
+      .ms-auto .btn,
+      .ms-auto .btn-sm {
+        width: auto !important;
+        min-width: 90px !important;
+        max-width: 160px !important;
+        font-size: 0.98rem !important;
+        padding: 0.4rem 0.9rem !important;
+        margin: 0 !important;
+        box-sizing: border-box;
+      }
+      #adminButton {
+        margin-bottom: 0 !important;
+      }
+      #authInfo {
+        width: 100%;
+        margin-top: 0.8rem;
+        align-items: center;
+        justify-content: flex-end;
+      }
+      #authInfo button {
+        margin-left: 0.8rem;
+        font-size: 0.81rem !important;
+        padding: 0.4rem 0.8rem !important;
+        min-width: 0 !important;
+        width: auto !important;
+        white-space: nowrap;
+      }
+      #authStatus {
+        word-break: break-all;
+        font-size: 0.81rem;
+      }
+      .d-flex.gap-2 {
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        width: 100%;
+        gap: 0.8rem;
+        margin-bottom: 0.8rem;
+      }
+      .btn-cancel-red, .btn-primary {
+        min-width: 0;
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
+      }
+      .card.p-4 {
+        padding: 0.5rem !important;
+      }
+    }
+
+    /* 랜덤뽑기 모달 스타일 */
+    .random-draw-modal .modal-content {
+      background: var(--card-background);
+      border-radius: 20px;
+      border: none;
+    }
+
+    .random-draw-modal .modal-header {
+      border-bottom: 1px solid #444;
+      padding: 1rem;
+    }
+
+    .random-draw-modal .modal-body {
+      padding: 1.5rem;
+    }
+
+    .random-draw-modal .modal-title {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .random-draw-modal .btn-close {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M2 2l12 12M14 2L2 14'/%3e%3c/svg%3e") !important;
+      filter: none !important;
+      -webkit-filter: none !important;
+      opacity: 1 !important;
+      color: #fff !important;
+    }
+
+    .random-draw-modal .form-control {
+      background-color: #444;
+      border: 2px solid #555;
+      color: #ffffff;
+      border-radius: 15px;
+      padding: 0.7rem 1.26rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .random-draw-modal .form-control:focus {
+      background-color: #444;
+      border-color: #4f8bfd;
+      color: #ffffff;
+      box-shadow: 0 0 0 0.2rem rgba(79, 139, 253, 0.25);
+    }
+
+    .random-draw-modal .btn {
+      border-radius: 15px;
+      padding: 0.7rem 1.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .random-draw-modal .form-label {
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .random-draw-modal .result-box {
+      background: #444;
+      border-radius: 15px;
+      padding: 1rem;
+      margin-top: 1rem;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #4f8bfd;
+      gap: 0.5rem;
+    }
+
+    .random-draw-modal .result-box div {
+      width: 100%;
+      text-align: center;
+      padding: 0.5rem;
+      background: rgba(79, 139, 253, 0.1);
+      border-radius: 10px;
+    }
+
+    .random-draw-modal .btn-primary {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      border: none;
+      color: white;
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+
+    .random-draw-modal .btn-primary:hover {
+      background: linear-gradient(135deg, #6ee7f7 0%, #4f8bfd 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    /* 랜덤뽑기 애니메이션 스타일 */
+    @keyframes drawAnimation {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .draw-animation {
+      animation: drawAnimation 0.5s ease-in-out;
+    }
+
+    .result-highlight {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 0.5rem 0;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    .distribution-input {
+      background: #444;
+      border: 2px solid #555;
+      border-radius: 15px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .distribution-input input,
+    .distribution-input select {
+      background: #333;
+      border: 1px solid #555;
+      color: white;
+      border-radius: 10px;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .distribution-input label {
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .distribution-history {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .distribution-history::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .distribution-history::-webkit-scrollbar-track {
+      background: #333;
+      border-radius: 4px;
+    }
+
+    .distribution-history::-webkit-scrollbar-thumb {
+      background: #4f8bfd;
+      border-radius: 4px;
+    }
+
+    .distribution-history::-webkit-scrollbar-thumb:hover {
+      background: #6ee7f7;
+    }
+
+    /* 추첨 결과 애니메이션 스타일 */
+    @keyframes resultAnimation {
+      0% { transform: translateY(-20px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes highlightAnimation {
+      0% { background: #4f8bfd; }
+      50% { background: #6ee7f7; }
+      100% { background: #4f8bfd; }
+    }
+
+    .result-item {
+      animation: resultAnimation 0.5s ease-out;
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 0.5rem 0;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    .result-item.highlight {
+      animation: highlightAnimation 1s infinite;
+    }
+
+    .distribution-input-form {
+      background: #444;
+      border: 2px solid #555;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .distribution-input-form .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .distribution-input-form label {
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .distribution-input-form input,
+    .distribution-input-form select {
+      width: 100%;
+      background: #333;
+      border: 1px solid #555;
+      color: white;
+      border-radius: 10px;
+      padding: 0.8rem;
+      font-size: 1rem;
+    }
+
+    .distribution-input-form input:focus,
+    .distribution-input-form select:focus {
+      border-color: #4f8bfd;
+      box-shadow: 0 0 0 0.2rem rgba(79, 139, 253, 0.25);
+    }
+
+    .distribution-input-form .btn-save {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .distribution-input-form .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(79, 139, 253, 0.3);
+    }
+
+    @keyframes pop {
+        0% { transform: scale(0.7); }
+        80% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .result-item {
+        animation: pop 0.5s;
+        color: #ff9800;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0.5rem 0;
+    }
+
+    .result-item.pulse {
+        animation: pulse 1s infinite;
+    }
+
+    .distribution-input-form {
+        background: #343a40;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    }
+
+    .distribution-input-form .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .distribution-input-form label {
+        color: #f8f9fa;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .distribution-input-form input,
+    .distribution-input-form select {
+        width: 100%;
+        background: #495057;
+        border: 1px solid #6c757d;
+        color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+
+    .distribution-input-form input:focus,
+    .distribution-input-form select:focus {
+        border-color: #3366ff;
+        outline: none;
+        background: #495057;
+        color: #fff;
+    }
+
+    /* 랜덤뽑기 팝업 디자인 개선 */
+    .random-draw-modal .modal-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #4f8bfd;
+      letter-spacing: 0.02em;
+    }
+    .random-draw-modal .card-header,
+    .random-draw-modal .card-body {
+      font-size: 1.08rem;
+      font-weight: 500;
+    }
+    .random-draw-modal .list-group-item {
+      font-size: 0.84rem !important;
+      font-weight: 500;
+      background: #23272b;
+      border: none;
+      color: #fff;
+      margin-bottom: 0.2rem;
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+    }
+    .random-draw-modal .btn,
+    .random-draw-modal .btn-sm {
+      font-size: 1.08rem;
+      font-weight: 700;
+      border-radius: 10px;
+      min-width: 70px;
+      padding: 0.5rem 1.1rem;
+      margin-left: 0.2rem;
+      margin-right: 0.2rem;
+    }
+    .random-draw-modal .btn-success {
+      background: linear-gradient(135deg, #00bc8c 0%, #4f8bfd 100%);
+      color: #fff;
+      border: none;
+    }
+    .random-draw-modal .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+      color: #fff;
+      border: none;
+    }
+    .random-draw-modal .btn-primary {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: #fff;
+      border: none;
+    }
+    .random-draw-modal .btn-primary:hover,
+    .random-draw-modal .btn-success:hover,
+    .random-draw-modal .btn-danger:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 2px 8px rgba(79,139,253,0.15);
+    }
+    .random-draw-modal .form-control {
+      font-size: 1.08rem;
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      background: #23272b;
+      color: #fff;
+      border: 1.5px solid #4f8bfd;
+    }
+    .random-draw-modal .form-control:focus {
+      border-color: #6ee7f7;
+      background: #23272b;
+      color: #fff;
+      box-shadow: 0 0 0 0.15rem rgba(79,139,253,0.15);
+    }
+    .random-draw-modal .result-box {
+      background: #23272b;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-top: 1rem;
+      min-height: 80px;
+      font-size: 1.18rem;
+      font-weight: 700;
+      color: #4f8bfd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border: 1.5px solid #4f8bfd;
+    }
+    .random-draw-modal .result-item {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ff9800;
+      margin: 0.3rem 0;
+      background: none;
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0;
+    }
+    .random-draw-modal .distribution-input-form {
+      background: #23272b;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1.2rem;
+      border: 1.5px solid #4f8bfd;
+    }
+    .random-draw-modal .distribution-input-form label {
+      color: #4f8bfd;
+      font-weight: 700;
+      font-size: 1.08rem;
+      margin-bottom: 0.3rem;
+    }
+    .random-draw-modal .distribution-input-form input,
+    .random-draw-modal .distribution-input-form select {
+      font-size: 1.08rem;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      background: #23272b;
+      color: #fff;
+      border: 1.5px solid #4f8bfd;
+      margin-bottom: 0.5rem;
+    }
+    .random-draw-modal .distribution-input-form input:focus,
+    .random-draw-modal .distribution-input-form select:focus {
+      border-color: #6ee7f7;
+      background: #23272b;
+      color: #fff;
+      box-shadow: 0 0 0 0.15rem rgba(79,139,253,0.15);
+    }
+    .random-draw-modal .distribution-input-form .btn-save {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: #fff;
+      border: none;
+      font-size: 1.08rem;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      margin-top: 0.5rem;
+    }
+    .random-draw-modal .table {
+      font-size: 1.08rem;
+      background: #23272b;
+      color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .random-draw-modal .table th,
+    .random-draw-modal .table td {
+      background: #23272b;
+      color: #fff;
+      border: none;
+      text-align: center;
+      vertical-align: middle;
+      padding: 0.7rem 0.5rem;
+    }
+    .random-draw-modal .table thead th {
+      color: #4f8bfd;
+      font-weight: 800;
+      font-size: 1.08rem;
+      background: #23272b;
+      border-bottom: 2px solid #4f8bfd;
+    }
+    .random-draw-modal .table-hover tbody tr:hover {
+      background: #2a2e33;
+    }
+    @media (max-width: 900px) {
+      .random-draw-modal .modal-dialog {
+        max-width: 98vw;
+        margin: 0.5rem auto;
+      }
+      .random-draw-modal .modal-body {
+        padding: 0.7rem;
+      }
+      .random-draw-modal .card-body {
+        padding: 0.7rem;
+      }
+      .random-draw-modal .result-box {
+        padding: 0.7rem;
+        font-size: 1.05rem;
+      }
+      .random-draw-modal .distribution-input-form {
+        padding: 0.7rem;
+      }
+      .random-draw-modal .table th,
+      .random-draw-modal .table td {
+        padding: 0.5rem 0.2rem;
+        font-size: 0.98rem;
+      }
+      .random-draw-modal .list-group-item {
+        font-size: 0.98rem;
+        padding: 0.5rem 0.7rem;
+      }
+      .random-draw-modal .btn,
+      .random-draw-modal .btn-sm {
+        font-size: 0.95rem;
+        min-width: 48px;
+        padding: 0.35rem 0.7rem;
+      }
+      .random-draw-modal .drawIdList-item,
+      .random-draw-modal #drawIdList .list-group-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+      .random-draw-modal #drawIdList .btn {
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 0.3rem 0.7rem !important;
+        font-size: 0.95rem !important;
+      }
+      .random-draw-modal .card-header .btn {
+        width: auto !important;
+        min-width: 70px !important;
+        max-width: 140px !important;
+        padding: 0.35rem 0.9rem !important;
+        font-size: 0.95rem !important;
+        margin-left: 0.2rem;
+        margin-right: 0.2rem;
+        box-sizing: border-box;
+      }
+    }
+    .random-draw-modal .card-body .btn-primary {
+      font-size: 1.08rem;
+      font-weight: 700;
+      border-radius: 10px;
+      min-width: 120px;
+      max-width: 180px;
+      padding: 0.5rem 1.2rem;
+      margin-left: 0.2rem;
+      margin-right: 0.2rem;
+      box-sizing: border-box;
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: #fff;
+      border: none;
+      transition: filter 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+    @media (max-width: 900px) {
+      .random-draw-modal .card-body .btn-primary {
+        font-size: 0.98rem;
+        min-width: 110px;
+        max-width: 140px;
+        padding: 0.4rem 1rem;
+        white-space: nowrap;
+      }
+    }
+
+    /* 상세수정 모달 다크 테마 및 폰트 크기 통일 */
+    #detailEditModal .modal-content {
+      background: #23272b;
+      color: #f1f3f5;
+      border-radius: 16px;
+      font-size: 1.08rem;
+    }
+    #detailEditModal .modal-header, #detailEditModal .modal-body {
+      background: #23272b;
+      color: #f1f3f5;
+      font-size: 1.08rem;
+    }
+    #detailEditModal .modal-title {
+      font-size: 1.22rem;
+      font-weight: 800;
+      color: #4f8bfd;
+    }
+    #detailEditModal .card {
+      background: #23272b;
+      color: #f1f3f5;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      font-size: 1.08rem;
+      margin-bottom: 1.1rem;
+    }
+    #detailEditModal .card-header {
+      background: #23272b;
+      color: #4f8bfd;
+      font-weight: 700;
+      font-size: 1.08rem;
+      border-bottom: 1px solid #444;
+      border-radius: 12px 12px 0 0;
+    }
+    #detailEditModal .form-control, #detailEditModal .form-select {
+      background: #2a2e33;
+      color: #f1f3f5;
+      border: 1.5px solid #4f8bfd;
+      font-size: 1.08rem;
+      border-radius: 8px;
+      margin-bottom: 0.2rem;
+    }
+    #detailEditModal .form-control:focus, #detailEditModal .form-select:focus {
+      border-color: #6ee7f7;
+      background: #23272b;
+      color: #fff;
+      box-shadow: 0 0 0 0.15rem rgba(79,139,253,0.15);
+    }
+    #detailEditModal .table {
+      background: #23272b;
+      color: #f1f3f5;
+      font-size: 1.08rem;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #detailEditModal .table th, #detailEditModal .table td {
+      background: #23272b;
+      color: #f1f3f5;
+      border: none;
+      text-align: center;
+      vertical-align: middle;
+      padding: 0.7rem 0.5rem;
+      font-size: 1.08rem;
+    }
+    #detailEditModal .table-striped > tbody > tr:nth-of-type(odd) {
+      background: #262b32;
+    }
+    #detailEditModal .btn {
+      font-size: 1.08rem;
+      font-weight: 700;
+      border-radius: 8px;
+      min-width: 120px;
+      padding: 0.5rem 1.2rem;
+      margin-left: 0.1rem;
+      margin-right: 0.1rem;
+      box-sizing: border-box;
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    @media (max-width: 900px) {
+      #detailEditModal .btn {
+        font-size: 0.98rem;
+        min-width: 90px;
+        padding: 0.35rem 0.9rem;
+        height: 38px;
+      }
+    }
+    #detailEditModal .btn-primary {
+      background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%);
+      color: #fff;
+      border: none;
+    }
+    #detailEditModal .btn-success {
+      background: linear-gradient(135deg, #00bc8c 0%, #4f8bfd 100%);
+      color: #fff;
+      border: none;
+    }
+    #detailEditModal .btn-warning {
+      background: linear-gradient(135deg, #facc15 0%, #f59e42 100%);
+      color: #23272b;
+      border: none;
+    }
+    #detailEditModal .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+      color: #fff;
+      border: none;
+    }
+    #detailEditModal .btn:focus, #detailEditModal .btn:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 2px 8px rgba(79,139,253,0.15);
+    }
+    @media (max-width: 900px) {
+      #detailEditModal .modal-content, #detailEditModal .card, #detailEditModal .modal-header, #detailEditModal .modal-body {
+        font-size: 0.98rem;
+        padding: 0.7rem;
+      }
+      #detailEditModal .btn {
+        font-size: 0.98rem;
+        min-width: 70px;
+        padding: 0.35rem 0.7rem;
+      }
+      #detailEditModal .table th, #detailEditModal .table td {
+        font-size: 0.98rem;
+        padding: 0.5rem 0.2rem;
+      }
+    }
+
+    .random-draw-modal .modal-content,
+    .random-draw-modal .modal-header,
+    .random-draw-modal .modal-body,
+    .random-draw-modal .card,
+    .random-draw-modal .card-header,
+    .random-draw-modal .card-body,
+    .random-draw-modal .form-control,
+    .random-draw-modal .form-select,
+    .random-draw-modal .table,
+    .random-draw-modal .table th,
+    .random-draw-modal .table td,
+    #detailEditModal .modal-content,
+    #detailEditModal .modal-header,
+    #detailEditModal .modal-body,
+    #detailEditModal .card,
+    #detailEditModal .card-header,
+    #detailEditModal .card-body,
+    #detailEditModal .form-control,
+    #detailEditModal .form-select,
+    #detailEditModal .table,
+    #detailEditModal .table th,
+    #detailEditModal .table td {
+      font-size: 0.84rem !important;
+    }
+    .random-draw-modal .btn,
+    .random-draw-modal .btn-sm,
+    #detailEditModal .btn {
+      font-size: 0.84rem !important;
+      min-width: 80px !important;
+      padding: 0.48rem 0.96rem !important;
+      border-radius: 12px !important;
+      height: 35px !important;
+    }
+    .random-draw-modal .form-control,
+    .random-draw-modal .form-select,
+    #detailEditModal .form-control,
+    #detailEditModal .form-select {
+      border-radius: 12px !important;
+      padding: 0.56rem 1.01rem !important;
+      font-size: 0.84rem !important;
+    }
+    .random-draw-modal .table,
+    #detailEditModal .table {
+      border-radius: 12px !important;
+      font-size: 0.84rem !important;
+    }
+    @media (max-width: 900px) {
+      .random-draw-modal .btn,
+      .random-draw-modal .btn-sm,
+      #detailEditModal .btn {
+        font-size: 0.78rem !important;
+        min-width: 64px !important;
+        padding: 0.32rem 0.7rem !important;
+        /* height: 28px !important; */
+        line-height: normal !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .random-draw-modal .form-control,
+      .random-draw-modal .form-select,
+      #detailEditModal .form-control,
+      #detailEditModal .form-select {
+        font-size: 0.78rem !important;
+        padding: 0.4rem 0.7rem !important;
+        border-radius: 10px !important;
+      }
+      .random-draw-modal .table,
+      .random-draw-modal .table th,
+      .random-draw-modal .table td,
+      #detailEditModal .table,
+      #detailEditModal .table th,
+      #detailEditModal .table td {
+        font-size: 0.78rem !important;
+      }
+    }
+    .random-draw-modal .list-group-item.d-flex.justify-content-between.align-items-center {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    #bossList ~ div[style*="color:#1976d2"],
+    #bossList ~ div[style*="color: #1976d2"] {
+      color: #fff !important;
+    }
+    .boss-info-notice {
+      color: #fff !important;
+    }
+    @media (max-width: 900px) {
+      #detailEditModal .row.g-2 {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+      }
+      #detailEditModal .row.g-2 > .col,
+      #detailEditModal .row.g-2 > .col-auto {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        display: block !important;
+      }
+    }
+    @media (max-width: 1000px) {
+      .random-draw-modal .modal-dialog {
+        max-width: 98vw;
+        margin: 0.5rem auto;
+      }
+    }
+
+    /* 당번신청 팝업 전용 스타일 */
+    #dutySelectorModal .modal-content {
+      background: #23272b;
+      border-radius: 18px;
+      border: none;
+    }
+    #dutySelectorModal .modal-header {
+      border-bottom: 1px solid #333;
+      background: #23272b;
+    }
+    #dutySelectorModal .modal-title {
+      color: #4f8bfd;
+      font-weight: 800;
+    }
+    #dutySelectorModal .form-control {
+      background: #2a2e33;
+      color: #fff;
+      border: 1.5px solid #4f8bfd;
+      border-radius: 10px;
+    }
+    #dutySelectorModal .card {
+      background: #23272b;
+      border-radius: 12px;
+      border: 1.5px solid #4f8bfd;
+      margin-bottom: 1rem;
+    }
+    #dutySelectorModal .date-card {
+      background: #23272b;
+      border-radius: 10px;
+      border: 1px solid #444;
+      margin-bottom: 1.1rem;
+      padding: 1rem 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    #dutySelectorModal .date-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #fff;
+      margin-right: 20px;
+    }
+    #dutySelectorModal .date-card.today {
+      border: 2px solid #4f8bfd;
+      background: #222b3a;
+    }
+    #dutySelectorModal .duty-button {
+      background: #4f8bfd;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      min-width: 90px;
+      width: auto;
+      flex-grow: 0;
+      max-width: 100%;
+      margin-right: 0;
+      transition: background 0.2s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.8rem;
+    }
+    #dutySelectorModal .duty-button:disabled {
+      background: #666;
+      color: #fff;
+      font-size: 0.8rem;
+    }
+    #dutySelectorModal .duty-cancel-x {
+      color: #ff4444;
+      font-size: 1.2rem;
+      font-weight: 900;
+      margin-left: 6px;
+      margin-right: 5px;
+      cursor: pointer;
+      transition: color 0.2s;
+      vertical-align: middle;
+      user-select: none;
+    }
+    #dutySelectorModal .duty-cancel-x:hover {
+      color: #ff0000;
+      text-shadow: 0 0 4px #ff4444;
+    }
+    #dutySelectorModal .badge {
+      font-size: 0.95em;
+      border-radius: 6px;
+      padding: 0.3em 0.7em;
+    }
+    /* 팝업 내 모든 버튼 한 줄 표기 */
+    #dutySelectorModal .btn,
+    #dutySelectorModal button {
+      white-space: nowrap !important;
+      min-width: 90px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: min-content;
+      vertical-align: middle;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #dutySelectorModal .modal-dialog {
+      max-width: 800px;
+      width: 100%;
+    }
+    @media (max-width: 800px) {
+      #dutySelectorModal .modal-dialog {
+        max-width: 98vw;
+        width: 98vw;
+        margin: 0.5rem auto;
+      }
+    }
+    #dutySelectorModal .buttons-container .d-flex {
+      width: auto;
+      margin-bottom: 0.3rem;
+    }
+    #dutySelectorModal .btn-close {
+      filter: brightness(0) invert(1);
+      opacity: 0.8;
+    }
+    #dutySelectorModal .btn-close:hover {
+      opacity: 1;
+    }
+
+    /* 중복 제거된 모달 공통 스타일 */
+    .modal-content {
+      background: #23272b;
+      border-radius: 18px;
+      border: none;
+      font-size: 0.84rem;
+    }
+    .modal-header {
+      border-bottom: 1px solid #333;
+      background: #23272b;
+      font-size: 0.84rem;
+    }
+    .modal-title {
+      color: #4f8bfd;
+      font-weight: 800;
+    }
+    .modal-body {
+      font-size: 0.84rem;
+    }
+    .btn-close {
+      filter: brightness(0) invert(1);
+      opacity: 0.8;
+    }
+    .btn-close:hover {
+      opacity: 1;
+    }
+    
+    /* 모든 모달에서 공통으로 사용되는 폼 스타일 */
+    .modal .form-control, .modal .form-select {
+      background: #2a2e33;
+      color: #fff;
+      border: 1.5px solid #4f8bfd;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      padding: 0.56rem 1.01rem;
+    }
+    .modal .form-control:focus, .modal .form-select:focus {
+      border-color: #6ee7f7;
+      background: #23272b;
+      color: #fff;
+      box-shadow: 0 0 0 0.15rem rgba(79,139,253,0.15);
+    }
+    
+    /* 모든 모달에서 공통으로 사용되는 버튼 스타일 */
+    .modal .btn {
+      font-size: 0.84rem;
+      font-weight: 700;
+      border-radius: 12px;
+      min-width: 80px;
+      padding: 0.48rem 0.96rem;
+      height: 35px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* 모바일에서 모달 버튼 최적화 */
+    @media (max-width: 900px) {
+      .modal .btn {
+        font-size: 0.78rem;
+        min-width: 64px;
+        padding: 0.32rem 0.7rem;
+        line-height: normal;
+      }
+      .modal .form-control, .modal .form-select {
+        font-size: 0.78rem;
+        padding: 0.4rem 0.7rem;
+        border-radius: 10px;
+      }
+      .modal-content {
+        font-size: 0.78rem;
+      }
+    }
+
+    /* 자금현황 모달 가로폭을 랜덤뽑기 모달과 동일하게 */
+    #fundStatusModal .modal-dialog {
+      max-width: 900px;
+      width: 98vw;
+    }
+    @media (max-width: 1000px) {
+      #fundStatusModal .modal-dialog {
+        max-width: 98vw;
+        width: 98vw;
+        margin: 0.5rem auto;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #fundStatusModal .modal-dialog {
+        max-width: 99vw;
+        width: 99vw;
+        margin: 0.5rem auto;
+      }
+      #fundStatusModal .modal-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #4f8bfd;
+        letter-spacing: 0.01em;
+      }
+      #fundStatusModal .modal-header {
+        padding: 0.7rem 1rem 0.7rem 1rem;
+      }
+      #fundStatusModal .modal-body {
+        padding: 0.7rem 0.5rem 1rem 0.5rem;
+      }
+      #fundStatusModal .d-flex.justify-content-end.mb-2 {
+        gap: 0.5rem;
+        flex-direction: row;
+        margin-bottom: 0.7rem !important;
+      }
+      #fundStatusModal .btn, #fundStatusModal button {
+        font-size: 0.95rem !important;
+        padding: 0.4rem 0.8rem !important;
+        min-width: 0 !important;
+        height: 32px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1.2 !important;
+      }
+      #fundStatusModal input, #fundStatusModal select {
+        font-size: 1rem !important;
+        padding: 0.5rem 0.7rem !important;
+        border-radius: 10px !important;
+      }
+      #fundStatusModal .row.g-2, #fundStatusModal .row.g-3 {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+      }
+      #fundStatusModal .col-md-3, #fundStatusModal .col-md-2, #fundStatusModal .col-md-4 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        display: block !important;
+        margin-bottom: 0.5rem !important;
+      }
+      #fundStatusModal .table-responsive {
+        overflow-x: auto !important;
+        margin-bottom: 0.5rem;
+      }
+      #fundStatusModal table {
+        min-width: 600px;
+        font-size: 0.95em;
+      }
+      #fundStatusModal th, #fundStatusModal td {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 120px;
+        vertical-align: middle;
+        padding: 0.4rem 0.5rem !important;
+      }
+      #fundStatusModal td:first-child, #fundStatusModal th:first-child {
+        max-width: 180px;
+      }
+      #fundStatusModal th {
+        font-size: 0.98em;
+        font-weight: 700;
+        background: #23272b;
+        color: #4f8bfd;
+        border-bottom: 1.5px solid #4f8bfd;
+      }
+      #fundStatusModal .table {
+        border-radius: 10px !important;
+        font-size: 0.95em !important;
+      }
+      #fundStatusModal .btn-link {
+        padding: 0 !important;
+        min-width: 0 !important;
+        height: 28px !important;
+        width: 28px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+      #fundStatusModal .fa-xmark {
+        font-size: 1.2em !important;
+        vertical-align: middle;
+      }
+      #fundStatusInputForm {
+        margin-bottom: 0.7rem !important;
+      }
+    }
+
+    /* 랜덤뽑기 모달 분배내역 표 모바일 가로 스크롤 및 한줄 처리 */
+    @media (max-width: 600px) {
+      .random-draw-modal .table-responsive {
+        overflow-x: auto;
+        min-width: 100vw;
+      }
+      .random-draw-modal table {
+        min-width: 600px;
+        font-size: 0.95em;
+      }
+      .random-draw-modal th, .random-draw-modal td {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 120px;
+        vertical-align: middle;
+        padding: 0.4rem 0.5rem !important;
+      }
+      .random-draw-modal td:first-child, .random-draw-modal th:first-child {
+        max-width: 180px;
+      }
+    }
+
+    .menu-btn-group {
+      flex-direction: row !important;
+      align-items: flex-start !important;
+      gap: 0.4rem !important;
+      width: 100% !important;
+      justify-content: flex-start !important;
+    }
+    .menu-btn-group .btn {
+      width: auto !important;
+      min-width: 90px !important;
+      max-width: 100%;
+      text-align: center !important;
+      font-size: 0.98rem !important;
+      padding: 0.45rem 1.1rem !important;
+    }
+    #adminButton {
+      width: auto !important;
+      min-width: 90px !important;
+      max-width: 100%;
+      font-size: 0.98rem !important;
+      padding: 0.45rem 1.1rem !important;
+    }
+    @media (max-width: 600px) {
+      .mb-4.d-flex {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 0.5rem;
+        justify-content: flex-start !important;
+      }
+      .mb-4.d-flex h1 {
+        margin-left: 0 !important;
+        text-align: left !important;
+        flex: 0 1 auto !important;
+        width: auto !important;
+      }
+      #authInfo {
+        align-self: flex-end;
+      }
+      .menu-btn-group {
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        gap: 0.4rem !important;
+      }
+      .menu-btn-group .btn {
+        width: auto !important;
+        min-width: 90px !important;
+        max-width: 100%;
+        text-align: center !important;
+        font-size: 0.98rem !important;
+        padding: 0.45rem 1.1rem !important;
+      }
+    }
+
+    .auth-info-fixed {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    @media (max-width: 900px) {
+      .auth-info-fixed {
+        top: 12px;
+        right: 10px;
+        font-size: 0.98em;
+      }
+      .auth-info-fixed .btn {
+        font-size: 0.98em !important;
+        padding: 0.4rem 0.8rem !important;
+      }
+    }
+
+    /* 드로어 메뉴 스타일 */
+    .drawer-menu-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4);
+      z-index: 2000;
+    }
+    .drawer-menu {
+      display: block;
+      position: fixed;
+      top: 0; left: -260px;
+      width: 240px;
+      height: 100vh;
+      background: #23272b;
+      box-shadow: 2px 0 16px rgba(0,0,0,0.18);
+      z-index: 2100;
+      transition: left 0.25s cubic-bezier(.4,0,.2,1);
+      padding: 0;
+      overflow-y: auto;
+    }
+    .drawer-menu.open {
+      left: 0;
+    }
+    .drawer-menu-header {
+      padding: 1.1rem 1.2rem 0.7rem 1.2rem;
+      border-bottom: 1px solid #444;
+    }
+    .drawer-menu-list {
+      list-style: none;
+      margin: 0; padding: 0;
+    }
+    .drawer-menu-btn {
+      width: 100%;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.08rem;
+      font-weight: 600;
+      text-align: left;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid #333;
+      transition: background 0.15s;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .drawer-menu-btn:hover, .drawer-menu-btn:focus {
+      background: #2a2e33;
+      color: #4f8bfd;
+    }
+    @media (max-width: 600px) {
+      .drawer-menu {
+        width: 100vw;
+        min-width: 0;
+        max-width: 100vw;
+        left: -100vw;
+      }
+      .drawer-menu.open {
+        left: 0;
+      }
+      .drawer-menu-header {
+        padding: 0.9rem 1rem 0.6rem 1rem;
+      }
+      .drawer-menu-btn {
+        font-size: 1.01rem;
+        padding: 0.85rem 1rem;
+      }
+    }
+
+    .menu-hamburger-btn {
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+      padding: 0 0.5rem;
+    }
+    .drawer-close-btn {
+      font-size: 1.7rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    @media (max-width: 600px) {
+      .menu-hamburger-btn {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 1.25rem !important;
+        padding: 0 0.3rem !important;
+      }
+      .drawer-close-btn {
+        font-size: 1.3rem !important;
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+      }
+    }
+
+    /* 드로어 메뉴 닫기 버튼: 메뉴가 열렸을 때만 보이게 */
+    .drawer-menu-header .drawer-close-btn { display: none; }
+    .drawer-menu.open .drawer-menu-header .drawer-close-btn { display: flex; }
+
+    /* 표 가로 스크롤 힌트 및 섀도우 */
+    .scroll-hint {
+      display: none;
+      text-align: center;
+      color: #6ee7f7;
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.04em;
+      background: linear-gradient(90deg, #23272b 60%, #4f8bfd22 100%);
+      border-radius: 8px;
+      padding: 0.3rem 0.5rem 0.3rem 0.5rem;
+      box-shadow: 0 2px 8px rgba(79,139,253,0.08);
+      animation: hintMove 1.2s infinite alternate;
+      user-select: none;
+      width: 100%;
+      max-width: 100vw;
+    }
+    @keyframes hintMove {
+      0% { letter-spacing: 0.04em; opacity: 0.85; }
+      100% { letter-spacing: 0.18em; opacity: 1; }
+    }
+    @media (min-width: 768px) {
+      .scroll-hint { display: none !important; }
+    }
+    .table-scroll-shadow {
+      position: absolute;
+      top: 0; right: 0; width: 28px; height: 100%;
+      pointer-events: none;
+      background: linear-gradient(to left, rgba(34,34,34,0.95), rgba(34,34,34,0));
+      z-index: 2;
+      border-radius: 0 10px 10px 0;
+      display: block;
+    }
+    .table-responsive {
+      overflow-x: auto !important;
+    }
+    .table-responsive table {
+      min-width: 600px;
+    }
+    @media (max-width: 600px) {
+      .table-responsive table {
+        min-width: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="mb-4 d-flex align-items-center gap-2" style="position:relative;">
+    <button id="menuOpenBtn" class="btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center menu-hamburger-btn" aria-label="메뉴 열기" onclick="openDrawerMenu()">&#9776;</button>
+    <h1 class="h3 mb-2 mb-md-0 ms-2" style="margin-bottom:0 !important;">대장길드 참여자 체크 Ver 2.7</h1>
+  </div>
+  <!-- 드로어 메뉴 -->
+  <div id="drawerMenuOverlay" class="drawer-menu-overlay" onclick="closeDrawerMenu()"></div>
+  <nav id="drawerMenu" class="drawer-menu">
+    <div class="drawer-menu-header d-flex justify-content-between align-items-center">
+      <span style="font-weight:700;font-size:1.15rem;">메뉴</span>
+      <button class="btn btn-link text-light p-0 drawer-close-btn" onclick="closeDrawerMenu()" aria-label="메뉴 닫기">&times;</button>
+    </div>
+    <ul class="drawer-menu-list">
+      <li><button class="drawer-menu-btn" onclick="openFundStatusModal();closeDrawerMenu();">자금현황</button></li>
+      <li><button class="drawer-menu-btn" onclick="openRandomDraw();closeDrawerMenu();">랜덤뽑기</button></li>
+      <li><button class="drawer-menu-btn" onclick="openDutySelectorModal();closeDrawerMenu();">당번신청</button></li>
+      <li><button id="detailEditBtnDrawer" class="drawer-menu-btn" style="display:none;" data-bs-toggle="modal" data-bs-target="#detailEditModal" onclick="closeDrawerMenu();">상세수정</button></li>
+      <li><button class="drawer-menu-btn" onclick="window.open('https://dogfightda.github.io/hit2_ys/', '_blank')">연성 예측기</button></li>
+      <li><button class="drawer-menu-btn" onclick="window.open('https://dogfightda.github.io/hit2/', '_blank')">캐릭터 검색</button></li>
+      <li><button id="adminButtonDrawer" class="drawer-menu-btn" onclick="setAdmin();closeDrawerMenu();">관리자 로그인</button></li>
+      <li><button id="authInfoDrawer" class="drawer-menu-btn" style="display:none;" onclick="logout();closeDrawerMenu();">로그아웃</button></li>
+    </ul>
+  </nav>
+
+  <div id="scoreSummary" class="card p-4 mb-4">
+    <ul class="nav nav-tabs" id="scoreTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="total-tab" data-bs-toggle="tab" data-bs-target="#total" type="button" role="tab" aria-controls="total" aria-selected="true" onclick="resetShowAll()">누적</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab" aria-controls="weekly" aria-selected="false" onclick="resetShowAll()">주간</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom" type="button" role="tab" aria-controls="custom" aria-selected="false" onclick="resetShowAll()">기간별</button>
+      </li>
+      <div class="sort-buttons">
+        <button class="sort-btn active" onclick="changeSort('score')">점수순</button>
+        <button class="sort-btn" onclick="changeSort('participation')">참여율순</button>
+      </div>
+    </ul>
+    <div class="tab-content" id="scoreTabContent">
+      <div class="tab-pane fade show active" id="total" role="tabpanel" aria-labelledby="total-tab"></div>
+      <div class="tab-pane fade" id="weekly" role="tabpanel" aria-labelledby="weekly-tab"></div>
+      <div class="tab-pane fade" id="custom" role="tabpanel" aria-labelledby="custom-tab">
+        <div class="custom-period-inputs mb-3">
+          <div class="row g-2">
+            <div class="col-md-5">
+              <input type="datetime-local" id="customStartDate" class="form-control" placeholder="시작일">
+            </div>
+            <div class="col-md-5">
+              <input type="datetime-local" id="customEndDate" class="form-control" placeholder="종료일">
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-outline-light btn-sm" onclick="displayCustomScores()" style="background: linear-gradient(135deg, #4f8bfd 0%, #6ee7f7 100%); color: #fff !important; border: none !important; font-weight: 700; box-shadow: 0 2px 8px rgba(79,139,253,0.08); border-radius: 8px; transition: background 0.2s; width: 100%;">조회</button>
+            </div>
+          </div>
+        </div>
+        <div id="customScores"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-4 mb-4">
+    <h5 class="section-title">닉네임 설정</h5>
+    <div class="input-group">
+      <input id="nickname" class="form-control" placeholder="닉네임을 입력해주세요">
+      <button class="btn btn-primary" onclick="saveNickname()">저장</button>
+    </div>
+  </div>
+
+  <div id="adminSection" class="card p-4 mb-4 d-none">
+    <h5 class="section-title">보스 정보 등록</h5>
+    <div class="input-group">
+      <input id="bossId" class="form-control" placeholder="보스 이름을 입력해주세요">
+      <input id="bossScore" class="form-control" type="number" placeholder="점수를 입력해주세요">
+      <input id="bossTime" class="form-control" type="datetime-local">
+      <button class="btn btn-primary" onclick="openBoss()">보스 오픈</button>
+    </div>
+  </div>
+
+  <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="section-title mb-0">오픈된 보스</h5>
+      <button class="btn btn-outline-primary btn-sm" onclick="downloadDistributionCSV()" style="display: flex; align-items: center; justify-content: center; height: 100%; line-height: 1.2;">CSV 다운로드</button>
+    </div>
+    <div class="boss-info-notice" style="margin:0.2rem 0 0.5rem 0; color:#1976d2; font-size:0.98rem; font-weight:500;">
+      안내 : 보스 지정된 오픈시간 후 6시간 동안 참여 선택이 가능합니다.
+    </div>
+    <div class="d-flex gap-2">
+      <button id="deleteAllButton" class="btn btn-outline-danger btn-sm" onclick="confirmAndDeleteAll()">전체 삭제</button>
+    </div>
+    <div id="bossList"></div>
+  </div>
+</div>
+
+<!-- 랜덤뽑기 모달 -->
+<div class="modal fade random-draw-modal" id="randomDrawModal" tabindex="-1" aria-labelledby="randomDrawModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="randomDrawModalLabel">대장길드 랜덤 뽑기</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-4">
+          <!-- 기본 아이디 목록 -->
+          <div class="col-md-6">
+            <div class="card bg-dark">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="text-light">기본 아이디 목록</span>
+                <button class="btn btn-success btn-sm" onclick="addAllBaseIdsToDrawList()">전체추가</button>
+              </div>
+              <div class="card-body">
+                <ul id="baseIdList" class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;"></ul>
+              </div>
+            </div>
+          </div>
+          <!-- 뽑기 대상 목록 -->
+          <div class="col-md-6">
+            <div class="card bg-dark">
+              <div class="card-header">
+                <span class="text-light">뽑기 대상 목록</span>
+              </div>
+              <div class="card-body">
+                <ul id="drawIdList" class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 추첨 영역 -->
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <div class="d-flex gap-3 align-items-center mb-3">
+              <input type="number" id="drawCount" class="form-control" min="1" value="1" placeholder="뽑을 인원 수">
+              <button class="btn btn-primary" onclick="drawRandom()">추첨하기</button>
+            </div>
+            <div id="drawResult" class="result-box text-center py-3">
+              결과가 여기에 표시됩니다
+            </div>
+          </div>
+        </div>
+        <!-- 분배 내역 -->
+        <div class="card bg-dark">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="text-light">분배 내역</span>
+            <button class="btn btn-outline-primary btn-sm" onclick="downloadDistributionCSV()">CSV 다운로드</button>
+          </div>
+          <div class="card-body">
+            <div class="scroll-hint">좌우로 스크롤하세요 <span style="font-size:1.2em;vertical-align:-2px;">⇄</span></div>
+            <div class="table-responsive">
+              <table class="table table-dark table-hover">
+                <thead>
+                  <tr>
+                    <th class="text-center">날짜</th>
+                    <th class="text-center">닉네임</th>
+                    <th class="text-center">아이템</th>
+                    <th class="text-center" id="actionColumn" style="display: none;">작업</th>
+                  </tr>
+                </thead>
+                <tbody id="adminInputList"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- 분배 내역 입력 폼 (관리자용) -->
+        <div id="distributionInputForm" class="card bg-dark mt-4" style="display: none;">
+          <div class="card-header">
+            <span class="text-light">분배 내역 입력</span>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <input type="date" id="distributionDate" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <select id="distributionNickname" class="form-control">
+                  <option value="">닉네임 선택</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <input type="text" id="distributionItem" class="form-control" placeholder="아이템 입력">
+              </div>
+            </div>
+            <div class="text-end mt-3">
+              <button class="btn btn-primary" onclick="saveDistributionInput()">저장</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 신규 아이디 추가 모달 -->
+<div class="modal fade" id="addIdModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark">
+      <div class="modal-header">
+        <h5 class="modal-title text-light">신규 아이디 추가</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="modalNewId" class="form-control mb-3" placeholder="새로운 아이디를 입력하세요">
+        <div class="text-end">
+          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">취소</button>
+          <button class="btn btn-primary" onclick="addNewIdFromModal()">추가</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 상세수정 모달 리뉴얼: 밝은 Bootstrap 카드/테이블/입력폼/버튼 스타일, 기능 정상화 -->
+<div class="modal fade" id="detailEditModal" tabindex="-1" aria-labelledby="detailEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailEditModalLabel">상세수정</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="card mb-4">
+          <div class="card-header">누락 데이터 추가</div>
+          <div class="card-body">
+            <div class="row g-2">
+              <div class="col-12 mb-2"><input id="missingBossId_modal" class="form-control" placeholder="보스 ID"></div>
+              <div class="col"><input id="missingBossTime_modal" class="form-control" type="datetime-local"></div>
+              <div class="col"><input id="missingNick_modal" class="form-control" placeholder="닉네임"></div>
+              <div class="col"><input id="missingScore_modal" class="form-control" type="number" placeholder="점수"></div>
+              <div class="col-auto"><button class="btn btn-primary w-100" onclick="addMissingData_modal()">추가</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="card mb-4">
+          <div class="card-header">참여자 수정</div>
+          <div class="card-body">
+            <select id="bossSelect_modal" class="form-select mb-2" onchange="loadParticipantsTable_modal()">
+              <option value="">보스 선택</option>
+            </select>
+            <table class="table table-striped table-hover">
+              <tbody id="participantTable_modal"></tbody>
+            </table>
+            <div class="row g-2 mb-2">
+              <div class="col"><input id="editNick_modal" class="form-control" readonly placeholder="선택된 닉네임"></div>
+              <div class="col"><input id="editScore_modal" class="form-control" type="number" placeholder="현재 점수"></div>
+              <div class="col-auto"><button class="btn btn-primary w-100" onclick="updateParticipantScore_modal()">점수 수정</button></div>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col"><input id="newNick_modal" class="form-control" placeholder="새 닉네임"></div>
+              <div class="col-auto"><button class="btn btn-warning w-100" onclick="changeParticipantNick_modal()">닉네임 변경</button></div>
+            </div>
+            <hr/>
+            <div class="row g-2 mb-2">
+              <div class="col"><input id="addNick_modal" class="form-control" placeholder="추가할 닉네임"></div>
+              <div class="col"><input id="addScore_modal" class="form-control" type="number" placeholder="점수"></div>
+              <div class="col-auto"><button class="btn btn-success w-100" onclick="addParticipantToBoss_modal()">참여자 추가</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="card mb-4">
+          <div class="card-header">보스 ID 수정</div>
+          <div class="card-body row g-2">
+            <div class="col"><input id="newBossId_modal" class="form-control" placeholder="새 보스 ID"></div>
+            <div class="col-auto"><button class="btn btn-danger w-100" onclick="changeBossId_modal()">보스 ID 변경</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 당번신청 모달 -->
+<div class="modal fade" id="dutySelectorModal" tabindex="-1" aria-labelledby="dutySelectorModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="background:#23272b;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dutySelectorModalLabel">당번 정하기 시스템</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="dutySelectorBody">
+        <!-- duty_selector.html의 모든 UI가 여기에 동적으로 렌더링됩니다 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 자금현황 모달 -->
+<div class="modal fade" id="fundStatusModal" tabindex="-1" aria-labelledby="fundStatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fundStatusModalLabel">길드자금현황</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-end mb-2">
+          <button class="btn btn-outline-primary btn-sm me-2" onclick="downloadFundStatusCSV()">CSV 다운로드</button>
+          <button id="fundResetButton" class="btn btn-danger btn-sm" style="display:none;" onclick="resetFundStatus()">전체 초기화</button>
+        </div>
+        <div id="fundStatusInputForm" class="mb-3" style="display:none;">
+          <div class="row g-2">
+            <div class="col-md-3"><input type="text" id="fundContent" class="form-control" placeholder="내용"></div>
+            <div class="col-md-2"><input type="number" id="fundAmount" class="form-control" placeholder="금액"></div>
+            <div class="col-md-2">
+              <select id="fundType" class="form-control">
+                <option value="증가">증가</option>
+                <option value="감소">감소</option>
+              </select>
+            </div>
+            <div class="col-md-3"><input type="text" id="fundNote" class="form-control" placeholder="비고"></div>
+            <div class="col-md-2"><button class="btn btn-primary w-100" onclick="saveFundStatus()">저장</button></div>
+          </div>
+        </div>
+        <div class="scroll-hint">좌우로 스크롤하세요 <span style="font-size:1.2em;vertical-align:-2px;">⇄</span></div>
+        <div class="table-responsive" style="position:relative;">
+          <div class="table-scroll-shadow"></div>
+          <table id="fundStatusTable" class="table table-dark table-hover">
+            <thead>
+              <tr>
+                <th>내용</th>
+                <th style="width: 120px;">금액</th>
+                <th style="width: 70px;">증감</th>
+                <th style="width: 120px;">잔액(잼)</th>
+                <th>비고</th>
+                <th id="fundActionColumn" style="width: 20px; display:none;">작업</th>
+              </tr>
+            </thead>
+            <tbody id="fundStatusTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAY6Ff6uZ-iZ7soeuXBU0mtTKKZZ8gAPck",
+  authDomain: "bossraidtracker.firebaseapp.com",
+  databaseURL: "https://bossraidtracker-default-rtdb.firebaseio.com",
+  projectId: "bossraidtracker",
+  storageBucket: "bossraidtracker.appspot.com",
+  messagingSenderId: "975753692062",
+  appId: "1:975753692062:web:0991fb5bcbc52a9d3d0c8f"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// 공통 유틸리티 함수들 추가
+const Utils = {
+  // 로딩 표시 관리
+  showLoading: function(message = '처리 중...') {
+    // 로딩 표시 로직
+  },
+  
+  hideLoading: function() {
+    // 로딩 숨김 로직
+  },
+  
+  // 에러 메시지 표준화
+  showError: function(message) {
+    alert(`${message}`);
+  },
+  
+  // 성공 메시지 표준화
+  showSuccess: function(message) {
+    alert(`${message}`);
+  },
+  
+  // 확인 대화상자 표준화
+  confirm: function(message) {
+    return confirm(`⚠️ ${message}`);
+  },
+  
+  // 날짜 포맷팅
+  formatDate: function(timestamp) {
+    return new Date(timestamp).toLocaleString("ko-KR");
+  },
+  
+  // 닉네임 검증
+  validateNickname: function(nickname) {
+    if (!nickname || nickname.trim() === '') {
+      this.showError('닉네임을 입력해주세요.');
+      return false;
+    }
+    return true;
+  }
+};
+
+// Firebase 작업 공통 함수들
+const FirebaseUtils = {
+  // 안전한 Firebase 참조 생성
+  safeRef: function(path) {
+    try {
+      return db.ref(path);
+    } catch (error) {
+      Utils.showError('데이터베이스 연결 오류가 발생했습니다.');
+      console.error('Firebase ref error:', error);
+      return null;
+    }
+  },
+  
+  // 안전한 데이터 읽기
+  safeRead: async function(path) {
+    try {
+      const ref = this.safeRef(path);
+      if (!ref) return null;
+      const snapshot = await ref.once('value');
+      return snapshot.val();
+    } catch (error) {
+      Utils.showError('데이터를 읽는 중 오류가 발생했습니다.');
+      console.error('Firebase read error:', error);
+      return null;
+    }
+  },
+  
+  // 안전한 데이터 쓰기
+  safeWrite: async function(path, data) {
+    try {
+      const ref = this.safeRef(path);
+      if (!ref) return false;
+      await ref.set(data);
+      return true;
+    } catch (error) {
+      Utils.showError('데이터를 저장하는 중 오류가 발생했습니다.');
+      console.error('Firebase write error:', error);
+      return false;
+    }
+  }
+};
+
+function saveNickname() {
+  let nickname = document.getElementById("nickname").value;
+  nickname = nickname.replace(/\s/g, "");
+  
+  if (!Utils.validateNickname(nickname)) {
+    return;
+  }
+  
+  localStorage.setItem("nickname", nickname);
+  document.getElementById("nickname").value = nickname;
+  Utils.showSuccess("닉네임이 성공적으로 저장되었습니다.");
+}
+
+function setAdmin() {
+  const email = prompt("관리자 이메일을 입력해주세요:");
+  const password = prompt("관리자 비밀번호를 입력해주세요:");
+  if (email === "dogfightda@gmail.com" && password === "0716") {
+    localStorage.setItem("admin", email);
+    Utils.showSuccess("관리자 인증이 완료되었습니다.");
+    checkAdmin();
+    location.reload(); // 로그인 시 새로고침
+  } else {
+    Utils.showError("관리자 인증에 실패했습니다. 이메일과 비밀번호를 다시 확인해주세요.");
+  }
+}
+
+function logout() {
+  localStorage.removeItem("admin");
+  Utils.showSuccess("로그아웃이 완료되었습니다.");
+  checkAdmin();
+  location.reload(); // 로그아웃 시 새로고침
+}
+
+function isAdmin() {
+  return localStorage.getItem("admin") === "dogfightda@gmail.com";
+}
+
+function checkAdmin() {
+  var adminSection = document.getElementById("adminSection");
+  if (adminSection) adminSection.classList.toggle("d-none", !isAdmin());
+  var authInfo = document.getElementById("authInfo");
+  if (authInfo) authInfo.classList.toggle("d-none", !isAdmin());
+  var adminBtn = document.getElementById("adminButton");
+  if (adminBtn) adminBtn.classList.toggle("d-none", isAdmin());
+  var deleteAllBtn = document.getElementById("deleteAllButton");
+  if (deleteAllBtn) deleteAllBtn.style.display = isAdmin() ? "inline-block" : "none";
+  // 드로어 메뉴용 버튼 표시
+  var adminBtnDrawer = document.getElementById("adminButtonDrawer");
+  if (adminBtnDrawer) adminBtnDrawer.style.display = isAdmin() ? "none" : "block";
+  var authInfoDrawer = document.getElementById("authInfoDrawer");
+  if (authInfoDrawer) authInfoDrawer.style.display = isAdmin() ? "block" : "none";
+  // 상세수정 버튼 표시
+  const detailBtn = document.getElementById("detailEditBtn");
+  if(detailBtn) detailBtn.style.display = isAdmin() ? "inline-block" : "none";
+  const detailBtnDrawer = document.getElementById("detailEditBtnDrawer");
+  if(detailBtnDrawer) detailBtnDrawer.style.display = isAdmin() ? "inline-block" : "none";
+  var authStatus = document.getElementById("authStatus");
+  if (authStatus) authStatus.textContent = isAdmin() ? localStorage.getItem("admin") : "-";
+}
+
+function openBoss() {
+  const bossId = document.getElementById("bossId").value.trim();
+  const scoreInput = document.getElementById("bossScore").value.trim();
+  const score = parseInt(scoreInput);
+  const timeInput = document.getElementById("bossTime").value;
+  const timestamp = timeInput ? new Date(timeInput).getTime() : Date.now();
+
+  if (!bossId) {
+    Utils.showError("보스 이름을 입력해주세요.");
+    return;
+  }
+  if (!scoreInput || isNaN(score)) {
+    Utils.showError("점수를 올바른 숫자로 입력해주세요.");
+    return;
+  }
+  
+  Utils.showLoading("보스를 오픈하는 중...");
+  db.ref("bosses/"+bossId).set({open:true,timestamp:timestamp,score})
+    .then(() => {
+      Utils.hideLoading();
+      Utils.showSuccess("보스가 성공적으로 오픈되었습니다.");
+      // 실시간 반영이므로 별도 새로고침 불필요
+      document.getElementById("bossId").value = "";
+      document.getElementById("bossScore").value = "";
+      document.getElementById("bossTime").value = "";
+    })
+    .catch((error) => {
+      Utils.hideLoading();
+      Utils.showError("보스 오픈 중 오류가 발생했습니다.");
+      console.error(error);
+    });
+}
+
+function participate(bossId){
+  const nickname = localStorage.getItem("nickname");
+  if (!Utils.validateNickname(nickname)) return;
+  
+  db.ref(`bosses/${bossId}/score`).once("value",snap=>{
+    const score=snap.val()||0;
+    db.ref(`bosses/${bossId}/participants/${nickname}`).set({score})
+      .then(() => {
+        Utils.showSuccess("보스 참여가 완료되었습니다.");
+        // 실시간 반영이므로 별도 새로고침 불필요
+      })
+      .catch((error) => {
+        Utils.showError("참여 처리 중 오류가 발생했습니다.");
+        console.error(error);
+      });
+  });
+}
+
+function cancelParticipation(bossId){
+  const nickname = localStorage.getItem("nickname");
+  if (!Utils.validateNickname(nickname)) return;
+  
+  if (Utils.confirm("정말로 보스 참여를 취소하시겠습니까?")) {
+    db.ref(`bosses/${bossId}/participants/${nickname}`).remove()
+      .then(() => {
+        Utils.showSuccess("보스 참여가 취소되었습니다.");
+        // 실시간 반영이므로 별도 새로고침 불필요
+      })
+      .catch((error) => {
+        Utils.showError("참여 취소 중 오류가 발생했습니다.");
+        console.error(error);
+      });
+  }
+}
+
+function deleteBoss(bossId){
+  if(Utils.confirm("해당 보스 정보를 삭제하시겠습니까?")) {
+    db.ref("bosses/"+bossId).remove()
+      .then(() => {
+        Utils.showSuccess("보스가 삭제되었습니다.");
+        // 실시간 반영이므로 별도 새로고침 불필요
+      })
+      .catch((error) => {
+        Utils.showError("보스 삭제 중 오류가 발생했습니다.");
+        console.error(error);
+      });
+  }
+}
+
+function deleteParticipant(bossId,nick){
+  if(Utils.confirm("해당 참여자의 정보를 삭제하시겠습니까?")) {
+    db.ref(`bosses/${bossId}/participants/${nick}`).remove()
+      .then(() => {
+        Utils.showSuccess("참여자가 삭제되었습니다.");
+        // 실시간 반영이므로 별도 새로고침 불필요
+      })
+      .catch((error) => {
+        Utils.showError("참여자 삭제 중 오류가 발생했습니다.");
+        console.error(error);
+      });
+  }
+}
+
+function confirmAndDeleteAll(){
+  if(!isAdmin()){ 
+    Utils.showError("관리자만 삭제할 수 있는 기능입니다."); 
+    return; 
+  }
+  if(Utils.confirm("모든 보스 정보와 참여자 정보가 삭제됩니다. 정말로 진행하시겠습니까?")) {
+    db.ref("bosses").remove()
+      .then(() => {
+        Utils.showSuccess("모든 데이터가 삭제되었습니다.");
+        // 실시간 반영이므로 별도 새로고침 불필요
+      })
+      .catch((error) => {
+        Utils.showError("데이터 삭제 중 오류가 발생했습니다.");
+        console.error(error);
+      });
+  }
+}
+
+function loadBosses(){
+  db.ref("bosses").on("value",snap=>{
+    const data=snap.val(),now=Date.now(),cont=document.getElementById("bossList");cont.innerHTML="";
+    const sortedIds = Object.keys(data).sort((a,b)=>data[b].timestamp - data[a].timestamp);
+    for(const id of sortedIds){
+      const boss=data[id],open=boss.timestamp,within=(now-open)<21600000;
+      let html = `<div class="card boss-card mb-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="card-title mb-2">${id}
+            ${isAdmin()?`<span class="admin-delete" onclick="deleteBoss('${id}')">[X]</span>`:""}</h5>
+            <div class="text-muted mb-3">${new Date(open).toLocaleString("ko-KR")}</div>
+          </div>
+          <div class="btn-action-group">
+            <button class="btn ${within ? 'btn-primary' : 'btn-secondary'}" onclick="${within ? `participate('${id}')` : "alert('참여 가능 시간이 지났습니다.')"}" style="min-width: 80px; text-align: center; font-weight: 600; padding: 0.6rem 1.2rem; font-size: 0.9rem; border-radius: 10px; transition: all 0.3s ease;">${within ? "참여" : "불가"}</button>
+            <button class="btn btn-danger" onclick="cancelParticipation('${id}')" style="min-width: 80px; text-align: center; font-weight: 600; padding: 0.6rem 1.2rem; font-size: 0.9rem; border-radius: 10px; transition: all 0.3s ease;">취소</button>
+          </div>
+        </div>
+        <div class="participant-list">
+          <ul class="mt-2">`;
+      if (boss.participants) {
+        const sortedNicks = Object.entries(boss.participants).sort((a, b) => a[0].localeCompare(b[0], 'ko'));
+        for (const [nick, info] of sortedNicks) {
+          html += `<li>${nick} <span class="text-muted">(${info.score}점)</span> ${isAdmin()?`<span class="admin-delete" onclick="deleteParticipant('${id}','${nick}')">[X]</span>`:""}</li>`;
+        }
+      } else html += "<li class='text-muted'>참여자 없음</li>";
+      html += "</ul></div></div>";
+      cont.innerHTML += html;
+    }
+    requestAnimationFrame(() => { hideLoadingOverlay(); }); // 데이터 렌더링 후 오버레이 제거
+  });
+}
+
+let currentSort = 'score';
+let showAll = {
+  total: false,
+  weekly: false,
+  custom: false
+};
+
+function changeSort(sortType) {
+  currentSort = sortType;
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  const activeTab = document.querySelector('.nav-link.active').id;
+  if (activeTab === 'total-tab') {
+    displayTotalScores();
+  } else if (activeTab === 'weekly-tab') {
+    displayWeeklyScores();
+  } else if (activeTab === 'custom-tab') {
+    displayCustomScores();
+  }
+}
+
+function displayTotalScores(){
+  db.ref("bosses").once("value",snap=>{
+    const data=snap.val(),scores={},participation={};
+    const totalBosses = Object.keys(data).length;
+    
+    for(const id in data){
+      const boss=data[id];
+      if(boss.participants){
+        for(const nick in boss.participants){
+          const score=boss.participants[nick].score||0;
+          scores[nick]=(scores[nick]||0)+score;
+          participation[nick] = (participation[nick] || 0) + 1;
+        }
+      }
+    }
+    
+    let sorted;
+    if (currentSort === 'score') {
+      sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+    } else {
+      sorted = Object.entries(scores).sort((a,b) => {
+        const rateA = ((participation[a[0]] || 0) / totalBosses) * 100;
+        const rateB = ((participation[b[0]] || 0) / totalBosses) * 100;
+        return rateB - rateA;
+      });
+    }
+
+    function renderList() {
+      const displayList = showAll.total ? sorted : sorted.slice(0, 5);
+      let currentRank = 1;
+      let currentScore = displayList[0] ? displayList[0][1] : 0;
+      let sameRankCount = 0;
+      
+      const html = displayList.map(([n,s], index) => {
+        if (s !== currentScore) {
+          currentRank = index + 1;
+          currentScore = s;
+          sameRankCount = 0;
+        } else {
+          sameRankCount++;
+        }
+        
+        const participated = participation[n] || 0;
+        const participationRate = ((participated / totalBosses) * 100).toFixed(1);
+        const textColor = participationRate >= 60 ? 'color: #FFD700;' : '';
+        return `<li><strong>${currentRank}등</strong> <span style="${textColor}">${n}: ${s}점</span> <span style="font-size: 84%">( 건수 : ${participated} | 참여율 : ${participationRate}%)</span></li>`;
+      }).join('');
+      document.getElementById('total').innerHTML =
+        `<h5 class='mb-2'>닉네임별 누적 점수</h5>
+        <ul>${html}</ul>
+        ${sorted.length > 5 ? `<button id='showMoreScores' class='btn btn-primary btn-sm mt-2'>${showAll.total ? '접기' : '더보기'}</button>` : ''}`;
+      if(sorted.length > 5) {
+        document.getElementById('showMoreScores').onclick = () => {
+          showAll.total = !showAll.total;
+          renderList();
+        };
+      }
+    }
+    renderList();
+    requestAnimationFrame(() => { hideLoadingOverlay(); }); // 데이터 렌더링 후 오버레이 제거
+  });
+}
+
+function displayWeeklyScores() {
+  db.ref("bosses").once("value", snap => {
+    const data = snap.val();
+    const scores = {};
+    const participation = {};
+    
+    // 현재 시간 기준으로 이번 주 수요일 9시와 다음 주 수요일 9시 사이의 시간 계산
+    const now = new Date();
+    const currentDay = now.getDay(); // 0: 일요일, 3: 수요일
+    const currentHour = now.getHours();
+    
+    // 이번 주 수요일 9시 계산
+    let thisWed = new Date(now);
+    thisWed.setHours(9, 0, 0, 0);
+    // 이번 주 수요일까지 며칠 남았는지 계산 (일요일=0, 수요일=3)
+    const diffToWed = (3 - thisWed.getDay() + 7) % 7;
+    thisWed.setDate(thisWed.getDate() + diffToWed);
+    // 만약 오늘이 수요일이고 9시 이전이면, 지난주 수요일 9시로 이동
+    if (now < thisWed) {
+      thisWed.setDate(thisWed.getDate() - 7);
+    }
+    // 시작: 이번 주 수요일 9시
+    const startDate = new Date(thisWed);
+    // 끝: 다음 주 수요일 9시
+    const endDate = new Date(thisWed);
+    endDate.setDate(endDate.getDate() + 7);
+    // 집계는 끝-1초까지
+    const endTimestamp = endDate.getTime() - 1000;
+    const startTimestamp = startDate.getTime();
+    // 표기용: 1분 빼서 08:59로
+    const displayEndDate = new Date(endDate.getTime() - 60 * 1000);
+    
+    // 주간 보스 수 계산
+    const weeklyBosses = Object.values(data).filter(boss => 
+      boss.timestamp >= startTimestamp && boss.timestamp <= endTimestamp
+    ).length;
+    
+    // 주간 점수 계산
+    for(const id in data) {
+      const boss = data[id];
+      if(boss.timestamp >= startTimestamp && boss.timestamp <= endTimestamp && boss.participants) {
+        for(const nick in boss.participants) {
+          const score = boss.participants[nick].score || 0;
+          scores[nick] = (scores[nick] || 0) + score;
+          participation[nick] = (participation[nick] || 0) + 1;
+        }
+      }
+    }
+    
+    let sorted;
+    if (currentSort === 'score') {
+      sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+    } else {
+      sorted = Object.entries(scores).sort((a,b) => {
+        const rateA = ((participation[a[0]] || 0) / weeklyBosses) * 100;
+        const rateB = ((participation[b[0]] || 0) / weeklyBosses) * 100;
+        return rateB - rateA;
+      });
+    }
+    
+    function renderList() {
+      const displayList = showAll.weekly ? sorted : sorted.slice(0, 5);
+      let currentRank = 1;
+      let currentScore = displayList[0] ? displayList[0][1] : 0;
+      let sameRankCount = 0;
+      
+      const html = displayList.map(([n,s], index) => {
+        if (s !== currentScore) {
+          currentRank = index + 1;
+          currentScore = s;
+          sameRankCount = 0;
+        } else {
+          sameRankCount++;
+        }
+        
+        const participated = participation[n] || 0;
+        const participationRate = ((participated / weeklyBosses) * 100).toFixed(1);
+        const textColor = participationRate >= 60 ? 'color: #FFD700;' : '';
+        return `<li><strong>${currentRank}등</strong> <span style="${textColor}">${n}: ${s}점</span> <span style="font-size: 84%">( 건수 : ${participated} | 참여율 : ${participationRate}%)</span></li>`;
+      }).join('');
+      
+      const periodText = `${startDate.getMonth() + 1}월 ${startDate.getDate()}일 (${['일', '월', '화', '수', '목', '금', '토'][startDate.getDay()]}) ${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')} ~ ${displayEndDate.getMonth() + 1}월 ${displayEndDate.getDate()}일 (${['일', '월', '화', '수', '목', '금', '토'][displayEndDate.getDay()]}) ${String(displayEndDate.getHours()).padStart(2, '0')}:${String(displayEndDate.getMinutes()).padStart(2, '0')}`;
+      
+      document.getElementById('weekly').innerHTML =
+        `<h5 class='mb-2'>닉네임별 주간 점수</h5>
+        <div class="text-muted mb-3" style="font-size: 0.9rem;">${periodText}</div>
+        <ul>${html}</ul>
+        ${sorted.length > 5 ? `<button id='showMoreWeeklyScores' class='btn btn-primary btn-sm mt-2'>${showAll.weekly ? '접기' : '더보기'}</button>` : ''}`;
+        
+      if(sorted.length > 5) {
+        document.getElementById('showMoreWeeklyScores').onclick = () => {
+          showAll.weekly = !showAll.weekly;
+          renderList();
+        };
+      }
+    }
+    renderList();
+    requestAnimationFrame(() => { hideLoadingOverlay(); }); // 데이터 렌더링 후 오버레이 제거
+  });
+}
+
+function displayCustomScores() {
+  const startDate = document.getElementById('customStartDate').value;
+  const endDate = document.getElementById('customEndDate').value;
+  
+  if (!startDate || !endDate) {
+    alert('시작일과 종료일을 모두 선택해주세요.');
+    return;
+  }
+  
+  const startTimestamp = new Date(startDate).getTime();
+  const endTimestamp = new Date(endDate).getTime();
+  
+  if (startTimestamp >= endTimestamp) {
+    alert('종료일은 시작일보다 이후여야 합니다.');
+    return;
+  }
+  
+  db.ref("bosses").once("value", snap => {
+    const data = snap.val();
+    const scores = {};
+    const participation = {};
+    
+    // 선택된 기간의 보스 수 계산
+    const periodBosses = Object.values(data).filter(boss => 
+      boss.timestamp >= startTimestamp && boss.timestamp <= endTimestamp
+    ).length;
+    
+    // 선택된 기간의 점수 계산
+    for(const id in data) {
+      const boss = data[id];
+      if(boss.timestamp >= startTimestamp && boss.timestamp <= endTimestamp && boss.participants) {
+        for(const nick in boss.participants) {
+          const score = boss.participants[nick].score || 0;
+          scores[nick] = (scores[nick] || 0) + score;
+          participation[nick] = (participation[nick] || 0) + 1;
+        }
+      }
+    }
+    
+    let sorted;
+    if (currentSort === 'score') {
+      sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+    } else {
+      sorted = Object.entries(scores).sort((a,b) => {
+        const rateA = ((participation[a[0]] || 0) / periodBosses) * 100;
+        const rateB = ((participation[b[0]] || 0) / periodBosses) * 100;
+        return rateB - rateA;
+      });
+    }
+    
+    function renderList() {
+      const displayList = showAll.custom ? sorted : sorted.slice(0, 5);
+      let currentRank = 1;
+      let currentScore = displayList[0] ? displayList[0][1] : 0;
+      let sameRankCount = 0;
+      
+      const html = displayList.map(([n,s], index) => {
+        if (s !== currentScore) {
+          currentRank = index + 1;
+          currentScore = s;
+          sameRankCount = 0;
+        } else {
+          sameRankCount++;
+        }
+        
+        const participated = participation[n] || 0;
+        const participationRate = ((participated / periodBosses) * 100).toFixed(1);
+        const textColor = participationRate >= 60 ? 'color: #FFD700;' : '';
+        return `<li><strong>${currentRank}등</strong> <span style="${textColor}">${n}: ${s}점</span> <span style="font-size: 84%">( 건수 : ${participated} | 참여율 : ${participationRate}%)</span></li>`;
+      }).join('');
+      
+      const periodText = `${new Date(startTimestamp).toLocaleDateString('ko-KR', {month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'})} ~ ${new Date(endTimestamp).toLocaleDateString('ko-KR', {month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'})}`;
+      
+      document.getElementById('customScores').innerHTML =
+        `<h5 class='mb-2'>닉네임별 기간 점수</h5>
+        <div class="text-muted mb-3" style="font-size: 0.9rem;">${periodText}</div>
+        <ul>${html}</ul>
+        ${sorted.length > 5 ? `<button id='showMoreCustomScores' class='btn btn-primary btn-sm mt-2'>${showAll.custom ? '접기' : '더보기'}</button>` : ''}`;
+        
+      if(sorted.length > 5) {
+        document.getElementById('showMoreCustomScores').onclick = () => {
+          showAll.custom = !showAll.custom;
+          renderList();
+        };
+      }
+    }
+    renderList();
+    requestAnimationFrame(() => { hideLoadingOverlay(); }); // 데이터 렌더링 후 오버레이 제거
+  });
+}
+
+// 페이지 로드 시 datetime-local 입력 필드의 기본값 설정
+window.addEventListener('DOMContentLoaded', function() {
+  const now = new Date();
+  const startDate = new Date(now);
+  startDate.setDate(startDate.getDate() - 7); // 7일 전
+  
+  // 한국 시간으로 변환
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+  
+  document.getElementById('customStartDate').value = formatDate(startDate);
+  document.getElementById('customEndDate').value = formatDate(now);
+});
+
+// 더보기 상태 초기화 함수 추가
+function resetShowAll() {
+  showAll = {
+    total: false,
+    weekly: false,
+    custom: false
+  };
+  displayTotalScores();
+  displayWeeklyScores();
+  displayCustomScores();
+}
+
+function openRandomDraw() {
+  const modal = new bootstrap.Modal(document.getElementById('randomDrawModal'));
+  loadDistributionInputs();
+  modal.show();
+  setTimeout(updateScrollHintVisibility, 200);
+}
+
+function drawRandom() {
+    const drawIdList = document.getElementById('drawIdList');
+    const drawCount = parseInt(document.getElementById('drawCount').value);
+    const resultBox = document.getElementById('drawResult');
+
+    // 뽑기 대상 목록에서 아이디 가져오기
+    const participants = Array.from(drawIdList.children).map(li => li.querySelector('span').textContent);
+    
+    if (participants.length === 0) {
+        resultBox.innerHTML = '<div class="text-danger">뽑기 대상이 없습니다.</div>';
+        return;
+    }
+
+    if (isNaN(drawCount) || drawCount < 1) {
+        resultBox.innerHTML = '<div class="text-danger">뽑을 인원 수를 올바르게 입력해주세요.</div>';
+        return;
+    }
+
+    if (drawCount > participants.length) {
+        resultBox.innerHTML = `<div class="text-danger">뽑을 인원 수(${drawCount}명)가 참여자 수(${participants.length}명)보다 많습니다.</div>`;
+        return;
+    }
+
+    // 애니메이션 효과를 위한 준비
+    resultBox.innerHTML = '<div class="draw-animation">뽑는 중...</div>';
+    
+    // 추첨 대상 섞기
+    const shuffled = [...participants].sort(() => Math.random() - 0.5);
+    const winners = shuffled.slice(0, drawCount);
+
+    // 여러 명 뽑을 때 한 명씩 순차적으로 애니메이션
+    async function animateDraw(names, winnerList) {
+        let resultHTML = '';
+        for (let i = 0; i < winnerList.length; i++) {
+            await new Promise(resolve => {
+                let t = 0;
+                const duration = 900 + Math.random() * 600; // 0.9~1.5초
+                let lastName = '';
+                const interval = setInterval(() => {
+                    lastName = names[Math.floor(Math.random() * names.length)];
+                    resultBox.innerHTML = resultHTML + `<span class='inline-block text-2xl md:text-3xl text-accent font-extrabold animate-pulse' style='color:#ff9800;'>${lastName}</span>`;
+                }, 50);
+                setTimeout(() => {
+                    clearInterval(interval);
+                    resultHTML += `<span class='block text-2xl md:text-3xl text-accent font-extrabold mb-1' style='color:#ff9800; animation:pop 0.5s;'>${winnerList[i]}</span>`;
+                    resultBox.innerHTML = resultHTML;
+                    setTimeout(resolve, 350);
+                }, duration);
+            });
+        }
+        if (winnerList.length === 1) {
+            resultBox.innerHTML = `당첨자: <span class='text-accent font-extrabold text-2xl md:text-3xl' style='color:#ff9800; animation:pop 0.5s;'>${winnerList[0]}</span>`;
+        } else {
+            resultBox.innerHTML = `당첨자:<br>` + winnerList.map(w => `<span class='block text-accent font-extrabold text-2xl md:text-3xl' style='color:#ff9800; animation:pop 0.5s;'>${w}</span>`).join('');
+        }
+    }
+    animateDraw(participants, winners);
+}
+
+// 모달이 닫힐 때 입력 필드 초기화
+document.getElementById('randomDrawModal').addEventListener('hidden.bs.modal', function () {
+  document.getElementById('drawIdList').innerHTML = '';
+  document.getElementById('drawCount').value = '1';
+  document.getElementById('drawResult').textContent = '결과가 여기에 표시됩니다';
+});
+
+// 기본 아이디 목록 초기화 함수
+window.initializeAndDisplayDefaultIds = async function() {
+  const baseIdList = document.getElementById('baseIdList');
+  try {
+    const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
+    let data = snapshot.val();
+    
+    // Firebase에 데이터가 없는 경우 초기 데이터 설정
+    if (!data) {
+      const initialData = {
+        name: '기본 아이디 목록',
+        participants: [
+          "채리대장", "총괄대장", "곰도리젤리", "수달대장", "가든대장",
+          "그냥대장", "내사랑정희", "리샤대장", "호구대장", "뽀빠이대장",
+          "진짜대장", "판다대장", "폭포대장", "화기대장", "기본원칙돌쇠대장",
+          "쭈니대장", "캇뚜대장", "열정대장", "예스대장", "츄하이대장",
+          "빠루대장", "입딜대장", "가챠대장", "내가대장", "향기대장"
+        ],
+        type: 'randomDraw',
+        createdAt: Date.now()
+      };
+      await db.ref('randomDrawLists/defaultIds').set(initialData);
+      data = initialData;
+    }
+
+    baseIdList.innerHTML = '';
+    if (!data.participants || data.participants.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'list-group-item text-center text-danger';
+      li.textContent = '기본 아이디 목록을 불러오는데 실패했습니다.';
+      baseIdList.appendChild(li);
+      return;
+    }
+
+    data.participants.sort().forEach((id) => {
+      const li = document.createElement('li');
+      li.className = 'list-group-item p-0';
+      const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+      li.innerHTML = `
+        <div class="d-flex flex-sm-row flex-column align-items-sm-center align-items-stretch w-100 p-2">
+          <span class="text-light flex-grow-1 text-truncate" style="min-width:0;max-width:180px;white-space:nowrap;overflow:hidden;">${id}</span>
+          <div class="d-flex flex-sm-row flex-column gap-2 ms-auto" style="min-width:90px;max-width:180px;">
+            <button class="btn btn-success btn-sm"
+              style="width:28px;height:28px;min-width:28px;min-height:28px;max-width:28px;max-height:28px;padding:0!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem!important;"
+              onclick="addToDrawList('${id}')">
+              <i class="fas fa-plus"></i>
+            </button>
+            ${isAdmin ? `
+              <button class="btn btn-danger btn-sm"
+                style="width:28px;height:28px;min-width:28px;min-height:28px;max-width:28px;max-height:28px;padding:0!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem!important;"
+                onclick="removeBaseId('${id}')">
+                <i class="fas fa-trash"></i>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+      baseIdList.appendChild(li);
+    });
+
+    // [신규 아이디 추가] 버튼
+    const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+    if (isAdmin) {
+      const addBtnLi = document.createElement('li');
+      addBtnLi.className = 'list-group-item text-center';
+      addBtnLi.innerHTML = `<button class="btn btn-primary btn-sm w-100" onclick="openAddIdModal()">+ 신규 아이디 추가</button>`;
+      baseIdList.appendChild(addBtnLi);
+    }
+  } catch (error) {
+    console.error('기본 아이디 목록 로드 오류:', error);
+    baseIdList.innerHTML = `
+      <li class="list-group-item text-center text-danger">
+        기본 아이디 목록을 불러오는데 실패했습니다.
+      </li>
+    `;
+  }
+};
+
+// 뽑기 대상 목록에 아이디 추가
+window.addToDrawList = function(id) {
+  const drawIdList = document.getElementById('drawIdList');
+  const current = Array.from(drawIdList.children).map(li => li.querySelector('span').textContent);
+  if (current.includes(id)) return;
+  const li = document.createElement('li');
+  li.className = 'list-group-item d-flex justify-content-between align-items-center';
+  li.innerHTML = `
+    <span class="text-light">${id}</span>
+    <button class="btn btn-outline-light btn-sm" onclick="removeDrawId(this)">제거</button>
+  `;
+  drawIdList.appendChild(li);
+  // 이름순 정렬
+  const items = Array.from(drawIdList.children);
+  items.sort((a, b) => a.querySelector('span').textContent.localeCompare(b.querySelector('span').textContent));
+  items.forEach(item => drawIdList.appendChild(item));
+};
+
+// 뽑기 대상 목록에서 아이디 제거
+window.removeDrawId = function(btn) {
+  btn.closest('li').remove();
+};
+
+// 기본 아이디 삭제
+window.removeBaseId = async function(id) {
+  if (!confirm('정말로 이 ID를 삭제하시겠습니까?')) return;
+  try {
+    const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
+    let data = snapshot.val();
+    if (data && data.participants) {
+      data.participants = data.participants.filter(item => item !== id);
+      await db.ref('randomDrawLists/defaultIds').update({
+        participants: data.participants
+      });
+      await window.initializeAndDisplayDefaultIds();
+      await window.refreshDistributionNicknameOptions();
+    }
+  } catch (error) {
+    console.error('ID 삭제 오류:', error);
+    alert('ID 삭제 중 오류가 발생했습니다.');
+  }
+};
+
+// 전체 추가
+window.addAllBaseIdsToDrawList = async function() {
+  const drawIdList = document.getElementById('drawIdList');
+  try {
+    const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
+    let data = snapshot.val();
+    if (!data || !data.participants) {
+      alert('기본 아이디 목록을 불러오는데 실패했습니다.');
+      return;
+    }
+    const current = Array.from(drawIdList.children).map(li => li.querySelector('span').textContent);
+    data.participants.forEach(id => {
+      if (!current.includes(id)) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+          <span class="text-light">${id}</span>
+          <button class="btn btn-outline-light btn-sm" onclick="removeDrawId(this)">제거</button>
+        `;
+        drawIdList.appendChild(li);
+      }
+    });
+    // 이름순 정렬
+    const items = Array.from(drawIdList.children);
+    items.sort((a, b) => a.querySelector('span').textContent.localeCompare(b.querySelector('span').textContent));
+    items.forEach(item => drawIdList.appendChild(item));
+  } catch (error) {
+    console.error('전체 추가 오류:', error);
+    alert('전체 추가 중 오류가 발생했습니다.');
+  }
+};
+
+window.distributionSortState = { key: 'date', asc: true };
+window.loadDistributionInputs = async function() {
+  const inputList = document.getElementById('adminInputList');
+  const actionColumn = document.getElementById('actionColumn');
+  const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+  try {
+    const snapshot = await db.ref('randomDrawLists/distributionInputs').once('value');
+    const inputs = snapshot.val() || {};
+    inputList.innerHTML = '';
+    actionColumn.style.display = isAdmin ? 'table-cell' : 'none';
+    if (Object.keys(inputs).length === 0) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td colspan="${isAdmin ? '4' : '3'}" class="text-center py-4">
+          <div class="text-muted">입력된 내역이 없습니다.</div>
+        </td>
+      `;
+      inputList.appendChild(tr);
+      return;
+    }
+    // 닉네임 등장 횟수 집계
+    const nicknameCount = {};
+    Object.values(inputs).forEach(data => {
+      nicknameCount[data.nickname] = (nicknameCount[data.nickname] || 0) + 1;
+    });
+    // 정렬
+    let entries = Object.entries(inputs);
+    const { key, asc } = window.distributionSortState;
+    entries.sort((a, b) => {
+      if (key === 'date') {
+        // 날짜 오름차순(기본)
+        return asc ? (a[1].date > b[1].date ? 1 : -1) : (a[1].date < b[1].date ? 1 : -1);
+      } else if (key === 'nickname') {
+        return asc ? (a[1].nickname > b[1].nickname ? 1 : -1) : (a[1].nickname < b[1].nickname ? 1 : -1);
+      }
+      return 0;
+    });
+    entries.forEach(([key, data]) => {
+      const isDuplicated = nicknameCount[data.nickname] > 1;
+      const tr = document.createElement('tr');
+      tr.className = 'distribution-row';
+      tr.innerHTML = `
+        <td class="text-center">${data.date}</td>
+        <td class="text-center">
+          ${data.nickname}
+          ${isDuplicated ? `<span class="ms-1" style="color: #ff4444; font-weight: 700;">(${nicknameCount[data.nickname]})</span>` : ''}
+        </td>
+        <td class="text-center">${data.item}</td>
+        ${isAdmin ? `
+          <td class="text-center">
+            <button class="btn btn-link p-0" title='삭제' onclick='deleteDistributionInput('${key}')'><i class="fas fa-xmark text-danger"></i></button>
+          </td>
+        ` : ''}
+      `;
+      inputList.appendChild(tr);
+    });
+    // 컬럼명 클릭 이벤트 및 정렬 아이콘 표시
+    const ths = document.querySelectorAll('.random-draw-modal .table thead th');
+    ths.forEach(th => {
+      th.style.cursor = '';
+      th.innerHTML = th.textContent.replace(/[▲▼]/g, '');
+    });
+    // 날짜
+    const dateTh = ths[0];
+    dateTh.style.cursor = 'pointer';
+    dateTh.innerHTML = '날짜' + (window.distributionSortState.key === 'date' ? (window.distributionSortState.asc ? ' ▲' : ' ▼') : '');
+    dateTh.onclick = function() {
+      if (window.distributionSortState.key === 'date') {
+        window.distributionSortState.asc = !window.distributionSortState.asc;
+      } else {
+        window.distributionSortState.key = 'date';
+        window.distributionSortState.asc = true;
+      }
+      window.loadDistributionInputs();
+    };
+    // 닉네임
+    const nickTh = ths[1];
+    nickTh.style.cursor = 'pointer';
+    nickTh.innerHTML = '닉네임' + (window.distributionSortState.key === 'nickname' ? (window.distributionSortState.asc ? ' ▲' : ' ▼') : '');
+    nickTh.onclick = function() {
+      if (window.distributionSortState.key === 'nickname') {
+        window.distributionSortState.asc = !window.distributionSortState.asc;
+      } else {
+        window.distributionSortState.key = 'nickname';
+        window.distributionSortState.asc = true;
+      }
+      window.loadDistributionInputs();
+    };
+  } catch (error) {
+    console.error('데이터 로드 중 오류:', error);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td colspan="${isAdmin ? '4' : '3'}" class="text-center py-4">
+        <div class="text-danger">데이터를 불러오는 중 오류가 발생했습니다.</div>
+      </td>
+    `;
+    inputList.appendChild(tr);
+  }
+  requestAnimationFrame(() => { hideLoadingOverlay(); updateScrollHintVisibility(); }); // 데이터 렌더링 후 오버레이 및 스크롤 힌트 체크
+};
+
+// 닉네임 드롭다운 옵션 갱신
+window.refreshDistributionNicknameOptions = async function() {
+  const nicknameSelect = document.getElementById('distributionNickname');
+  if (!nicknameSelect) return;
+  nicknameSelect.innerHTML = '<option value="">닉네임 선택</option>';
+  try {
+    const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
+    let data = snapshot.val();
+    let ids = (data && data.participants) ? data.participants : [];
+    ids.sort().forEach(id => {
+      const option = document.createElement('option');
+      option.value = id;
+      option.textContent = id;
+      nicknameSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error('닉네임 옵션 갱신 오류:', error);
+    alert('닉네임 목록을 불러오는데 실패했습니다.');
+  }
+  requestAnimationFrame(() => { hideLoadingOverlay(); updateScrollHintVisibility(); }); // 데이터 렌더링 후 오버레이 및 스크롤 힌트 체크
+};
+
+// 분배 내역 저장
+window.saveDistributionInput = async function() {
+  const date = document.getElementById('distributionDate').value;
+  const nickname = document.getElementById('distributionNickname').value;
+  const item = document.getElementById('distributionItem').value;
+
+  if (!date || !nickname || !item) {
+    alert('모든 필드를 입력해주세요!');
+    return;
+  }
+
+  try {
+    const newInput = {
+      date,
+      nickname,
+      item,
+      timestamp: Date.now()
+    };
+
+    await db.ref('randomDrawLists/distributionInputs').push(newInput);
+    
+    // 입력 필드 초기화
+    document.getElementById('distributionDate').value = '';
+    document.getElementById('distributionNickname').value = '';
+    document.getElementById('distributionItem').value = '';
+
+    // 성공 메시지 표시
+    const successMsg = document.createElement('div');
+    successMsg.className = 'alert alert-success mt-3';
+    successMsg.textContent = '분배 내역이 저장되었습니다.';
+    document.getElementById('distributionInputForm').appendChild(successMsg);
+    
+    // 3초 후 메시지 제거
+    setTimeout(() => {
+      successMsg.remove();
+    }, 3000);
+
+    // 목록 새로고침
+    await loadDistributionInputs();
+  } catch (error) {
+    console.error('저장 중 오류:', error);
+    alert('저장 중 오류가 발생했습니다: ' + error.message);
+  }
+  requestAnimationFrame(() => { hideLoadingOverlay(); updateScrollHintVisibility(); }); // 데이터 렌더링 후 오버레이 및 스크롤 힌트 체크
+};
+
+// 분배 내역 삭제
+window.deleteDistributionInput = async function(key) {
+  if (!confirm('정말로 이 항목을 삭제하시겠습니까?')) return;
+  
+  try {
+    await db.ref(`randomDrawLists/distributionInputs/${key}`).remove();
+    await loadDistributionInputs();
+  } catch (error) {
+    console.error('삭제 중 오류:', error);
+    alert('삭제 중 오류가 발생했습니다: ' + error.message);
+  }
+  requestAnimationFrame(() => { hideLoadingOverlay(); updateScrollHintVisibility(); }); // 데이터 렌더링 후 오버레이 및 스크롤 힌트 체크
+};
+
+// 신규 아이디 추가 모달 열기
+window.openAddIdModal = function() {
+  const modal = new bootstrap.Modal(document.getElementById('addIdModal'));
+  modal.show();
+};
+
+// 신규 아이디 추가
+window.addNewIdFromModal = async function() {
+  const input = document.getElementById('modalNewId');
+  const newId = input.value.trim();
+  if (!newId) {
+    alert('아이디를 입력하세요.');
+    return;
+  }
+  try {
+    const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
+    let data = snapshot.val();
+    if (!data || !data.participants) {
+      alert('기본 아이디 목록을 불러오는데 실패했습니다.');
+      return;
+    }
+    let ids = data.participants;
+    if (ids.includes(newId)) {
+      alert('이미 존재하는 아이디입니다.');
+      return;
+    }
+    ids.push(newId);
+    await db.ref('randomDrawLists/defaultIds').update({ participants: ids });
+    await window.initializeAndDisplayDefaultIds();
+    await window.refreshDistributionNicknameOptions();
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addIdModal'));
+    modal.hide();
+    input.value = '';
+  } catch (error) {
+    console.error('아이디 추가 오류:', error);
+    alert('아이디 추가 중 오류가 발생했습니다.');
+  }
+  requestAnimationFrame(() => { hideLoadingOverlay(); updateScrollHintVisibility(); }); // 데이터 렌더링 후 오버레이 및 스크롤 힌트 체크
+};
+
+window.onload = () => {
+  checkAdmin();
+  displayTotalScores();
+  displayWeeklyScores();
+  displayCustomScores();
+  loadBosses();
+  // 랜덤 뽑기 관련 초기화
+  window.initializeAndDisplayDefaultIds();
+  window.loadDistributionInputs();
+  window.refreshDistributionNicknameOptions();
+};
+
+function openDutySelectorModal() {
+  renderDutySelectorUI();
+  var modal = new bootstrap.Modal(document.getElementById('dutySelectorModal'));
+  modal.show();
+}
+
+function renderDutySelectorUI() {
+  // 닉네임 불러오기
+  const nickname = localStorage.getItem('nickname');
+  if (!nickname) {
+    document.getElementById('dutySelectorBody').innerHTML = `
+      <div class="alert alert-warning mb-3">닉네임을 먼저 저장해 주세요.</div>
+    `;
+    return;
+  }
+  document.getElementById('dutySelectorBody').innerHTML = `
+    <div id="dutySelector_adminArea" style="display:none;">
+      <div class="card p-3 mb-3 bg-dark">
+        <h5 class="mb-2" style="color:#4a90e2;">날짜 오픈 설정</h5>
+        <div class="row g-2 mb-2">
+          <div class="col-md-4"><input type="date" id="dutySelector_startDate" class="form-control"></div>
+          <div class="col-md-4"><input type="date" id="dutySelector_endDate" class="form-control"></div>
+          <div class="col-md-4"><input type="number" id="dutySelector_maxParticipants" class="form-control" placeholder="일일 최대 인원"></div>
+        </div>
+        <div class="d-flex gap-2 mb-2">
+          <button class="btn btn-primary btn-sm" onclick="dutySelector_openDates()">오픈하기</button>
+          <button class="btn btn-info btn-sm" onclick="dutySelector_resetDuty()">당번 초기화</button>
+          <button class="btn btn-danger btn-sm" onclick="dutySelector_resetAll()">전체 초기화</button>
+        </div>
+        <hr class="my-2" style="border-color: rgba(255,255,255,0.1);">
+        <h5 class="mb-2" style="color:#4a90e2;">전체 시간 설정</h5>
+        <div class="d-flex gap-2">
+          <input type="time" id="dutySelector_globalTime" class="form-control" placeholder="전체 시간 입력">
+          <button class="btn btn-primary btn-sm" onclick="dutySelector_saveGlobalTime()">전체 시간 저장</button>
+        </div>
+      </div>
+    </div>
+    <div id="dutySelector_dateList"></div>
+  `;
+  // 관리자 UI 노출 여부
+  const isAdmin = localStorage.getItem('admin') === 'dogfightda@gmail.com';
+  document.getElementById('dutySelector_adminArea').style.display = isAdmin ? 'block' : 'none';
+  // 설정 데이터 불러오기 및 날짜 리스트 표시
+  dutySelector_loadSettingsAndDisplayDates();
+}
+
+function dutySelector_saveNickname() {
+  const nickname = document.getElementById('dutySelector_nickname').value.trim();
+  if (!nickname) {
+    alert('닉네임을 입력해주세요.');
+    return;
+  }
+  localStorage.setItem('duty_selector_nickname', nickname);
+  alert('닉네임이 저장되었습니다.');
+}
+
+// 파이어베이스 연동 및 날짜별 카드, 참가/취소, 시간 입력, 초기화 등 모든 기능 구현
+function dutySelector_loadSettingsAndDisplayDates() {
+  // settings 불러오기
+  firebase.database().ref('duty_selector/settings').on('value', (snapshot) => {
+    const data = snapshot.val();
+    const isAdmin = localStorage.getItem('admin') === 'dogfightda@gmail.com';
+    // 관리자라면 입력값 세팅
+    if (isAdmin && data) {
+      document.getElementById('dutySelector_startDate').value = new Date(data.startDate).toISOString().split('T')[0];
+      document.getElementById('dutySelector_endDate').value = new Date(data.endDate).toISOString().split('T')[0];
+      document.getElementById('dutySelector_maxParticipants').value = data.maxParticipants;
+    }
+    // 날짜별 카드 표시
+    if (data) {
+      dutySelector_displayDates(data);
+    } else {
+      document.getElementById('dutySelector_dateList').innerHTML = '';
+      if (isAdmin) {
+        document.getElementById('dutySelector_startDate').value = '';
+        document.getElementById('dutySelector_endDate').value = '';
+        document.getElementById('dutySelector_maxParticipants').value = '';
+      }
+    }
+  });
+}
+
+function dutySelector_openDates() {
+  const start = new Date(document.getElementById('dutySelector_startDate').value);
+  const end = new Date(document.getElementById('dutySelector_endDate').value);
+  const max = document.getElementById('dutySelector_maxParticipants').value;
+  if (!start || !end || !max) {
+    alert('모든 필드를 입력해주세요.');
+    return;
+  }
+  const dutyData = {
+    startDate: start.getTime(),
+    endDate: end.getTime(),
+    maxParticipants: parseInt(max),
+    createdAt: Date.now()
+  };
+  firebase.database().ref('duty_selector/settings').set(dutyData)
+    .then(() => {
+      alert('날짜 오픈 설정이 저장되었습니다.');
+    })
+    .catch((error) => {
+      alert('저장 중 오류가 발생했습니다.');
+    });
+}
+
+function dutySelector_resetDuty() {
+  if (!confirm('정말로 모든 당번 정보를 초기화하시겠습니까?')) return;
+  firebase.database().ref('duty_selector/participants').remove()
+    .then(() => {
+      alert('모든 당번 정보가 초기화되었습니다.');
+    })
+    .catch((error) => {
+      alert('초기화 중 오류가 발생했습니다.');
+    });
+}
+
+function dutySelector_resetAll() {
+  if (!confirm('정말로 모든 설정과 당번 정보를 초기화하시겠습니까?\n날짜 설정과 당번 정보가 모두 삭제됩니다.')) return;
+  firebase.database().ref('duty_selector').remove()
+    .then(() => {
+      document.getElementById('dutySelector_startDate').value = '';
+      document.getElementById('dutySelector_endDate').value = '';
+      document.getElementById('dutySelector_maxParticipants').value = '';
+      document.getElementById('dutySelector_dateList').innerHTML = '';
+      alert('모든 설정과 당번 정보가 초기화되었습니다.');
+    })
+    .catch((error) => {
+      alert('초기화 중 오류가 발생했습니다.');
+    });
+}
+
+function dutySelector_saveGlobalTime() {
+  const globalTime = document.getElementById('dutySelector_globalTime').value;
+  if (!globalTime) {
+    alert('시간을 입력해주세요.');
+    return;
+  }
+  firebase.database().ref('duty_selector/settings').once('value')
+    .then((snapshot) => {
+      const settings = snapshot.val();
+      if (!settings) {
+        alert('먼저 날짜를 설정해주세요.');
+        return;
+      }
+      const startDate = new Date(settings.startDate);
+      const endDate = new Date(settings.endDate);
+      const promises = [];
+      for (let dt = new Date(startDate); dt <= endDate; dt.setDate(dt.getDate() + 1)) {
+        const dateKey = dt.toISOString().split('T')[0];
+        promises.push(firebase.database().ref(`duty_selector/times/${dateKey}`).set(globalTime));
+      }
+      Promise.all(promises)
+        .then(() => {
+          alert('모든 날짜의 시간이 설정되었습니다.');
+          dutySelector_loadSettingsAndDisplayDates();
+        })
+        .catch((error) => {
+          alert('시간 설정 중 오류가 발생했습니다.');
+        });
+    });
+}
+
+function dutySelector_displayDates(dutyData) {
+  const dateList = document.getElementById('dutySelector_dateList');
+  dateList.innerHTML = '';
+  const currentNickname = localStorage.getItem('nickname');
+  const isAdmin = localStorage.getItem('admin') === 'dogfightda@gmail.com';
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  for (let dt = new Date(dutyData.startDate); dt <= new Date(dutyData.endDate); dt.setDate(dt.getDate() + 1)) {
+    const day = new Date(dt);
+    const card = document.createElement('div');
+    card.className = 'date-card';
+    const isToday = day.getFullYear() === today.getFullYear() && day.getMonth() === today.getMonth() && day.getDate() === today.getDate();
+    if (isToday) card.classList.add('today');
+    const dateText = day.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+    const dateKey = day.toISOString().split('T')[0];
+    firebase.database().ref(`duty_selector/times/${dateKey}`).once('value').then((timeSnap) => {
+      const savedTime = timeSnap.val();
+      let timeHtml = '';
+      if (isAdmin) {
+        timeHtml = `<div class="d-flex gap-2 align-items-center"><input type="time" id="dutySelector_timeInput_${dateKey}" class="form-control my-2" placeholder="시간 입력"${savedTime ? ` value="${savedTime}"` : ''}><button class="btn btn-primary btn-sm" onclick="dutySelector_saveTime('${dateKey}')">시간 저장</button></div>`;
+      } else if (savedTime) {
+        timeHtml = `<span class="badge bg-info text-dark ms-2">당번 타임 ${savedTime}</span>`;
+      }
+      card.innerHTML = `<div class="d-flex align-items-center"><div class="date-title mb-0">${dateText}</div>${timeHtml}</div><div class="buttons-container"></div>`;
+      // 참가자 정보 표시
+      const participantsRef = firebase.database().ref(`duty_selector/participants/${dateKey}`);
+      participantsRef.on('value', (snapshot) => {
+        const participants = snapshot.val() || {};
+        const buttonsContainer = card.querySelector('.buttons-container') || document.createElement('div');
+        buttonsContainer.className = 'buttons-container d-flex flex-wrap gap-1 mt-2';
+        buttonsContainer.innerHTML = '';
+        for (let i = 0; i < dutyData.maxParticipants; i++) {
+          const buttonGroup = document.createElement('div');
+          buttonGroup.className = 'd-flex align-items-center';
+          buttonGroup.style.width = 'auto';
+          const btn = document.createElement('button');
+          btn.className = 'btn duty-button btn-sm';
+          if (participants[i]) {
+            btn.innerHTML = participants[i].nickname;
+            btn.disabled = true;
+            buttonGroup.appendChild(btn);
+            if (isAdmin || participants[i].nickname === currentNickname) {
+              const cancelX = document.createElement('span');
+              cancelX.className = 'duty-cancel-x';
+              cancelX.innerHTML = '&times;';
+              cancelX.title = '취소';
+              cancelX.onclick = function() {
+                if (confirm('정말로 취소하시겠습니까?')) {
+                  participantsRef.child(i).remove()
+                    .catch(() => alert('취소 중 오류가 발생했습니다.'));
+                }
+              };
+              buttonGroup.appendChild(cancelX);
+            }
+          } else {
+            btn.innerHTML = '+';
+            btn.onclick = function() {
+              const nickname = localStorage.getItem('nickname');
+              if (!nickname) {
+                alert('닉네임을 입력하세요.');
+                return;
+              }
+              participantsRef.once('value')
+                .then((snapshot) => {
+                  const currentParticipants = snapshot.val() || {};
+                  for (const key in currentParticipants) {
+                    if (currentParticipants[key].nickname === nickname) {
+                      alert('이미 다른 날짜에 등록된 닉네임입니다.');
+                      return;
+                    }
+                  }
+                  firebase.database().ref('duty_selector/participants').once('value')
+                    .then((allSnapshot) => {
+                      const allParticipants = allSnapshot.val() || {};
+                      for (const date in allParticipants) {
+                        for (const key in allParticipants[date]) {
+                          if (allParticipants[date][key].nickname === nickname) {
+                            alert('이미 다른 날짜에 등록된 닉네임입니다.');
+                            return;
+                          }
+                        }
+                      }
+                      if (currentParticipants[i]) {
+                        alert('이미 다른 사용자가 선택했습니다.');
+                        return;
+                      }
+                      const participantData = {
+                        nickname: nickname,
+                        timestamp: Date.now()
+                      };
+                      participantsRef.child(i).set(participantData)
+                        .then(() => {
+                          btn.innerHTML = nickname;
+                          btn.disabled = true;
+                          if (isAdmin || nickname === currentNickname) {
+                            const cancelX = document.createElement('span');
+                            cancelX.className = 'duty-cancel-x';
+                            cancelX.innerHTML = '&times;';
+                            cancelX.title = '취소';
+                            cancelX.onclick = function() {
+                              if (confirm('정말로 취소하시겠습니까?')) {
+                                participantsRef.child(i).remove()
+                                  .catch(() => alert('취소 중 오류가 발생했습니다.'));
+                              }
+                            };
+                            buttonGroup.appendChild(cancelX);
+                          }
+                        })
+                        .catch((error) => {
+                          alert('저장 중 오류가 발생했습니다.');
+                        });
+                    });
+                });
+            };
+            buttonGroup.appendChild(btn);
+          }
+          buttonsContainer.appendChild(buttonGroup);
+        }
+        if (!card.querySelector('.buttons-container')) {
+          card.appendChild(buttonsContainer);
+        }
+      });
+      dateList.appendChild(card);
+    });
+  }
+  requestAnimationFrame(() => { hideLoadingOverlay(); updateScrollHintVisibility(); }); // 데이터 렌더링 후 오버레이 및 스크롤 힌트 체크
+}
+
+function dutySelector_saveTime(dateKey) {
+  const timeInput = document.getElementById('dutySelector_timeInput_' + dateKey);
+  const time = timeInput.value;
+  if (!time) {
+    alert('시간을 입력해주세요.');
+    return;
+  }
+  firebase.database().ref(`duty_selector/times/${dateKey}`).set(time)
+    .then(() => { alert('시간이 저장되었습니다.'); })
+    .catch((error) => { alert('저장 중 오류가 발생했습니다.'); });
+}
+
+function openFundStatusModal() {
+  const modal = new bootstrap.Modal(document.getElementById('fundStatusModal'));
+  // 관리자 여부에 따라 입력 폼 표시
+  const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+  var inputForm = document.getElementById('fundStatusInputForm');
+  if (inputForm && inputForm.style) inputForm.style.display = isAdmin ? 'block' : 'none';
+  var actionCol = document.getElementById('fundActionColumn');
+  if (actionCol && actionCol.style) actionCol.style.display = isAdmin ? '' : 'none';
+  var resetBtn = document.getElementById('fundResetButton');
+  if (resetBtn && resetBtn.style) resetBtn.style.display = isAdmin ? 'inline-block' : 'none';
+  loadFundStatusTable();
+  modal.show();
+  setTimeout(updateScrollHintVisibility, 200);
+}
+
+function loadFundStatusTable() {
+  db.ref('fundStatus/records').once('value', (snap) => {
+    const records = snap.val() || {};
+    const sorted = Object.entries(records).sort((a, b) => a[1].timestamp - b[1].timestamp);
+    let balance = 0;
+    const rows = sorted.map(([key, data]) => {
+      let amount = parseInt(data.amount) || 0;
+      if (data.type === '증가') {
+        balance += amount;
+      } else {
+        balance -= amount;
+      }
+      return `<tr>
+        <td>${data.content || ''}</td>
+        <td>${amount.toLocaleString()}잼</td>
+        <td>${data.type}</td>
+        <td>${balance.toLocaleString()}잼</td>
+        <td>${data.note || ''}</td>
+        ${localStorage.getItem("admin") === "dogfightda@gmail.com" ? `<td><button class='btn btn-link p-0' title='삭제' onclick='deleteFundStatus("${key}")'><i class="fas fa-xmark text-danger"></i></button></td>` : ''}
+      </tr>`;
+    }).join('');
+    document.getElementById('fundStatusTable').innerHTML = rows || `<tr><td colspan="6" class="text-center">내역이 없습니다.</td></tr>`;
+    requestAnimationFrame(() => { hideLoadingOverlay(); updateScrollHintVisibility(); }); // 데이터 렌더링 후 오버레이 및 스크롤 힌트 체크
+  });
+}
+
+function saveFundStatus() {
+  const content = document.getElementById('fundContent').value.trim();
+  const amount = parseInt(document.getElementById('fundAmount').value);
+  const type = document.getElementById('fundType').value;
+  const note = document.getElementById('fundNote').value.trim();
+  if (!content || isNaN(amount) || amount <= 0) {
+    alert('내용과 금액을 올바르게 입력하세요.');
+    return;
+  }
+  const newRecord = {
+    content,
+    amount,
+    type,
+    note,
+    timestamp: Date.now()
+  };
+  db.ref('fundStatus/records').push(newRecord).then(() => {
+    document.getElementById('fundContent').value = '';
+    document.getElementById('fundAmount').value = '';
+    document.getElementById('fundType').value = '증가';
+    document.getElementById('fundNote').value = '';
+    loadFundStatusTable();
+  });
+}
+
+function deleteFundStatus(key) {
+  if (!confirm('정말로 삭제하시겠습니까?')) return;
+  db.ref('fundStatus/records/' + key).remove().then(() => {
+    loadFundStatusTable();
+  });
+}
+
+// 자금현황 CSV 다운로드
+function downloadFundStatusCSV() {
+  db.ref('fundStatus/records').once('value', (snap) => {
+    const records = snap.val() || {};
+    const sorted = Object.entries(records).sort((a, b) => a[1].timestamp - b[1].timestamp);
+    let balance = 0;
+    let csvContent = '\ufeff내용,금액(잼),증감,잔액(잼),비고\n';
+    sorted.forEach(([_, data]) => {
+      let amount = parseInt(data.amount) || 0;
+      if (data.type === '증가') {
+        balance += amount;
+      } else {
+        balance -= amount;
+      }
+      // 쉼표, 따옴표 처리 및 단위 제거
+      const content = data.content ? `"${data.content.replace(/"/g, '""')}"` : '';
+      const type = data.type;
+      const note = data.note ? `"${data.note.replace(/"/g, '""')}"` : '';
+      csvContent += `${content},${amount},${type},${balance},${note}\n`;
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8-sig' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `자금현황_${y}${m}${d}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+}
+
+// 자금현황 전체 초기화 (관리자만)
+function resetFundStatus() {
+  if (!confirm('정말로 모든 자금현황 내역을 삭제하시겠습니까?')) return;
+  db.ref('fundStatus/records').remove().then(() => {
+    loadFundStatusTable();
+    alert('전체 초기화가 완료되었습니다.');
+  });
+}
+
+// 드로어 메뉴 열기/닫기
+function openDrawerMenu() {
+  document.getElementById('drawerMenu').classList.add('open');
+  document.getElementById('drawerMenuOverlay').style.display = 'block';
+  // 관리자/로그아웃 버튼 표시 제어
+  const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+  document.getElementById('adminButtonDrawer').style.display = isAdmin ? 'none' : 'block';
+  document.getElementById('authInfoDrawer').style.display = isAdmin ? 'block' : 'none';
+  // 상세수정 버튼 표시
+  const detailBtn = document.getElementById('detailEditBtnDrawer');
+  if(detailBtn) detailBtn.style.display = isAdmin ? 'inline-block' : 'none';
+}
+
+function closeDrawerMenu() {
+  document.getElementById('drawerMenu').classList.remove('open');
+  document.getElementById('drawerMenuOverlay').style.display = 'none';
+}
+
+function updateScrollHintVisibility() {
+  document.querySelectorAll('.table-responsive').forEach(function(wrapper) {
+    var hint = wrapper.previousElementSibling;
+    if (hint && hint.classList.contains('scroll-hint')) {
+      // 실제로 스크롤 이동이 가능한지 체크
+      const canScroll = wrapper.scrollWidth > wrapper.clientWidth + 1;
+      let moved = false;
+      if (canScroll) {
+        const prev = wrapper.scrollLeft;
+        wrapper.scrollLeft = 1;
+        moved = wrapper.scrollLeft === 1;
+        wrapper.scrollLeft = prev;
+      }
+      if (canScroll && moved) {
+        hint.style.display = 'block';
+      } else {
+        hint.style.display = 'none';
+      }
+    }
+  });
+}
+</script>
+
+<script>
+function downloadCSV() {
+  db.ref("bosses").once("value", (snap) => {
+    const data = snap.val();
+    // 1. 보스별 참여자 목록 시트
+    let bossRows = [["보스ID","보스오픈시간","닉네임","점수"]];
+    const sortedBossIds = Object.keys(data).sort((a, b) => data[b].timestamp - data[a].timestamp);
+    for (const bossId of sortedBossIds) {
+      const boss = data[bossId];
+      const openTime = boss.timestamp ? new Date(boss.timestamp).toLocaleString("ko-KR") : "";
+      if (boss.participants) {
+        const sortedParticipants = Object.entries(boss.participants).sort((a, b) => a[0].localeCompare(b[0]));
+        for (const [nick, info] of sortedParticipants) {
+          const score = info.score || 0;
+          bossRows.push([bossId, openTime, nick, score]);
+        }
+      } else {
+        bossRows.push([bossId, openTime, "", ""]);
+      }
+    }
+    // 2. 닉네임별 누적 점수 시트
+    let scoreMap = {};
+    for (const bossId in data) {
+      const boss = data[bossId];
+      if (boss.participants) {
+        for (const nick in boss.participants) {
+          const score = boss.participants[nick].score || 0;
+          scoreMap[nick] = (scoreMap[nick] || 0) + score;
+        }
+      }
+    }
+    let scoreRows = [["닉네임", "누적점수"]];
+    Object.entries(scoreMap).sort((a,b)=>b[1]-a[1]).forEach(([nick, score]) => {
+      scoreRows.push([nick, score]);
+    });
+    // 3. SheetJS로 엑셀 파일 생성
+    const wb = XLSX.utils.book_new();
+    const ws1 = XLSX.utils.aoa_to_sheet(bossRows);
+    const ws2 = XLSX.utils.aoa_to_sheet(scoreRows);
+    XLSX.utils.book_append_sheet(wb, ws1, "보스별참여자");
+    XLSX.utils.book_append_sheet(wb, ws2, "닉네임별누적점수");
+    XLSX.writeFile(wb, "보스참여자_및_누적점수.xlsx");
+  });
+}
+</script>
+
+<script>
+// 닉네임 입력 시 실시간으로 공백 제거
+window.addEventListener('DOMContentLoaded', function() {
+  var nicknameInput = document.getElementById("nickname");
+  if(nicknameInput) {
+    nicknameInput.addEventListener("input", function(e) {
+      this.value = this.value.replace(/\s/g, "");
+    });
+    var saved = localStorage.getItem("nickname");
+    if(saved) nicknameInput.value = saved;
+  }
+});
+</script>
+
+<script>
+// 상세수정 모달용 함수들
+function addMissingData_modal() {
+  const bossId = document.getElementById("missingBossId_modal").value;
+  const timeStr = document.getElementById("missingBossTime_modal").value;
+  const nick = document.getElementById("missingNick_modal").value;
+  const score = parseInt(document.getElementById("missingScore_modal").value) || 0;
+  const timestamp = new Date(timeStr).getTime();
+  if (!bossId || !nick || !timestamp) return alert("모든 값 입력 필요");
+  db.ref("bosses/" + bossId).update({ open:true, timestamp:timestamp });
+  db.ref("bosses/" + bossId + "/participants/" + nick).set({ score:score })
+    .then(() => { alert("누락 데이터 추가 완료"); loadBossList_modal(); });
+}
+function loadBossList_modal() {
+  db.ref("bosses").once("value", snap => {
+    const data = snap.val();
+    const bossSelect = document.getElementById("bossSelect_modal");
+    bossSelect.innerHTML = "<option value=''>보스 선택</option>";
+    for (const bossId in data) {
+      bossSelect.innerHTML += `<option value="${bossId}">${bossId}</option>`;
+    }
+  });
+  // 테이블 초기화
+  document.getElementById("participantTable_modal").innerHTML = "";
+  document.getElementById("editNick_modal").value = "";
+  document.getElementById("editScore_modal").value = "";
+  document.getElementById("newNick_modal").value = "";
+  document.getElementById("addNick_modal").value = "";
+  document.getElementById("addScore_modal").value = "";
+  document.getElementById("newBossId_modal").value = "";
+}
+function loadParticipantsTable_modal() {
+  const bossId = document.getElementById("bossSelect_modal").value;
+  const table = document.getElementById("participantTable_modal");
+  table.innerHTML = "";
+  if (!bossId) return;
+  db.ref("bosses/" + bossId + "/participants").once("value", snap => {
+    const participants = snap.val();
+    for (const nick in participants) {
+      const score = participants[nick].score || 0;
+      table.innerHTML += `<tr>
+        <td>${nick}</td>
+        <td>${score}</td>
+        <td><button class="btn btn-outline-primary btn-table" onclick="selectParticipant_modal(this, '${bossId}', '${nick}', ${score})">선택</button></td>
+      </tr>`;
+    }
+  });
+}
+function selectParticipant_modal(btn, bossId, nick, score) {
+  document.getElementById("editNick_modal").value = nick;
+  document.getElementById("editScore_modal").value = score;
+  document.querySelectorAll("#participantTable_modal tr").forEach(row => row.classList.remove("selected-row"));
+  btn.parentNode.parentNode.classList.add("selected-row");
+}
+function updateParticipantScore_modal() {
+  const bossId = document.getElementById("bossSelect_modal").value;
+  const nick = document.getElementById("editNick_modal").value;
+  const newScore = parseInt(document.getElementById("editScore_modal").value) || 0;
+  if (!bossId || !nick) return alert("보스, 닉네임 선택 필요");
+  db.ref("bosses/" + bossId + "/participants/" + nick).update({ score:newScore })
+    .then(() => {
+      alert("점수 수정 완료");
+      loadParticipantsTable_modal();
+    });
+}
+function changeParticipantNick_modal() {
+  const bossId = document.getElementById("bossSelect_modal").value;
+  const oldNick = document.getElementById("editNick_modal").value;
+  const newNick = document.getElementById("newNick_modal").value;
+  if (!bossId || !oldNick || !newNick) return alert("모든 값 입력 필요");
+  db.ref("bosses/" + bossId + "/participants/" + oldNick).once("value", snap => {
+    const data = snap.val();
+    if (data) {
+      db.ref("bosses/" + bossId + "/participants/" + newNick).set(data);
+      db.ref("bosses/" + bossId + "/participants/" + oldNick).remove()
+        .then(() => {
+          alert("닉네임 변경 완료");
+          loadParticipantsTable_modal();
+        });
+    } else alert("기존 닉네임 데이터 없음");
+  });
+}
+function changeBossId_modal() {
+  const oldBossId = document.getElementById("bossSelect_modal").value;
+  const newBossId = document.getElementById("newBossId_modal").value;
+  if (!oldBossId) return alert("보스를 먼저 선택해주세요.");
+  if (!newBossId) return alert("새 보스 ID를 입력해주세요.");
+  db.ref("bosses/" + newBossId).once("value", snap => {
+    if (snap.exists()) {
+      alert("이미 존재하는 보스 ID입니다. 다른 ID를 입력하세요.");
+    } else {
+      db.ref("bosses/" + oldBossId).once("value", snap => {
+        const data = snap.val();
+        if (data) {
+          db.ref("bosses/" + newBossId).set(data);
+          db.ref("bosses/" + oldBossId).remove()
+            .then(() => {
+              alert("보스 ID 변경 완료");
+              loadBossList_modal();
+              document.getElementById("newBossId_modal").value = "";
+              document.getElementById("bossSelect_modal").value = newBossId;
+              loadParticipantsTable_modal();
+            });
+        } else alert("기존 보스 데이터 없음");
+      });
+    }
+  });
+}
+function addParticipantToBoss_modal() {
+  const bossId = document.getElementById("bossSelect_modal").value;
+  const nick = document.getElementById("addNick_modal").value.trim();
+  const score = parseInt(document.getElementById("addScore_modal").value) || 0;
+  if (!bossId) return alert("보스를 먼저 선택하세요.");
+  if (!nick) return alert("닉네임을 입력하세요.");
+  db.ref("bosses/" + bossId + "/participants/" + nick).set({ score })
+    .then(() => {
+      alert("참여자 추가 완료");
+      document.getElementById("addNick_modal").value = "";
+      document.getElementById("addScore_modal").value = "";
+      loadParticipantsTable_modal();
+    });
+}
+// 모달 오픈 시 데이터 새로고침
+const detailEditModal = document.getElementById('detailEditModal');
+detailEditModal.addEventListener('show.bs.modal', function () {
+  loadBossList_modal();
+  // 입력값 초기화
+  document.getElementById("missingBossId_modal").value = "";
+  document.getElementById("missingBossTime_modal").value = "";
+  document.getElementById("missingNick_modal").value = "";
+  document.getElementById("missingScore_modal").value = "";
+});
+</script>
+
+<script>
+// CSV 다운로드 함수 추가
+function downloadDistributionCSV() {
+  db.ref('randomDrawLists/distributionInputs').once('value', (snap) => {
+    const inputs = snap.val() || {};
+    
+    // BOM 추가 및 CSV 헤더
+    let csvContent = '\ufeff날짜,닉네임,아이템\n';
+    
+    // 데이터 정렬 및 CSV 행 추가
+    Object.entries(inputs)
+      .sort((a, b) => b[1].timestamp - a[1].timestamp)
+      .forEach(([_, data]) => {
+        // CSV 형식에 맞게 데이터 처리 (쉼표가 있는 경우 따옴표로 감싸기)
+        const date = data.date || '';
+        const nickname = data.nickname ? `"${data.nickname.replace(/"/g, '""')}"` : '';
+        const item = data.item ? `"${data.item.replace(/"/g, '""')}"` : '';
+        
+        csvContent += `${date},${nickname},${item}\n`;
+      });
+    
+    // CSV 파일 다운로드 (UTF-8 with BOM)
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8-sig' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `분배내역_${new Date().toLocaleDateString()}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+  requestAnimationFrame(() => { hideLoadingOverlay(); updateScrollHintVisibility(); }); // 데이터 렌더링 후 오버레이 및 스크롤 힌트 체크
+}
+</script>
+
+<!-- 로딩 오버레이 -->
+<div id="loadingOverlay" style="position:fixed;z-index:3000;top:0;left:0;width:100vw;height:100vh;background:rgba(20,22,30,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.3s;">
+  <div class="spinner-border text-primary" style="width:4rem;height:4rem;" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <div style="color:#fff;font-size:1.2rem;font-weight:700;margin-top:1.5rem;letter-spacing:0.05em;">로딩중...</div>
+</div>
+
+<script>
+// 로딩 오버레이 제어
+function hideLoadingOverlay() {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; }, 350);
+  }
+}
+
+// 데이터 로딩 완료 시점에 hideLoadingOverlay() 호출
+// 주요 데이터 로딩 함수들 마지막에 아래 코드 추가
+let mainDataLoaded = false;
+function tryHideLoadingOverlay() {
+  if (mainDataLoaded) hideLoadingOverlay();
+}
+
+// 예시: 모든 주요 데이터가 로드된 후 mainDataLoaded = true; tryHideLoadingOverlay(); 호출
+window.addEventListener('DOMContentLoaded', function() {
+  // 기존 데이터 로딩 함수들 내부에서 마지막에 아래 코드 추가
+  Promise.all([
+    window.initializeAndDisplayDefaultIds?.(),
+    window.loadDistributionInputs?.(),
+    window.refreshDistributionNicknameOptions?.(),
+    // 기타 주요 데이터 로딩 함수들 필요시 추가
+  ]).then(() => {
+    mainDataLoaded = true;
+    tryHideLoadingOverlay();
+  }).catch(() => {
+    mainDataLoaded = true;
+    tryHideLoadingOverlay();
+  });
+});
+</script>
+</body>
+</html>
