@@ -1865,14 +1865,61 @@
       display: block;
     }
     .table-responsive {
+      width: 100%;
       overflow-x: auto !important;
     }
     .table-responsive table {
       min-width: 600px;
+      width: auto !important;
     }
     @media (max-width: 600px) {
       .table-responsive table {
         min-width: 400px;
+      }
+    }
+    .random-draw-modal .table-responsive {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      margin-left: -16px;
+    }
+    @media (max-width: 600px) {
+      .random-draw-modal .modal-body,
+      .random-draw-modal .card-body {
+        padding: 0.2rem !important;
+      }
+    }
+
+    /* 자금현황 표 그림자 완전 제거 */
+    #fundStatusModal .table,
+    #fundStatusModal .table-responsive,
+    #fundStatusModal .table-scroll-shadow,
+    #fundStatusModal table,
+    #fundStatusModal th,
+    #fundStatusModal td,
+    .table-dark,
+    .table-hover {
+      box-shadow: none !important;
+    }
+
+    /* 자금현황 표 우측 그림자(섀도우) 완전 제거 */
+    .table-scroll-shadow {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      #baseIdList .d-flex.flex-sm-row.flex-column {
+        flex-direction: row !important;
+        align-items: center !important;
+      }
+    }
+
+    #fundStatusModal th {
+      text-align: center !important;
+    }
+
+    @media (max-width: 600px) {
+      #fundStatusModal th {
+        color: #fff !important;
       }
     }
   </style>
@@ -2205,7 +2252,7 @@
                 <th id="fundActionColumn" style="width: 20px; display:none;">작업</th>
               </tr>
             </thead>
-            <tbody id="fundStatusTable"></tbody>
+            <tbody id="fundStatusTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -3617,16 +3664,16 @@ function loadFundStatusTable() {
         balance -= amount;
       }
       return `<tr>
-        <td>${data.content || ''}</td>
-        <td>${amount.toLocaleString()}잼</td>
-        <td>${data.type}</td>
-        <td>${balance.toLocaleString()}잼</td>
-        <td>${data.note || ''}</td>
-        ${localStorage.getItem("admin") === "dogfightda@gmail.com" ? `<td><button class='btn btn-link p-0' title='삭제' onclick='deleteFundStatus("${key}")'><i class="fas fa-xmark text-danger"></i></button></td>` : ''}
+        <td style='text-align:center'>${data.content || ''}</td>
+        <td style='text-align:center'>${amount.toLocaleString()}잼</td>
+        <td style='text-align:center'>${data.type}</td>
+        <td style='text-align:center'>${balance.toLocaleString()}잼</td>
+        <td style='text-align:center'>${data.note || ''}</td>
+        ${localStorage.getItem("admin") === "dogfightda@gmail.com" ? `<td style='text-align:center'><button class='btn btn-link p-0' title='삭제' onclick='deleteFundStatus(\"${key}\")'><i class="fas fa-xmark text-danger"></i></button></td>` : ''}
       </tr>`;
     }).join('');
-    document.getElementById('fundStatusTable').innerHTML = rows || `<tr><td colspan="6" class="text-center">내역이 없습니다.</td></tr>`;
-    requestAnimationFrame(() => { hideLoadingOverlay(); updateScrollHintVisibility(); }); // 데이터 렌더링 후 오버레이 및 스크롤 힌트 체크
+    document.getElementById('fundStatusTableBody').innerHTML = rows || `<tr><td colspan="6" class="text-center">내역이 없습니다.</td></tr>`;
+    requestAnimationFrame(() => { hideLoadingOverlay(); updateScrollHintVisibility(); });
   });
 }
 
