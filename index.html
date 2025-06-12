@@ -1413,8 +1413,9 @@
     #dutySelectorModal .btn,
     #dutySelectorModal button {
       white-space: nowrap !important;
-      min-width: 90px;
+      min-width: 90px !important;
       max-width: 100%;
+      max-height: 30px !important;
       overflow: hidden;
       text-overflow: ellipsis;
       height: min-content;
@@ -1987,12 +1988,12 @@
     </div>
     <ul class="drawer-menu-list">
       <li><button class="drawer-menu-btn" onclick="window.open('https://dogfightda.github.io/boss_cut/', '_blank')" style= "margin-top: 10px;">리젠 타이머 Web</button></li>
-      <li><button class="drawer-menu-btn" onclick="openFundStatusModal();closeDrawerMenu();">자금현황</button></li>
-      <li><button class="drawer-menu-btn" onclick="openRandomDraw();closeDrawerMenu();">랜덤뽑기</button></li>
-      <li><button class="drawer-menu-btn" onclick="openDutySelectorModal();closeDrawerMenu();">당번신청</button></li>
-      <li><button id="detailEditBtnDrawer" class="drawer-menu-btn" style="display:none;" data-bs-toggle="modal" data-bs-target="#detailEditModal" onclick="closeDrawerMenu();">상세수정</button></li>
+      <li><button class="drawer-menu-btn" onclick="openFundStatusModal();closeDrawerMenu();">길드 자금 현황</button></li>
+      <li><button class="drawer-menu-btn" onclick="openRandomDraw();closeDrawerMenu();">랜덤 뽑기 & 분배 내역</button></li>
+      <li><button class="drawer-menu-btn" onclick="openDutySelectorModal();closeDrawerMenu();">당번 신청</button></li>
+      <li><button id="detailEditBtnDrawer" class="drawer-menu-btn" style="display:none;" data-bs-toggle="modal" data-bs-target="#detailEditModal" onclick="closeDrawerMenu();">상세 수정</button></li>
       <li><button class="drawer-menu-btn" onclick="window.open('https://dogfightda.github.io/hit2_ys/', '_blank')">연성 예측기</button></li>
-      <li><button class="drawer-menu-btn" onclick="window.open('https://dogfightda.github.io/hit2/', '_blank')">캐릭터 검색</button></li>
+      <li><button class="drawer-menu-btn" onclick="window.open('https://dogfightda.github.io/hit2/', '_blank')">캐릭터 검색기</button></li>
       <li><button id="adminButtonDrawer" class="drawer-menu-btn" onclick="setAdmin();closeDrawerMenu();">관리자 로그인</button></li>
       <li><button id="authInfoDrawer" class="drawer-menu-btn" style="display:none;" onclick="logout();closeDrawerMenu();">로그아웃</button></li>
       <li>
