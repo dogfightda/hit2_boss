@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <title>대장길드 참여자 체크 Ver 2.6</title>
+  <title>대장길드 참여자 체크 Ver 2.7</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.1.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1629,12 +1629,35 @@
         margin-bottom: 0.7rem !important;
       }
     }
+
+    /* 랜덤뽑기 모달 분배내역 표 모바일 가로 스크롤 및 한줄 처리 */
+    @media (max-width: 600px) {
+      .random-draw-modal .table-responsive {
+        overflow-x: auto;
+        min-width: 100vw;
+      }
+      .random-draw-modal table {
+        min-width: 600px;
+        font-size: 0.95em;
+      }
+      .random-draw-modal th, .random-draw-modal td {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 120px;
+        vertical-align: middle;
+        padding: 0.4rem 0.5rem !important;
+      }
+      .random-draw-modal td:first-child, .random-draw-modal th:first-child {
+        max-width: 180px;
+      }
+    }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-    <h1 class="h3 mb-0">대장길드 참여자 체크 Ver 2.6</h1>
+    <h1 class="h3 mb-0">대장길드 참여자 체크 Ver 2.7</h1>
     <div class="ms-auto">
       <button id="fundStatusButton" class="btn btn-outline-primary btn-sm me-2" onclick="openFundStatusModal()">자금현황</button>
       <button id="randomButton" class="btn btn-outline-primary btn-sm" onclick="openRandomDraw()">랜덤뽑기</button>
@@ -1943,7 +1966,7 @@
                 <th>내용</th>
                 <th style="width: 120px;">금액</th>
                 <th style="width: 70px;">증감</th>
-                <th style="width: 120px;">잔액</th>
+                <th style="width: 120px;">잔액(잼)</th>
                 <th>비고</th>
                 <th id="fundActionColumn" style="width: 20px; display:none;">작업</th>
               </tr>
@@ -2072,7 +2095,8 @@ function setAdmin() {
     localStorage.setItem("admin", email);
     Utils.showSuccess("관리자 인증이 완료되었습니다.");
     checkAdmin();
-    location.reload();
+    // 새로고침 없이 UI 갱신
+    checkAdmin();
   } else {
     Utils.showError("관리자 인증에 실패했습니다. 이메일과 비밀번호를 다시 확인해주세요.");
   }
@@ -2081,7 +2105,8 @@ function setAdmin() {
 function logout() {
   localStorage.removeItem("admin");
   Utils.showSuccess("로그아웃이 완료되었습니다.");
-  location.reload();
+  // 새로고침 없이 UI 갱신
+  checkAdmin();
 }
 
 function isAdmin() {
@@ -2120,7 +2145,10 @@ function openBoss() {
     .then(() => {
       Utils.hideLoading();
       Utils.showSuccess("보스가 성공적으로 오픈되었습니다.");
-      location.reload();
+      // 실시간 반영이므로 별도 새로고침 불필요
+      document.getElementById("bossId").value = "";
+      document.getElementById("bossScore").value = "";
+      document.getElementById("bossTime").value = "";
     })
     .catch((error) => {
       Utils.hideLoading();
@@ -2138,7 +2166,7 @@ function participate(bossId){
     db.ref(`bosses/${bossId}/participants/${nickname}`).set({score})
       .then(() => {
         Utils.showSuccess("보스 참여가 완료되었습니다.");
-        location.reload();
+        // 실시간 반영이므로 별도 새로고침 불필요
       })
       .catch((error) => {
         Utils.showError("참여 처리 중 오류가 발생했습니다.");
@@ -2155,7 +2183,7 @@ function cancelParticipation(bossId){
     db.ref(`bosses/${bossId}/participants/${nickname}`).remove()
       .then(() => {
         Utils.showSuccess("보스 참여가 취소되었습니다.");
-        location.reload();
+        // 실시간 반영이므로 별도 새로고침 불필요
       })
       .catch((error) => {
         Utils.showError("참여 취소 중 오류가 발생했습니다.");
@@ -2169,7 +2197,7 @@ function deleteBoss(bossId){
     db.ref("bosses/"+bossId).remove()
       .then(() => {
         Utils.showSuccess("보스가 삭제되었습니다.");
-        location.reload();
+        // 실시간 반영이므로 별도 새로고침 불필요
       })
       .catch((error) => {
         Utils.showError("보스 삭제 중 오류가 발생했습니다.");
@@ -2183,7 +2211,7 @@ function deleteParticipant(bossId,nick){
     db.ref(`bosses/${bossId}/participants/${nick}`).remove()
       .then(() => {
         Utils.showSuccess("참여자가 삭제되었습니다.");
-        location.reload();
+        // 실시간 반영이므로 별도 새로고침 불필요
       })
       .catch((error) => {
         Utils.showError("참여자 삭제 중 오류가 발생했습니다.");
@@ -2201,7 +2229,7 @@ function confirmAndDeleteAll(){
     db.ref("bosses").remove()
       .then(() => {
         Utils.showSuccess("모든 데이터가 삭제되었습니다.");
-        location.reload();
+        // 실시간 반영이므로 별도 새로고침 불필요
       })
       .catch((error) => {
         Utils.showError("데이터 삭제 중 오류가 발생했습니다.");
@@ -2787,19 +2815,16 @@ window.addAllBaseIdsToDrawList = async function() {
   }
 };
 
-// 분배 내역 로드
+window.distributionSortState = { key: 'date', asc: true };
 window.loadDistributionInputs = async function() {
   const inputList = document.getElementById('adminInputList');
   const actionColumn = document.getElementById('actionColumn');
   const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
-  
   try {
     const snapshot = await db.ref('randomDrawLists/distributionInputs').once('value');
     const inputs = snapshot.val() || {};
-    
     inputList.innerHTML = '';
     actionColumn.style.display = isAdmin ? 'table-cell' : 'none';
-    
     if (Object.keys(inputs).length === 0) {
       const tr = document.createElement('tr');
       tr.innerHTML = `
@@ -2810,34 +2835,74 @@ window.loadDistributionInputs = async function() {
       inputList.appendChild(tr);
       return;
     }
-
     // 닉네임 등장 횟수 집계
     const nicknameCount = {};
     Object.values(inputs).forEach(data => {
       nicknameCount[data.nickname] = (nicknameCount[data.nickname] || 0) + 1;
     });
-
-    Object.entries(inputs)
-      .sort((a, b) => b[1].timestamp - a[1].timestamp)
-      .forEach(([key, data]) => {
-        const isDuplicated = nicknameCount[data.nickname] > 1;
-        const tr = document.createElement('tr');
-        tr.className = 'distribution-row';
-        tr.innerHTML = `
-          <td class="text-center">${data.date}</td>
+    // 정렬
+    let entries = Object.entries(inputs);
+    const { key, asc } = window.distributionSortState;
+    entries.sort((a, b) => {
+      if (key === 'date') {
+        // 날짜 오름차순(기본)
+        return asc ? (a[1].date > b[1].date ? 1 : -1) : (a[1].date < b[1].date ? 1 : -1);
+      } else if (key === 'nickname') {
+        return asc ? (a[1].nickname > b[1].nickname ? 1 : -1) : (a[1].nickname < b[1].nickname ? 1 : -1);
+      }
+      return 0;
+    });
+    entries.forEach(([key, data]) => {
+      const isDuplicated = nicknameCount[data.nickname] > 1;
+      const tr = document.createElement('tr');
+      tr.className = 'distribution-row';
+      tr.innerHTML = `
+        <td class="text-center">${data.date}</td>
+        <td class="text-center">
+          ${data.nickname}
+          ${isDuplicated ? `<span class="ms-1" style="color: #ff4444; font-weight: 700;">(${nicknameCount[data.nickname]})</span>` : ''}
+        </td>
+        <td class="text-center">${data.item}</td>
+        ${isAdmin ? `
           <td class="text-center">
-            ${data.nickname}
-            ${isDuplicated ? `<span class="ms-1" style="color: #ff4444; font-weight: 700;">(${nicknameCount[data.nickname]})</span>` : ''}
+            <button class="btn btn-link p-0" title='삭제' onclick='deleteDistributionInput('${key}')'><i class="fas fa-xmark text-danger"></i></button>
           </td>
-          <td class="text-center">${data.item}</td>
-          ${isAdmin ? `
-            <td class="text-center">
-              <button class="btn btn-link p-0" title='삭제' onclick='deleteDistributionInput('${key}')'><i class="fas fa-xmark text-danger"></i></button>
-            </td>
-          ` : ''}
-        `;
-        inputList.appendChild(tr);
-      });
+        ` : ''}
+      `;
+      inputList.appendChild(tr);
+    });
+    // 컬럼명 클릭 이벤트 및 정렬 아이콘 표시
+    const ths = document.querySelectorAll('.random-draw-modal .table thead th');
+    ths.forEach(th => {
+      th.style.cursor = '';
+      th.innerHTML = th.textContent.replace(/[▲▼]/g, '');
+    });
+    // 날짜
+    const dateTh = ths[0];
+    dateTh.style.cursor = 'pointer';
+    dateTh.innerHTML = '날짜' + (window.distributionSortState.key === 'date' ? (window.distributionSortState.asc ? ' ▲' : ' ▼') : '');
+    dateTh.onclick = function() {
+      if (window.distributionSortState.key === 'date') {
+        window.distributionSortState.asc = !window.distributionSortState.asc;
+      } else {
+        window.distributionSortState.key = 'date';
+        window.distributionSortState.asc = true;
+      }
+      window.loadDistributionInputs();
+    };
+    // 닉네임
+    const nickTh = ths[1];
+    nickTh.style.cursor = 'pointer';
+    nickTh.innerHTML = '닉네임' + (window.distributionSortState.key === 'nickname' ? (window.distributionSortState.asc ? ' ▲' : ' ▼') : '');
+    nickTh.onclick = function() {
+      if (window.distributionSortState.key === 'nickname') {
+        window.distributionSortState.asc = !window.distributionSortState.asc;
+      } else {
+        window.distributionSortState.key = 'nickname';
+        window.distributionSortState.asc = true;
+      }
+      window.loadDistributionInputs();
+    };
   } catch (error) {
     console.error('데이터 로드 중 오류:', error);
     const tr = document.createElement('tr');
