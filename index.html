@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <title>대장길드 참여자 체크 Ver 2.8</title>
+  <title>대장길드 참여자 체크 Ver 2.9</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.1.3/dist/darkly/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1977,7 +1977,7 @@
 <div class="container">
   <div class="mb-4 d-flex align-items-center gap-2" style="position:relative;">
     <button id="menuOpenBtn" class="btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center menu-hamburger-btn" aria-label="메뉴 열기" onclick="openDrawerMenu()">&#9776;</button>
-    <h1 class="h3 mb-2 mb-md-0 ms-2" style="margin-bottom:0 !important;">대장길드 참여자 체크 Ver 2.8</h1>
+    <h1 class="h3 mb-2 mb-md-0 ms-2" style="margin-bottom:0 !important;">대장길드 참여자 체크 Ver 2.9</h1>
   </div>
   <!-- 드로어 메뉴 -->
   <div id="drawerMenuOverlay" class="drawer-menu-overlay" onclick="closeDrawerMenu()"></div>
@@ -1996,6 +1996,9 @@
       <li><button class="drawer-menu-btn" onclick="window.open('https://dogfightda.github.io/hit2/', '_blank')">캐릭터 검색기</button></li>
       <li><button id="adminButtonDrawer" class="drawer-menu-btn" onclick="setAdmin();closeDrawerMenu();">관리자 로그인</button></li>
       <li><button id="authInfoDrawer" class="drawer-menu-btn" style="display:none;" onclick="logout();closeDrawerMenu();">로그아웃</button></li>
+      <li>
+        <button class="drawer-menu-btn" onclick="openGuideModal();closeDrawerMenu();">설명서</button>
+      </li>
       <li>
         <button class="drawer-menu-apk-btn" onclick="downloadApk()">
           <span class="apk-icon">&#128190;</span>
@@ -2114,6 +2117,10 @@
         <!-- 추첨 영역 -->
         <div class="card bg-dark mb-4">
           <div class="card-body">
+            <div class="row g-2 mb-3">
+              <div class="col"><input id="bulkNicknames_draw" class="form-control" placeholder="닉네임 (띄어쓰기로 구분)"></div>
+              <div class="col-auto"><button class="btn btn-success w-100" onclick="addBulkParticipantsToDrawList()">단체 추가</button></div>
+            </div>
             <div class="d-flex gap-3 align-items-center mb-3">
               <input type="number" id="drawCount" class="form-control" min="1" value="1" placeholder="뽑을 인원 수">
               <button class="btn btn-primary" onclick="drawRandom()">추첨하기</button>
@@ -2239,6 +2246,12 @@
               <div class="col"><input id="addScore_modal" class="form-control" type="number" placeholder="점수"></div>
               <div class="col-auto"><button class="btn btn-success w-100" onclick="addParticipantToBoss_modal()">참여자 추가</button></div>
             </div>
+            <hr/>
+            <div class="row g-2 mb-2">
+              <div class="col"><input id="bulkNicknames_modal" class="form-control" placeholder="닉네임 (띄어쓰기로 구분)"></div>
+              <div class="col"><input id="bulkScore_modal" class="form-control" type="number" placeholder="점수"></div>
+              <div class="col-auto"><button class="btn btn-success w-100" onclick="addBulkParticipants_modal()">단체 추가</button></div>
+            </div>
           </div>
         </div>
         <div class="card mb-4">
@@ -2311,6 +2324,269 @@
             </thead>
             <tbody id="fundStatusTableBody"></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 설명서 모달 -->
+<div class="modal fade" id="guideModal" tabindex="-1" aria-labelledby="guideModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="guideModalLabel">대장길드 참여자 체크 시스템 설명서</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="max-height:70vh; overflow-y:auto;">
+        <h5 class="mb-4">대장길드 참여자 체크 시스템 상세 설명서</h5>
+        
+        <h6 class="text-primary mb-3">1. 메인페이지 주요 기능</h6>
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <h6 class="text-light mb-3">1.1 점수 현황</h6>
+            <ul class="text-light">
+              <li class="mb-2"><b>누적 점수</b>
+                <ul>
+                  <li>전체 기간 동안의 참여자별 총점과 참여율을 확인할 수 있습니다.</li>
+                  <li>참여율은 전체 보스 중 참여한 보스의 비율로 계산됩니다.</li>
+                  <li>예시: 총 100개의 보스 중 80개에 참여했다면 참여율은 80%입니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>주간 점수</b>
+                <ul>
+                  <li>최근 7일간의 참여자별 점수와 참여율을 확인할 수 있습니다.</li>
+                  <li>주간 점수는 매일 자정에 자동으로 초기화됩니다.</li>
+                  <li>주간 참여율은 최근 7일간의 보스 중 참여한 보스의 비율로 계산됩니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>기간별 점수</b>
+                <ul>
+                  <li>원하는 기간을 직접 설정하여 해당 기간의 점수와 참여율을 확인할 수 있습니다.</li>
+                  <li>시작일과 종료일을 선택하여 특정 기간의 데이터만 조회할 수 있습니다.</li>
+                  <li>기간별 데이터는 CSV로 다운로드하여 저장할 수 있습니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>정렬 기능</b>
+                <ul>
+                  <li>점수순 또는 참여율순으로 정렬하여 확인할 수 있습니다.</li>
+                  <li>오름차순/내림차순 정렬이 가능합니다.</li>
+                  <li>정렬된 데이터는 CSV로 다운로드할 수 있습니다.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <h6 class="text-light mb-3">1.2 닉네임 설정</h6>
+            <ul class="text-light">
+              <li class="mb-2"><b>닉네임 저장</b>
+                <ul>
+                  <li>메인페이지 상단의 닉네임 입력란에 자신의 닉네임을 입력하고 저장합니다.</li>
+                  <li>저장된 닉네임은 랜덤 뽑기, 당번 신청 등에서 자동으로 사용됩니다.</li>
+                  <li>닉네임은 브라우저에 저장되므로 다음 접속 시에도 유지됩니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>닉네임 변경</b>
+                <ul>
+                  <li>저장된 닉네임을 변경하려면 새로운 닉네임을 입력하고 저장합니다.</li>
+                  <li>닉네임 변경 시 이전 닉네임의 데이터는 유지됩니다.</li>
+                  <li>관리자는 상세 수정 메뉴에서 닉네임을 일괄 변경할 수 있습니다.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <h6 class="text-light mb-3">1.3 오픈된 보스</h6>
+            <ul class="text-light">
+              <li class="mb-2"><b>보스 목록</b>
+                <ul>
+                  <li>현재 진행 중인 보스 목록과 각 보스별 참여 현황을 확인할 수 있습니다.</li>
+                  <li>보스 오픈 시간으로부터 6시간 동안 참여 선택이 가능합니다.</li>
+                  <li>참여 가능 시간이 지난 보스는 자동으로 목록에서 제외됩니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>참여 현황</b>
+                <ul>
+                  <li>각 보스별 참여자 수와 참여율을 확인할 수 있습니다.</li>
+                  <li>참여자 목록을 클릭하면 상세 참여자 정보를 볼 수 있습니다.</li>
+                  <li>참여 현황은 실시간으로 업데이트됩니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>CSV 다운로드</b>
+                <ul>
+                  <li>현재 보스 목록을 엑셀 파일로 저장할 수 있습니다.</li>
+                  <li>파일명에 날짜가 자동으로 포함됩니다.</li>
+                  <li>CSV 파일에는 보스 ID, 오픈 시간, 참여자 수, 참여율이 포함됩니다.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <h6 class="text-primary mb-3">2. 메뉴별 상세 기능</h6>
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <h6 class="text-light mb-3">2.1 랜덤 뽑기 & 분배 내역</h6>
+            <ul class="text-light">
+              <li class="mb-2"><b>기본 아이디 목록</b>
+                <ul>
+                  <li>자주 사용하는 아이디들을 미리 등록해두고 관리할 수 있습니다.</li>
+                  <li>전체추가 버튼으로 한 번에 모든 아이디를 뽑기 대상에 추가할 수 있습니다.</li>
+                  <li>기본 아이디 목록은 관리자만 수정할 수 있습니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>뽑기 대상 관리</b>
+                <ul>
+                  <li>기본 아이디 목록에서 개별 선택하여 추가할 수 있습니다.</li>
+                  <li>단체 추가 기능으로 여러 닉네임을 한 번에 추가할 수 있습니다.</li>
+                  <li>예시: "총괄 수달 젤리" 입력 시 → "총괄대장", "수달이", "곰돌이젤리" 등이 자동으로 매칭됩니다.</li>
+                  <li>뽑기 대상 목록은 페이지 새로고침 시 초기화됩니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>추첨 기능</b>
+                <ul>
+                  <li>뽑을 인원 수를 입력하고 추첨하기 버튼을 클릭합니다.</li>
+                  <li>추첨 결과는 화면에 즉시 표시되며, 분배 내역에 자동으로 기록됩니다.</li>
+                  <li>추첨 결과는 CSV로 다운로드할 수 있습니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>분배 내역 관리</b>
+                <ul>
+                  <li>날짜, 닉네임, 아이템 정보를 확인할 수 있습니다.</li>
+                  <li>CSV 다운로드로 전체 분배 내역을 엑셀 파일로 저장할 수 있습니다.</li>
+                  <li>분배 내역은 Firebase에 저장되므로 영구적으로 보관됩니다.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <h6 class="text-light mb-3">2.2 당번 신청</h6>
+            <ul class="text-light">
+              <li class="mb-2"><b>날짜별 당번 관리</b>
+                <ul>
+                  <li>원하는 날짜를 선택하여 당번을 신청할 수 있습니다.</li>
+                  <li>일일 최대 인원 수를 설정하여 관리할 수 있습니다.</li>
+                  <li>당번 신청은 선착순으로 처리됩니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>전체 시간 설정</b>
+                <ul>
+                  <li>모든 날짜에 공통으로 적용될 시간을 한 번에 설정할 수 있습니다.</li>
+                  <li>개별 날짜의 시간도 수정 가능합니다.</li>
+                  <li>시간 설정은 24시간 형식으로 입력합니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>관리자 기능</b>
+                <ul>
+                  <li>당번 초기화: 특정 날짜의 당번 정보를 초기화할 수 있습니다.</li>
+                  <li>전체 초기화: 모든 당번 정보를 초기화할 수 있습니다.</li>
+                  <li>당번 정보는 Firebase에 저장되므로 영구적으로 보관됩니다.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <h6 class="text-light mb-3">2.3 길드 자금 현황</h6>
+            <ul class="text-light">
+              <li class="mb-2"><b>자금 내역 관리</b>
+                <ul>
+                  <li>내용, 금액, 증감 구분, 비고를 입력하여 자금 내역을 기록합니다.</li>
+                  <li>잔액이 자동으로 계산되어 표시됩니다.</li>
+                  <li>자금 내역은 Firebase에 저장되므로 영구적으로 보관됩니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>CSV 다운로드</b>
+                <ul>
+                  <li>전체 자금 내역을 엑셀 파일로 저장할 수 있습니다.</li>
+                  <li>날짜별로 파일명이 자동 생성됩니다.</li>
+                  <li>CSV 파일에는 날짜, 내용, 금액, 증감 구분, 비고, 잔액이 포함됩니다.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <h6 class="text-primary mb-3">3. 관리자 전용 기능</h6>
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <h6 class="text-light mb-3">3.1 상세 수정</h6>
+            <ul class="text-light">
+              <li class="mb-2"><b>누락 데이터 추가</b>
+                <ul>
+                  <li>보스 ID, 시간, 닉네임, 점수를 입력하여 누락된 데이터를 추가할 수 있습니다.</li>
+                  <li>추가된 데이터는 즉시 점수 현황에 반영됩니다.</li>
+                  <li>누락 데이터 추가는 관리자만 가능합니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>참여자 관리</b>
+                <ul>
+                  <li>보스별 참여자 목록 확인 및 수정</li>
+                  <li>점수 수정, 닉네임 변경, 참여자 추가 기능</li>
+                  <li>단체 추가 기능으로 여러 참여자를 한 번에 추가</li>
+                  <li>참여자 관리 기능은 관리자만 사용 가능합니다.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>보스 ID 관리</b>
+                <ul>
+                  <li>보스 ID 변경 기능</li>
+                  <li>기존 데이터는 새로운 ID로 이전됩니다.</li>
+                  <li>보스 ID 관리는 관리자만 가능합니다.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <h6 class="text-primary mb-3">4. 주의사항 및 팁</h6>
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <ul class="text-light">
+              <li class="mb-2"><b>데이터 저장</b>
+                <ul>
+                  <li>모든 데이터는 Firebase에 실시간으로 저장됩니다.</li>
+                  <li>인터넷 연결이 불안정할 경우 데이터 저장이 지연될 수 있습니다.</li>
+                  <li>중요한 데이터는 주기적으로 CSV로 다운로드하여 백업하세요.</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>닉네임 매칭</b>
+                <ul>
+                  <li>두 글자 이상의 부분 문자열로 실제 아이디를 찾을 수 있습니다.</li>
+                  <li>띄어쓰기로 구분하여 여러 닉네임을 한 번에 입력할 수 있습니다.</li>
+                  <li>예시: "총괄 수달 젤리" → "총괄대장", "수달이", "곰돌이젤리" 매칭</li>
+                </ul>
+              </li>
+              <li class="mb-2"><b>데이터 백업</b>
+                <ul>
+                  <li>중요한 데이터는 주기적으로 CSV로 다운로드하여 백업하세요.</li>
+                  <li>뽑기/참여자 목록은 페이지 새로고침 시 초기화될 수 있습니다.</li>
+                  <li>분배 내역, 당번 정보, 자금 내역은 Firebase에 저장되므로 영구적으로 보관됩니다.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <h6 class="text-primary mb-3">5. 문의 및 피드백</h6>
+        <div class="card bg-dark mb-4">
+          <div class="card-body">
+            <ul class="text-light">
+              <li class="mb-2">시스템 사용 중 오류가 발생하거나 개선이 필요한 부분이 있다면 관리자에게 직접 전달해 주세요.</li>
+              <li class="mb-2">새로운 기능 제안이나 사용자 경험 개선 의견도 환영합니다.</li>
+              <li class="mb-2">문의사항은 관리자에게 직접 전달해 주세요.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -3851,6 +4127,116 @@ function downloadApk() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+// 단체 추가 함수
+function addBulkParticipants_modal() {
+  const bossId = document.getElementById("bossSelect_modal").value;
+  const nicknames = document.getElementById("bulkNicknames_modal").value.trim();
+  const score = parseInt(document.getElementById("bulkScore_modal").value) || 0;
+  
+  if (!bossId) return alert("보스를 먼저 선택하세요.");
+  if (!nicknames) return alert("닉네임을 입력하세요.");
+  
+  // 입력한 닉네임 문자열을 띄어쓰기로 분리
+  const partialNames = nicknames.split(/\s+/);
+  
+  // Firebase에서 기본 아이디 목록 가져오기
+  db.ref("randomDrawLists/defaultIds").once("value", async (snap) => {
+    const defaultIds = snap.val()?.participants || [];
+    
+    // 각 부분 문자열에 대해 풀네임 찾기
+    const fullNames = partialNames.map(partial => {
+      const found = defaultIds.find(id => 
+        id.toLowerCase().includes(partial.toLowerCase())
+      );
+      return found || null;
+    }).filter(Boolean);
+    
+    if (fullNames.length === 0) {
+      alert("일치하는 풀네임이 없습니다.");
+      return;
+    }
+    
+    // 한 번에 저장
+    const updates = {};
+    fullNames.forEach(nick => {
+      updates[`bosses/${bossId}/participants/${nick}`] = { score };
+    });
+    
+    db.ref().update(updates)
+      .then(() => {
+        alert(`${fullNames.length}명의 참여자가 추가되었습니다.`);
+        document.getElementById("bulkNicknames_modal").value = "";
+        document.getElementById("bulkScore_modal").value = "";
+        loadParticipantsTable_modal();
+      })
+      .catch(error => {
+        alert("저장 중 오류가 발생했습니다.");
+        console.error(error);
+      });
+  });
+}
+
+// 단체 추가 함수 (랜덤뽑기용)
+function addBulkParticipantsToDrawList() {
+  const nicknames = document.getElementById("bulkNicknames_draw").value.trim();
+  if (!nicknames) return alert("닉네임을 입력하세요.");
+  
+  // 입력한 닉네임 문자열을 띄어쓰기로 분리 (여러 개의 띄어쓰기도 처리)
+  const partialNames = nicknames.split(/\s+/).filter(Boolean);
+  
+  // Firebase에서 기본 아이디 목록 가져오기
+  db.ref("randomDrawLists/defaultIds").once("value", async (snap) => {
+    const defaultIds = snap.val()?.participants || [];
+    
+    // 각 부분 문자열에 대해 풀네임 찾기 (두 글자 이상이면 매칭)
+    const fullNames = partialNames.map(partial => {
+      if (partial.length < 2) return null; // 두 글자 미만이면 무시
+      const found = defaultIds.find(id => 
+        id.toLowerCase().includes(partial.toLowerCase())
+      );
+      return found || null;
+    }).filter(Boolean);
+    
+    if (fullNames.length === 0) {
+      alert("일치하는 풀네임이 없습니다.");
+      return;
+    }
+    
+    // 뽑기 대상 목록에 추가
+    const drawIdList = document.getElementById("drawIdList");
+    const current = Array.from(drawIdList.children).map(li => li.querySelector("span").textContent);
+    
+    let addedCount = 0;
+    fullNames.forEach(nick => {
+      if (!current.includes(nick)) {
+        const li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between align-items-center";
+        li.innerHTML = `
+          <span class="text-light">${nick}</span>
+          <button class="btn btn-outline-light btn-sm" onclick="removeDrawId(this)">제거</button>
+        `;
+        drawIdList.appendChild(li);
+        addedCount++;
+      }
+    });
+    
+    // 이름순 정렬
+    const items = Array.from(drawIdList.children);
+    items.sort((a, b) => a.querySelector("span").textContent.localeCompare(b.querySelector("span").textContent));
+    items.forEach(item => drawIdList.appendChild(item));
+    
+    document.getElementById("bulkNicknames_draw").value = "";
+    
+    // 추가된 인원 수 안내
+    alert(`${addedCount}명이 뽑기 대상 목록에 추가되었습니다.`);
+  });
+}
+
+function openGuideModal() {
+  var modal = new bootstrap.Modal(document.getElementById('guideModal'));
+  modal.show();
 }
 </script>
 
