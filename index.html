@@ -266,11 +266,30 @@
       border-radius: 10px;
     }
 
+    .participant-list ul {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.3em 1.2em;
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+    @media (min-width: 461px) {
+      .participant-list ul {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (min-width: 801px) {
+      .participant-list ul {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
     .participant-list li {
-      font-size: 0.864rem;
-      font-weight: 600;
-      margin-bottom: 0.56rem;
+      display: block;
+      margin-bottom: 0.7rem;
       color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 500;
+      line-height: 1.4;
     }
 
     .participant-list .text-muted {
