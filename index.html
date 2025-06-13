@@ -2991,6 +2991,7 @@ function loadBosses(){
   db.ref("bosses").on("value",snap=>{
     const data=snap.val(),now=Date.now(),cont=document.getElementById("bossList");cont.innerHTML="";
     const sortedIds = Object.keys(data).sort((a,b)=>data[b].timestamp - data[a].timestamp);
+    const myNick = localStorage.getItem("nickname");
     for(const id of sortedIds){
       const boss=data[id],open=boss.timestamp,within=(now-open)<21600000;
       let html = `<div class="card boss-card mb-3">
@@ -3010,7 +3011,8 @@ function loadBosses(){
       if (boss.participants) {
         const sortedNicks = Object.entries(boss.participants).sort((a, b) => a[0].localeCompare(b[0], 'ko'));
         for (const [nick, info] of sortedNicks) {
-          html += `<li>${nick} <span class="text-muted">(${info.score}점)</span> ${isAdmin()?`<span class="admin-delete" onclick="deleteParticipant('${id}','${nick}')">[X]</span>`:""}</li>`;
+          const isMe = nick === myNick;
+          html += `<li><span${isMe ? ' style="color:#FFD700;font-weight:700;"' : ''}>${nick}</span> <span class="text-muted">(${info.score}점)</span> ${isAdmin()?`<span class="admin-delete" onclick="deleteParticipant('${id}','${nick}')">[X]</span>`:""}</li>`;
         }
       } else html += "<li class='text-muted'>참여자 없음</li>";
       html += "</ul></div></div>";
