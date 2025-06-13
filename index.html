@@ -3313,10 +3313,16 @@ function resetShowAll() {
 }
 
 function openRandomDraw() {
-  const modal = new bootstrap.Modal(document.getElementById('randomDrawModal'));
-  loadDistributionInputs();
+  var modal = new bootstrap.Modal(document.getElementById('randomDrawModal'));
   modal.show();
-  setTimeout(updateScrollHintVisibility, 200);
+  // 관리자라면 분배내역 입력 폼 보이기
+  const isAdmin = localStorage.getItem("admin") === "dogfightda@gmail.com";
+  const inputForm = document.getElementById('distributionInputForm');
+  if (inputForm) inputForm.style.display = isAdmin ? 'block' : 'none';
+  // 분배 닉네임 옵션 갱신
+  window.refreshDistributionNicknameOptions && window.refreshDistributionNicknameOptions();
+  // 분배내역 테이블 갱신
+  window.loadDistributionInputs && window.loadDistributionInputs();
 }
 
 function drawRandom() {
