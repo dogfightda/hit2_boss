@@ -2010,6 +2010,68 @@
       background: #222a33;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
+
+    .fade-in-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s cubic-bezier(.4,0,.2,1), transform 0.6s cubic-bezier(.4,0,.2,1);
+    }
+    .fade-in-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .modal.fade .modal-dialog {
+      transform: scale(0.96);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    .modal.fade.show .modal-dialog {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .btn, .drawer-menu-btn, .drawer-menu-apk-btn {
+      transition: transform 0.18s cubic-bezier(.4,0,.2,1), box-shadow 0.18s cubic-bezier(.4,0,.2,1);
+    }
+    .btn:hover, .drawer-menu-btn:hover, .drawer-menu-apk-btn:hover {
+      transform: scale(1.045);
+      box-shadow: 0 4px 16px rgba(79,139,253,0.18);
+      z-index: 2;
+    }
+    .btn:active, .drawer-menu-btn:active, .drawer-menu-apk-btn:active {
+      transform: scale(0.98);
+    }
+
+    .scroll-to-top {
+      transition: opacity 0.4s, transform 0.4s;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    .scroll-to-top.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .drawer-menu {
+      transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+      transform: translateX(-110%);
+    }
+    .drawer-menu.open {
+      transform: translateX(0);
+    }
+
+    .fade-row {
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .fade-row.visible {
+      opacity: 1;
+    }
+    .fade-row.removing {
+      opacity: 0 !important;
+      transition: opacity 0.3s;
+    }
   </style>
 </head>
 <body>
@@ -3891,7 +3953,7 @@ function dutySelector_displayDates(dutyData) {
       const savedTime = timeSnap.val();
       let timeHtml = '';
       if (isAdmin) {
-        timeHtml = `<div class="d-flex gap-2 align-items-center"><input type="time" id="dutySelector_timeInput_${dateKey}" class="form-control my-2" placeholder="시간 입력"${savedTime ? ` value="${savedTime}"` : ''}><button class="btn btn-primary btn-sm" onclick="dutySelector_saveTime('${dateKey}')">시간 저장</button></div>`;
+        timeHtml = `<div class="d-flex gap-2 align-items-center"><input type="time" id="dutySelector_timeInput_${dateKey}" class="form-control my-2" placeholder="시간 입력"${savedTime ? ` value="${savedTime}"` : ''}><button class="btn btn-primary btn-sm" onclick="dutySelector_saveTime('${dateKey}')">저장</button></div>`;
       } else if (savedTime) {
         timeHtml = `<span class="badge bg-info text-dark ms-2">당번 타임 ${savedTime}</span>`;
       }
@@ -4585,6 +4647,19 @@ function scrollToTop() {
     behavior: 'smooth'
   });
 }
+</script>
+
+<script>
+function handleFadeInUp() {
+  document.querySelectorAll('.fade-in-up').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight - 40) {
+      el.classList.add('visible');
+    }
+  });
+}
+window.addEventListener('scroll', handleFadeInUp);
+window.addEventListener('DOMContentLoaded', handleFadeInUp);
 </script>
 </body>
 </html>
