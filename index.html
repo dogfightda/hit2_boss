@@ -2111,7 +2111,7 @@
   <div class="card p-4">
     <div class="d-flex justify-content-between align-items-center mb-2">
       <h5 class="section-title mb-0">오픈된 보스</h5>
-      <button class="btn btn-outline-primary btn-sm" onclick="downloadDistributionCSV()" style="display: flex; align-items: center; justify-content: center; height: 100%; line-height: 1.2;">CSV 다운로드</button>
+      <button class="btn btn-outline-primary btn-sm" onclick="downloadCSV()" style="display: flex; align-items: center; justify-content: center; height: 100%; line-height: 1.2;">CSV 다운로드</button>
     </div>
     <div class="boss-info-notice" style="margin:0.2rem 0 0.5rem 0; color:#1976d2; font-size:0.98rem; font-weight:500;">
       안내 : 보스 지정된 오픈시간 후 6시간 동안 참여 선택이 가능합니다.
@@ -4303,28 +4303,35 @@ function downloadCSV() {
         bossRows.push([bossId, openTime, "", ""]);
       }
     }
-    // 2. 닉네임별 누적 점수 시트
+    // 2. 닉네임별 누적 점수, 건수, 참여율 시트
     let scoreMap = {};
+    let participation = {};
+    const totalBosses = Object.keys(data).length;
     for (const bossId in data) {
       const boss = data[bossId];
       if (boss.participants) {
         for (const nick in boss.participants) {
           const score = boss.participants[nick].score || 0;
           scoreMap[nick] = (scoreMap[nick] || 0) + score;
+          participation[nick] = (participation[nick] || 0) + 1;
         }
       }
     }
-    let scoreRows = [["닉네임", "누적점수"]];
-    Object.entries(scoreMap).sort((a,b)=>b[1]-a[1]).forEach(([nick, score]) => {
-      scoreRows.push([nick, score]);
-    });
+    let scoreRows = [["닉네임", "누적점수", "건수", "참여율(%)"]];
+    Object.entries(scoreMap)
+      .sort((a,b)=>b[1]-a[1])
+      .forEach(([nick, score]) => {
+        const count = participation[nick] || 0;
+        const rate = totalBosses > 0 ? ((count / totalBosses) * 100).toFixed(1) : "0.0";
+        scoreRows.push([nick, score, count, rate]);
+      });
     // 3. SheetJS로 엑셀 파일 생성
     const wb = XLSX.utils.book_new();
     const ws1 = XLSX.utils.aoa_to_sheet(bossRows);
     const ws2 = XLSX.utils.aoa_to_sheet(scoreRows);
     XLSX.utils.book_append_sheet(wb, ws1, "보스별참여자");
     XLSX.utils.book_append_sheet(wb, ws2, "닉네임별누적점수");
-    XLSX.writeFile(wb, "보스참여자_및_누적점수.xlsx");
+    XLSX.writeFile(wb, `참여자_점수_리스트_${new Date().toLocaleDateString()}.xlsx`);
   });
 }
 </script>
