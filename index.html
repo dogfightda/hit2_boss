@@ -1971,14 +1971,57 @@
       font-weight: 400;
       margin-top: 0.1em;
     }
+
+    /* 최상단 이동 버튼 스타일 */
+    .scroll-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background-color: #375a7f;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .scroll-to-top:hover {
+      background-color: #2b4764;
+      transform: translateY(-3px);
+    }
+
+    .scroll-to-top.show {
+      display: flex;
+    }
+
+    /* ... 기존 스타일 ... */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 1050;
+      background: #222a33;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="mb-4 d-flex align-items-center gap-2" style="position:relative;">
-    <button id="menuOpenBtn" class="btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center menu-hamburger-btn" aria-label="메뉴 열기" onclick="openDrawerMenu()">&#9776;</button>
-    <h1 class="h3 mb-2 mb-md-0 ms-2" style="margin-bottom:0 !important;">대장길드 참여자 체크 Ver 2.9</h1>
+  <div class="sticky-header">
+    <div class="mb-4 d-flex align-items-center gap-2" style="position:relative;">
+      <button id="menuOpenBtn" class="btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center menu-hamburger-btn" aria-label="메뉴 열기" onclick="openDrawerMenu()">&#9776;</button>
+      <h1 class="h3 mb-2 mb-md-0 ms-2" style="margin-bottom:0 !important;">대장길드 참여자 체크 Ver 2.9</h1>
+    </div>
   </div>
+  <!-- 최상단 이동 버튼 -->
+  <button class="scroll-to-top" onclick="scrollToTop()" title="최상단으로 이동">↑</button>
   <!-- 드로어 메뉴 -->
   <div id="drawerMenuOverlay" class="drawer-menu-overlay" onclick="closeDrawerMenu()"></div>
   <nav id="drawerMenu" class="drawer-menu">
@@ -4513,6 +4556,28 @@ window.addEventListener('DOMContentLoaded', function() {
     tryHideLoadingOverlay();
   });
 });
+</script>
+
+<script>
+// 스크롤 이벤트 처리
+window.addEventListener('scroll', function() {
+  const scrollBtn = document.querySelector('.scroll-to-top');
+  if (scrollBtn) {  // null 체크 추가
+    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+      scrollBtn.classList.add('show');
+    } else {
+      scrollBtn.classList.remove('show');
+    }
+  }
+});
+
+// 최상단으로 이동하는 함수
+function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
 </script>
 </body>
 </html>
