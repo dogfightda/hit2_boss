@@ -3513,24 +3513,6 @@ window.initializeAndDisplayDefaultIds = async function() {
     const snapshot = await db.ref('randomDrawLists/defaultIds').once('value');
     let data = snapshot.val();
     
-    // Firebase에 데이터가 없는 경우 초기 데이터 설정
-    if (!data) {
-      const initialData = {
-        name: '기본 아이디 목록',
-        participants: [
-          "채리대장", "총괄대장", "곰도리젤리", "수달대장", "가든대장",
-          "그냥대장", "내사랑정희", "리샤대장", "호구대장", "뽀빠이대장",
-          "진짜대장", "판다대장", "폭포대장", "화기대장", "기본원칙돌쇠대장",
-          "쭈니대장", "캇뚜대장", "열정대장", "예스대장", "츄하이대장",
-          "빠루대장", "입딜대장", "가챠대장", "내가대장", "향기대장"
-        ],
-        type: 'randomDraw',
-        createdAt: Date.now()
-      };
-      await db.ref('randomDrawLists/defaultIds').set(initialData);
-      data = initialData;
-    }
-
     baseIdList.innerHTML = '';
     if (!data.participants || data.participants.length === 0) {
       const li = document.createElement('li');
@@ -3549,13 +3531,13 @@ window.initializeAndDisplayDefaultIds = async function() {
           <span class="text-light flex-grow-1 text-truncate" style="min-width:0;max-width:180px;white-space:nowrap;overflow:hidden;">${id}</span>
           <div class="d-flex flex-sm-row flex-column gap-2 ms-auto" style="min-width:90px;max-width:180px;">
             <button class="btn btn-success btn-sm"
-              style="width:28px;height:28px;min-width:28px;min-height:28px;max-width:28px;max-height:28px;padding:0!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem!important;"
+              style="width:28px;height:20px;min-width:28px;min-height:20px;max-width:28px;max-height:20px;padding:0!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem!important;"
               onclick="addToDrawList('${id}')">
               <i class="fas fa-plus"></i>
             </button>
             ${isAdmin ? `
               <button class="btn btn-danger btn-sm"
-                style="width:28px;height:28px;min-width:28px;min-height:28px;max-width:28px;max-height:28px;padding:0!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem!important;"
+                style="width:28px;height:20px;min-width:28px;min-height:20px;max-width:28px;max-height:20px;padding:0!important;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem!important;"
                 onclick="removeBaseId('${id}')">
                 <i class="fas fa-trash"></i>
               </button>
